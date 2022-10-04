@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 02_process_population_data                                        #
+# File Name: 01c_process_population_data                                       #
 #                                                                              #
 # Purpose:   Load and format population data used in analyses.                 #
 # Steps:                                                                       # 
@@ -114,5 +114,5 @@ save(admin_3_population_dat, file = './tmp/admin_3_population_dat.RData')
 save(admin_2_population_dat, file = './tmp/admin_2_population_dat.RData')
 save(admin_1_population_dat, file = './tmp/admin_1_population_dat.RData')
 
-###############################################################################
-###############################################################################
+################################################################################
+################################################################################
