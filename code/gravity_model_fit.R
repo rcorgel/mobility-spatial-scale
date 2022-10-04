@@ -5,14 +5,12 @@
 # Clear environment
 rm(list = ls())
 
-# Set working directory
-setwd('/Users/rcorgel/Code/spatial-resolution/')
-
 # Load library and set environmental settings
 library(rstan)
 library(geosphere)
 library(reshape)
 library(ggmap)
+library(tidyverse)
 options(mc.cores=2)
 
 ################
@@ -20,10 +18,10 @@ options(mc.cores=2)
 ################
 
 # Load data
-load('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Documents/4. Learning/1. ScM/Thesis/gravity_mode_data.RData')
+load('./raw/gravity_mode_data.RData')
 
 # Set the model from stan
-model = stan_model('gravity_model.stan')
+model = stan_model('./code/gravity_model.stan')
 
 # Fit the model
 fit = sampling(model,
@@ -41,17 +39,24 @@ print(fit)
 # PREP DATA #
 #############
 
-# Load Namibia trips long
-load('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/asymmetry-project/tmp/NAM_trips_data_long.RData')
-# Load Namibia distric characteristics
-load('/Users/rcorgel/OneDrive/Projects/asymmetry-project/raw/NAM.ID.link.RData')
+# Load Sri Lanka mobility data
+load('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution/raw/sri_lanka_mobility_dat_clean.RData')
+
+# For now just look at November to January
+mobility_dat <- mobility_dat %>% filter(month == 2 | month != 3)
+
+
+
+
+# Load Sri Lanka population data (ADM 3)
+sri_lanka_pop <- read_csv('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution/raw/admin_3_population.csv')
 
 ## ADM 1 ##
 # Month
 adm1.trip.month <- trip.data.long %>%                                           # calculate number of trips between each origin/destination pair for each month/year
   group_by(start.adm1.code, end.adm1.code, m, y) %>%
-  mutate(adm1.single.trip.sum = sum(trip.count, na.rm = TRUE)) %>%
-  distinct(start.adm1.code, end.adm1.code, m, y, .keep_all=TRUE) 
+  dplyr::mutate(adm1.single.trip.sum = sum(trip.count, na.rm = TRUE)) %>%
+  dplyr::distinct(start.adm1.code, end.adm1.code, m, y, .keep_all=TRUE) 
 
 # Calculate average number of trips by month
 adm1.trip.month.avg <- adm1.trip.month %>%                                      # calculate average trip proportion each month between origin/destination
@@ -373,3 +378,5 @@ adm1$mse.from.adm2 <- sum((adm1$adm1.single.trip.avg - adm1$mod_trip.fit.from.ad
 # ADM2
 adm2$mse.adm2 <- sum((adm2$adm2.single.trip.avg - adm2$mod_trip.fit.adm2)^2) / nrow(adm2)
 adm2$mse.from.adm1 <- sum((adm2$adm2.single.trip.avg - adm2$mod_trip.fit.from.adm1)^2) / nrow(adm2)
+
+
