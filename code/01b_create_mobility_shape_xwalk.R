@@ -24,6 +24,7 @@ rm(list = ls())
 # Load libraries
 library(tidyverse)
 library(lubridate)
+library(sf)
 
 # Set the seed
 set.seed(12345)
@@ -40,10 +41,10 @@ load(file = './tmp/mobility_dat.RData')
 
 # Select only administrative unit variables
 mobility_dat_merge <- mobility_dat %>% 
-  group_by(admin_level_3_origin) %>% 
-  distinct(admin_level_3_origin, admin_level_2_origin, admin_level_1_origin, .keep_all = FALSE) %>%
-  filter(admin_level_3_origin != '[unknown]') %>% # remove unknowns
-  mutate(merge = admin_level_3_origin)            # rename to merge
+  group_by(adm_3_origin) %>% 
+  distinct(adm_3_origin, adm_2_origin, adm_1_origin, .keep_all = FALSE) %>%
+  filter(adm_3_origin != '[unknown]') %>% # remove unknowns
+  mutate(merge = adm_3_origin)            # rename to merge
 
 # Load shape files
 # Downloaded from: https://data.humdata.org/dataset/cod-ab-lka
@@ -89,31 +90,32 @@ merge_dat <- merge_dat[merge_dat$merge != 'Kothmale',]
 
 # Mobility data missing rows
 # Replace misspellings
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Ambagamuwa Korale'] <- 'Ambagamuwa'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Galle 4 Gravets'] <- 'Galle4Gravets'
+merge_dat$adm_3_origin[merge_dat$merge == 'Ambagamuwa Korale'] <- 'Ambagamuwa'
+merge_dat$adm_3_origin[merge_dat$merge == 'Galle 4 Gravets'] <- 'Galle4Gravets'
 
 # Single polygon broken into two in the shape file
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Kothmale East'] <- 'Kothmale'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Kothmale West'] <- 'Kothmale'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Nildandahinna'] <- 'Walapane'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Mathurata'] <- 'Hanguranketa'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Thalawakele'] <- 'Nuwara Eliya'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Norwood'] <- 'Ambagamuwa'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Wanduramba'] <- 'Baddegama'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Kalthota'] <- 'Balangoda'
+merge_dat$adm_3_origin[merge_dat$merge == 'Kothmale East'] <- 'Kothmale'
+merge_dat$adm_3_origin[merge_dat$merge == 'Kothmale West'] <- 'Kothmale'
+merge_dat$adm_3_origin[merge_dat$merge == 'Nildandahinna'] <- 'Walapane'
+merge_dat$adm_3_origin[merge_dat$merge == 'Mathurata'] <- 'Hanguranketa'
+merge_dat$adm_3_origin[merge_dat$merge == 'Thalawakele'] <- 'Nuwara Eliya'
+merge_dat$adm_3_origin[merge_dat$merge == 'Norwood'] <- 'Ambagamuwa'
+merge_dat$adm_3_origin[merge_dat$merge == 'Wanduramba'] <- 'Baddegama'
+merge_dat$adm_3_origin[merge_dat$merge == 'Kalthota'] <- 'Balangoda'
 
 # Single polygon broken into three in the shape file
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Rathgama'] <- 'Hikkaduwa'
-merge_dat$admin_level_3_origin[merge_dat$merge == 'Madampagama'] <- 'Hikkaduwa'
+merge_dat$adm_3_origin[merge_dat$merge == 'Rathgama'] <- 'Hikkaduwa'
+merge_dat$adm_3_origin[merge_dat$merge == 'Madampagama'] <- 'Hikkaduwa'
 
 # Select mobility data and shape file admin 3 variables and rename
 mobility_shape_xwalk <- merge_dat %>%
-  dplyr::select(c('admin_level_3_origin', 'ADM3_EN')) %>%
-  dplyr::rename('admin_level_3_mobile' = 'admin_level_3_origin',
-                'admin_level_3_shape' = 'ADM3_EN')
+  dplyr::select(c('adm_3_origin', 'ADM3_EN')) %>%
+  dplyr::rename('adm_3_mobility' = 'adm_3_origin',
+                'adm_3_shape' = 'ADM3_EN')
 
 # Save crosswalk
-write.csv(mobility_shape_xwalk, file = './tmp/mobility_shape_xwalk.csv')
+write.csv(mobility_shape_xwalk, file = './tmp/mobility_shape_xwalk.csv', 
+          row.names = FALSE)
 
 ################################################################################
 ################################################################################
