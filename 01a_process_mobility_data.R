@@ -27,7 +27,7 @@ library(reshape)
 set.seed(12345)
 
 # Set the directory
-setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution')
+setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
 
 ####################################
 # 2. LOAD AND FORMAT MOBILITY DATA #
