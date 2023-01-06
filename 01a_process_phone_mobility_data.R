@@ -1,11 +1,12 @@
 ################################################################################
-# File Name: 01a_process_mobility_data                                         #
+# File Name: 01a_process_phone_mobility_data                                   #
 #                                                                              #
-# Purpose:   Load and format mobility data used in analyses.                   #
+# Purpose:   Load and format phone mobility data used in analyses.             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Load and format mobility data                                  #
 #            3. Adjust for February/March mobility data issue                  #
+#            4. Aggregate data to administrative levels 1, 2, 3                #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -22,6 +23,7 @@ rm(list = ls())
 library(tidyverse)
 library(lubridate)
 library(reshape)
+library(assertr)
 
 # Set the seed
 set.seed(12345)
@@ -91,8 +93,10 @@ mar_mobility_dat <- mar_mobility_dat %>%
 # Combine data into one data set
 mobility_dat <- rbind(nov_mobility_dat, dec_mobility_dat, jan_mobility_dat, 
                       feb_mobility_dat, mar_mobility_dat)
+# Assert that all 5 months are in the data
+mobility_dat %>% assert(in_set(c(1, 2, 3, 11, 12)), month)
 
-# Merge on provinces (ADM 1)
+# Merge on provinces and codes (ADM 1)
 district_province_xwalk <- 
   read_csv('./raw/district_province_xwalk.csv')
 mobility_dat <- left_join(mobility_dat, district_province_xwalk, 
@@ -104,6 +108,8 @@ mobility_dat <- left_join(mobility_dat, district_province_xwalk,
 mobility_dat <- mobility_dat %>%
   dplyr::rename('adm_1_origin' = 'province.x',
          'adm_1_destination' = 'province.y',
+         'adm_1_origin_code' = 'province_code.x',
+         'adm_1_destination_code' = 'province_code.y',
          'adm_3_origin' = 'origin_area',
          'adm_3_destination' = 'destination_area',
          'adm_3_origin_code' = 'origin_area_code',
@@ -114,29 +120,25 @@ mobility_dat <- mobility_dat %>%
          'adm_2_destination_code' = 'admin_level_2_destination_code',
          'trips' = 'people') 
 
-# Replace missing data with unknown
-mobility_dat$adm_1_origin <- 
-  ifelse(is.na(mobility_dat$adm_1_origin), 
-         '[unknown]', mobility_dat$adm_1_origin)
-mobility_dat$adm_1_destination <- 
-  ifelse(is.na(mobility_dat$adm_1_destination), 
-         '[unknown]', mobility_dat$adm_1_destination)
-
 # Drop unknown destination and/or origin
 mobility_dat <- mobility_dat %>% 
-  filter(adm_1_origin != '[unknown]') %>% 
-  filter(adm_1_destination != '[unknown]') %>%
   filter(adm_3_origin != '[unknown]') %>% 
   filter(adm_3_destination != '[unknown]')
 
-# Save data
-save(mobility_dat, file = './tmp/mobility_dat.RData')
+# Assert admin variables are not missing
+mobility_dat %>% assert(not_na, 
+                        adm_1_origin, adm_1_destination, 
+                        adm_1_origin_code, adm_1_destination_code,
+                        adm_2_origin, adm_2_destination, 
+                        adm_2_origin_code, adm_2_destination_code,
+                        adm_3_origin, adm_3_destination, 
+                        adm_3_origin_code, adm_3_destination_code)
 
-# Save a version without February and March
-mobility_dat_nov_jan <- mobility_dat %>%
+# Save a version without February and March (due to data issue)
+phone_mobility_dat_nov_jan <- mobility_dat %>%
   filter(month != 2) %>%
   filter(month != 3)
-save(mobility_dat_nov_jan, file = './tmp/mobility_dat_nov_jan.RData')
+save(phone_mobility_dat_nov_jan, file = './tmp/phone_mobility_dat_nov_jan.RData')
 
 # Remove individual month mobility data data
 rm(list = c('nov_mobility_dat', 'dec_mobility_dat', 'jan_mobility_dat', 
@@ -165,9 +167,6 @@ rm(list = c('nov_mobility_dat', 'dec_mobility_dat', 'jan_mobility_dat',
 # the February and March averages. This ratio, serves as a multiplier on the 
 # daily trip counts for each route in February and March, respectively.
 
-# Load data 
-load('./tmp/mobility_dat.RData')
-
 # Calculate January, February, and March month average for all routes
 # Some months will have NA as the average if no trips occurred during that month
 mobility_dat <- mobility_dat %>% 
@@ -177,10 +176,12 @@ mobility_dat <- mobility_dat %>%
   group_by(adm_3_origin, adm_3_destination) %>%
   mutate(trips_month_avg_jan = trips_month_avg[month == 1][1],
          trips_month_avg_feb = trips_month_avg[month == 2][1],
-         trips_month_avg_mar = trips_month_avg[month == 3][1])
+         trips_month_avg_mar = trips_month_avg[month == 3][1]) %>%
+  ungroup()
 
 # Create new adjusted trips variable
-mobility_dat <- mobility_dat %>% 
+# Rename to more explicit name
+phone_mobility_dat <- mobility_dat %>% 
   mutate(trips_adj = ifelse(month == 2, 
                             trips * (trips_month_avg_jan/trips_month_avg_feb),
                             NA),        # for February
@@ -194,8 +195,77 @@ mobility_dat <- mobility_dat %>%
                             trips,
                             trips_adj)) # if lower after adj, replace with observed
 
-# Re-save full mobility data
-save(mobility_dat, file = './tmp/mobility_dat.RData')
+# Assert not missing trips_adj
+phone_mobility_dat %>% assert(not_na, trips_adj)
+
+# Save full mobility data
+save(phone_mobility_dat, file = './tmp/phone_mobility_dat.RData')
+
+######################################################
+# 4. AGGREGATE DATA TO ADMINISTRATIVE LEVELS 1, 2, 3 #
+######################################################
+
+# Collapse to different admin levels (and day level)
+# Calculate daily average trips between locations
+# Admin level 3
+adm_3_phone_mobility_dat <- phone_mobility_dat %>%                                
+  group_by(adm_3_origin, adm_3_destination) %>%
+  mutate(trips_avg = mean(trips_adj, na.rm = TRUE)) %>%
+  distinct(adm_3_origin, adm_3_destination, trips_avg, 
+           adm_3_origin_code, adm_3_destination_code, 
+           adm_2_origin, adm_2_destination, 
+           adm_2_origin_code, adm_2_destination_code, 
+           adm_1_origin, adm_1_destination, 
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+  ungroup()
+
+# Check number of units, should be number of adm 3 units
+verify(adm_3_phone_mobility_dat, length(unique(adm_3_origin)) == 330)
+verify(adm_3_phone_mobility_dat, length(unique(adm_3_destination)) == 330)
+
+# Admin level 2
+adm_2_phone_mobility_dat <- phone_mobility_dat %>%                                
+  group_by(adm_2_origin, adm_2_destination, date) %>%
+  mutate(trips_sum = sum(trips_adj)) %>%
+  distinct(adm_2_origin, adm_2_destination, date, trips_sum, 
+           adm_2_origin_code, adm_2_destination_code, 
+           adm_1_origin, adm_1_destination, 
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+  ungroup() %>%
+  group_by(adm_2_origin, adm_2_destination) %>%
+  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) %>%
+  distinct(adm_2_origin, adm_2_destination, trips_avg, 
+           adm_2_origin_code, adm_2_destination_code, 
+           adm_1_origin, adm_1_destination, 
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+  ungroup()
+
+# Check number of units, should be number of adm 2 units
+verify(adm_2_phone_mobility_dat, length(unique(adm_2_origin)) == 25)
+verify(adm_2_phone_mobility_dat, length(unique(adm_2_destination)) == 25)
+
+# Admin level 1
+adm_1_phone_mobility_dat <- phone_mobility_dat %>%                                
+  group_by(adm_1_origin, adm_1_destination, date) %>%
+  mutate(trips_sum = sum(trips_adj)) %>%
+  distinct(adm_1_origin, adm_1_destination, date, trips_sum, 
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+  ungroup() %>%
+  group_by(adm_1_origin, adm_1_destination) %>%
+  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) %>%
+  distinct(adm_1_origin, adm_1_destination, trips_avg, 
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+  ungroup()
+
+# Check number of units, should be number of adm 2 units
+verify(adm_1_phone_mobility_dat, length(unique(adm_1_origin)) == 9)
+verify(adm_1_phone_mobility_dat, length(unique(adm_1_destination)) == 9)
+
+# Save various administrative levels of mobile phone data
+save(list = c('adm_3_phone_mobility_dat', 
+              'adm_2_phone_mobility_dat', 
+              'adm_1_phone_mobility_dat'), 
+     file = './tmp/adm_phone_mobility_dat.RData')
 
 ################################################################################
 ################################################################################

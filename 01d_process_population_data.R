@@ -1,12 +1,12 @@
 ################################################################################
-# File Name: 01c_process_population_data                                       #
+# File Name: 01d_process_population_data                                       #
 #                                                                              #
 # Purpose:   Load and format population data used in analyses.                 #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Load and format population data                                #
 #            3. Load UN data and apply scaling factor                          #
-#            4. Aggregate data and merge on cross-walk                         #
+#            4. Aggregate data and merge on crosswalk                          #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -27,6 +27,7 @@ library(sp)
 library(raster)
 library(sf)
 library(readxl)
+library(assertr)
 
 # Set the seed
 set.seed(12345)
@@ -93,9 +94,9 @@ multiplier <- as.numeric(un_pop_est[un_pop_est$Year == 2021, 13]) /
 population_dat <- population_dat %>%
   mutate(population_2020_pixel_adj = population_2020_pixel * multiplier)
 
-#############################################
-# 4. AGGREGATE DATA AND MERGE ON CROSS-WALK #
-#############################################
+############################################
+# 4. AGGREGATE DATA AND MERGE ON CROSSWALK #
+############################################
 
 # Aggregate to the admin 3 level
 adm_3_population_dat <- population_dat %>% 
@@ -103,6 +104,9 @@ adm_3_population_dat <- population_dat %>%
   mutate(population_2020_polygon = sum(population_2020_pixel)) %>%
   distinct(adm_3, adm_2, adm_1, population_2020_polygon, 
            .keep_all = FALSE)
+
+# Check number of rows, should be number of adm 3 in shp file
+verify(adm_3_population_dat, length(unique(adm_3)) == 339)
 
 # Load xwalk to link population admin 3 units to mobile phone admin 3 units
 mobility_shape_xwalk <- read.csv('./tmp/mobility_shape_xwalk.csv')
@@ -119,6 +123,9 @@ adm_3_population_dat <- adm_3_population_dat %>%
   distinct(adm_3_mobility, adm_2, adm_1, 
            population_2020_adm_3, .keep_all = FALSE)
 
+# Check number of rows, should be number of adm 3 in mobility file
+verify(adm_3_population_dat, length(unique(adm_3_mobility)) == 330)
+
 # Aggregate to the admin 2 level
 adm_2_population_dat <- adm_3_population_dat %>% 
   dplyr::group_by(adm_2) %>%
@@ -126,16 +133,23 @@ adm_2_population_dat <- adm_3_population_dat %>%
   distinct(adm_2, adm_1, 
            population_2020_adm_2, .keep_all = FALSE)
 
+# Check number of rows, should be number of adm 2 units
+verify(adm_2_population_dat, length(unique(adm_2)) == 25)
+
 # Aggregate to the admin 1 level
 adm_1_population_dat <- adm_2_population_dat %>% 
   dplyr::group_by(adm_1) %>%
   mutate(population_2020_adm_1 = sum(population_2020_adm_2)) %>%
   distinct(adm_1, population_2020_adm_1, .keep_all = FALSE)
 
+# Check number of rows, should be number of adm 1 units
+verify(adm_1_population_dat, length(unique(adm_1)) == 9)
+
 # Save various administrative levels of population data
-save(adm_3_population_dat, file = './tmp/adm_3_population_dat.RData')
-save(adm_2_population_dat, file = './tmp/adm_2_population_dat.RData')
-save(adm_1_population_dat, file = './tmp/adm_1_population_dat.RData')
+save(list = c('adm_3_population_dat', 
+              'adm_2_population_dat', 
+              'adm_1_population_dat'), 
+     file = './tmp/adm_population_dat.RData')
 
 ################################################################################
 ################################################################################

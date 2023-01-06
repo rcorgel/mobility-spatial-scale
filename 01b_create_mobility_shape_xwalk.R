@@ -2,13 +2,13 @@
 # File Name: 01b_create_mobility_shape_xwalk                                   #
 #                                                                              #
 # Purpose:   Since administrative 3 units are not one to one between the       #
-#            mobility data and the shape files, a cross walk needs to be       #
+#            mobility data and the shape files, a crosswalk needs to be        #
 #            created to link the two data sets.                                #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Load and format mobility data and shape files                  #
 #            3. Merge mobility and spatial data                                #
-#            4. Create cross-walk                                              #
+#            4. Create crosswalk                                               #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -25,6 +25,7 @@ rm(list = ls())
 library(tidyverse)
 library(lubridate)
 library(sf)
+library(assertr)
 
 # Set the seed
 set.seed(12345)
@@ -32,15 +33,15 @@ set.seed(12345)
 # Set the directory
 setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
 
-###############################################
-# 2. LOAD AND FORMAT MOBILITY AND SHAPE FILES #
-###############################################
+####################################################
+# 2. LOAD AND FORMAT MOBILITY DATA AND SHAPE FILES #
+####################################################
 
 # Load processed mobility data
-load(file = './tmp/mobility_dat.RData')
+load(file = './tmp/phone_mobility_dat.RData')
 
 # Select only administrative unit variables
-mobility_dat_merge <- mobility_dat %>% 
+mobility_dat_merge <- phone_mobility_dat %>% 
   group_by(adm_3_origin) %>% 
   distinct(adm_3_origin, adm_2_origin, adm_1_origin, .keep_all = FALSE) %>%
   filter(adm_3_origin != '[unknown]') %>% # remove unknowns
@@ -78,9 +79,9 @@ merge_dat <- full_join(mobility_dat_merge, polygon_dat_merge,
 # Thalawakele, Norwood, Galle 4 Gravets, Wanduramba, Madampagama, Rathgama,
 # Kalthota
 
-########################
-# 4. CREATE CROSS-WALK #
-########################
+#######################
+# 4. CREATE CROSSWALK #
+#######################
 
 # Shape file missing rows
 # Drop all of these rows because they will be covered in the next section
@@ -112,6 +113,13 @@ mobility_shape_xwalk <- merge_dat %>%
   dplyr::select(c('adm_3_origin', 'ADM3_EN')) %>%
   dplyr::rename('adm_3_mobility' = 'adm_3_origin',
                 'adm_3_shape' = 'ADM3_EN')
+
+# Assert not missing variables
+mobility_shape_xwalk %>% assert(not_na, adm_3_shape, adm_3_mobility)
+
+# Assert number of districts is correct
+verify(mobility_shape_xwalk, length(unique(adm_3_shape)) == 339)
+verify(mobility_shape_xwalk, length(unique(adm_3_mobility)) == 330)
 
 # Save crosswalk
 write.csv(mobility_shape_xwalk, file = './tmp/mobility_shape_xwalk.csv', 
