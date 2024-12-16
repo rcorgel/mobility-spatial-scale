@@ -39,17 +39,17 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 load('./tmp/adm_population_dat.RData')
 
 # Administrative Unit 3
-adm_3_population_dat <- adm_3_population_dat %>%
+adm_3_population_dat <- adm_3_population_dat |>
   arrange(adm_3_mobility)
 adm_3_pop_vec <- adm_3_population_dat$population_2020_adm_3
 
 # Administrative Unit 2
-adm_2_population_dat <- adm_2_population_dat %>%
+adm_2_population_dat <- adm_2_population_dat |>
   arrange(adm_2)
 adm_2_pop_vec <- adm_2_population_dat$population_2020_adm_2
 
 # Administrative Unit 1
-adm_1_population_dat <- adm_1_population_dat %>%
+adm_1_population_dat <- adm_1_population_dat |>
   arrange(adm_1)
 adm_1_pop_vec <- adm_1_population_dat$population_2020_adm_1
 
@@ -74,18 +74,18 @@ adm_1_name_vec <- colnames(adm_1_phone_mobility_mat)
 ####################################
 
 # Load admin crosswalk
-admin_xwalk <- read_csv('./tmp/admin_xwalk.csv')
+admin_xwalk <- readRDS('./tmp/admin_xwalk.rds')
 
 # Administrative Unit 3
-adm_3_x_walk <- admin_xwalk %>% 
-  group_by(adm_3) %>%
-  dplyr::distinct(adm_3, .keep_all = TRUE) %>%
+adm_3_x_walk <- admin_xwalk |> 
+  group_by(adm_3) |>
+  dplyr::distinct(adm_3, .keep_all = TRUE) |>
   dplyr::select(c('adm_3', 'adm_2', 'adm_1')) 
 
 # Administrative Unit 2
-adm_2_x_walk <- admin_xwalk %>% 
-  group_by(adm_2) %>%
-  dplyr::distinct(adm_2, .keep_all = TRUE) %>%
+adm_2_x_walk <- admin_xwalk |> 
+  group_by(adm_2) |>
+  dplyr::distinct(adm_2, .keep_all = TRUE) |>
   dplyr::select(c('adm_2', 'adm_1')) 
 
 # Administrative Unit 1

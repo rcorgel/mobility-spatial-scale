@@ -1,9 +1,8 @@
 ################################################################################
 # File Name: 02b_rescale_phone_mobility_data                                   #
-# Purpose:   Rescale phone mobility data such that the external at finer       #
+# Purpose:   Rescale phone mobility data such that external travel at finer    #
 #            scales is the same as external travel at aggregated scales.       #
-#            This is in order to play around with the homogeneous mixing       #
-#            assumption.                                                       #
+#            This is in order to isolate the homogeneous mixing assumption.    #
 # Steps:                                                                       #
 #         1. Set-up the script                                                 #
 #         2. Load phone mobility data                                          #
@@ -41,20 +40,20 @@ load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
 load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
 load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
 
-# Create cross walks to match different admin levels
+# Create and load cross walks to match different admin levels
 # Load admin crosswalk
-admin_xwalk <- read_csv('./tmp/admin_xwalk.csv')
+admin_xwalk <- readRDS('./tmp/admin_xwalk.rds')
 
 # Administrative Unit 3
-adm_3_x_walk <- admin_xwalk %>% 
-  group_by(adm_3) %>%
-  dplyr::distinct(adm_3, .keep_all = TRUE) %>%
+adm_3_x_walk <- admin_xwalk |> 
+  group_by(adm_3) |>
+  dplyr::distinct(adm_3, .keep_all = TRUE) |>
   dplyr::select(c('adm_3', 'adm_2', 'adm_1')) 
 
 # Administrative Unit 2
-adm_2_x_walk <- admin_xwalk %>% 
-  group_by(adm_2) %>%
-  dplyr::distinct(adm_2, .keep_all = TRUE) %>%
+adm_2_x_walk <- admin_xwalk |> 
+  group_by(adm_2) |>
+  dplyr::distinct(adm_2, .keep_all = TRUE) |>
   dplyr::select(c('adm_2', 'adm_1')) 
 
 ############################
@@ -117,7 +116,7 @@ adm_3_phone_mobility_mat_rescale_adm_2 <- adm_3_phone_mobility_mat_rescale_adm_2
 # ADMIN 3 MATCHING ADMIN 1 #
 ############################
 
-# Reload data
+# Reload data (overwrite data)
 load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
 load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
 
@@ -173,7 +172,7 @@ adm_3_phone_mobility_mat_rescale_adm_1 <- adm_3_phone_mobility_mat_rescale_adm_1
 # ADMIN 2 MATCHING ADMIN 1 #
 ############################
 
-# Reload data
+# Reload data (overwrite data)
 load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
 load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
 

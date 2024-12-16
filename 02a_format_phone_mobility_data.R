@@ -43,8 +43,8 @@ load('./tmp/adm_phone_mobility_dat.RData')
 ##########################
 
 # Rename/select name data
-adm_3_phone_mobility_dat_name <- adm_3_phone_mobility_dat %>%
-  dplyr::select(c('adm_3_origin', 'adm_3_destination', 'trips_avg')) %>%
+adm_3_phone_mobility_dat_name <- adm_3_phone_mobility_dat |>
+  dplyr::select(c('adm_3_origin', 'adm_3_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_3_origin',
                 'adm_destination' = 'adm_3_destination')
 # Create name matrix and long data
@@ -54,8 +54,8 @@ adm_3_phone_mobility_long <- format_mobility_data(data = adm_3_phone_mobility_da
                                                   method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
-adm_3_phone_mobility_dat_code <- adm_3_phone_mobility_dat %>%
-  dplyr::select(c('adm_3_origin_code', 'adm_3_destination_code', 'trips_avg')) %>%
+adm_3_phone_mobility_dat_code <- adm_3_phone_mobility_dat |>
+  dplyr::select(c('adm_3_origin_code', 'adm_3_destination_code', 'trips_avg')) |>
   dplyr::rename('adm_origin_code' = 'adm_3_origin_code',
                 'adm_destination_code' = 'adm_3_destination_code')
 # Create code matrix and long data
@@ -76,8 +76,8 @@ save(list = c('adm_3_phone_mobility_mat',
 ##########################
 
 # Rename/select name data
-adm_2_phone_mobility_dat_name <- adm_2_phone_mobility_dat %>%
-  dplyr::select(c('adm_2_origin', 'adm_2_destination', 'trips_avg')) %>%
+adm_2_phone_mobility_dat_name <- adm_2_phone_mobility_dat |>
+  dplyr::select(c('adm_2_origin', 'adm_2_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_2_origin',
                 'adm_destination' = 'adm_2_destination')
 # Create name matrix and long data
@@ -87,8 +87,8 @@ adm_2_phone_mobility_long <- format_mobility_data(data = adm_2_phone_mobility_da
                                                   method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
-adm_2_phone_mobility_dat_code <- adm_2_phone_mobility_dat %>%
-  dplyr::select(c('adm_2_origin_code', 'adm_2_destination_code', 'trips_avg')) %>%
+adm_2_phone_mobility_dat_code <- adm_2_phone_mobility_dat |>
+  dplyr::select(c('adm_2_origin_code', 'adm_2_destination_code', 'trips_avg')) |>
   dplyr::rename('adm_origin_code' = 'adm_2_origin_code',
                 'adm_destination_code' = 'adm_2_destination_code')
 # Create code matrix and long data
@@ -109,8 +109,8 @@ save(list = c('adm_2_phone_mobility_mat',
 ##########################
 
 # Rename/select name data
-adm_1_phone_mobility_dat_name <- adm_1_phone_mobility_dat %>%
-  dplyr::select(c('adm_1_origin', 'adm_1_destination', 'trips_avg')) %>%
+adm_1_phone_mobility_dat_name <- adm_1_phone_mobility_dat |>
+  dplyr::select(c('adm_1_origin', 'adm_1_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_1_origin',
                 'adm_destination' = 'adm_1_destination')
 # Create name matrix and long data
@@ -120,8 +120,8 @@ adm_1_phone_mobility_long <- format_mobility_data(data = adm_1_phone_mobility_da
                                                   method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
-adm_1_phone_mobility_dat_code <- adm_1_phone_mobility_dat %>%
-  dplyr::select(c('adm_1_origin_code', 'adm_1_destination_code', 'trips_avg')) %>%
+adm_1_phone_mobility_dat_code <- adm_1_phone_mobility_dat |>
+  dplyr::select(c('adm_1_origin_code', 'adm_1_destination_code', 'trips_avg')) |>
   dplyr::rename('adm_origin_code' = 'adm_1_origin_code',
                 'adm_destination_code' = 'adm_1_destination_code')
 # Create code matrix and long data

@@ -40,15 +40,15 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 #########################
 
 # Do not need to load centroid data because it is in the mobility data
-load('./tmp/phone_mobility_dat.RData')
+phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
 
 # Get unique data for admin 3 origins
-adm_3_origin <- phone_mobility_dat %>% 
-  group_by(adm_3_origin, origin_lat, origin_long) %>%
+adm_3_origin <- phone_mobility_dat |> 
+  group_by(adm_3_origin, origin_lat, origin_long) |>
   distinct(adm_3_origin, origin_lat, origin_long, .keep_all = FALSE)
 # Get unique data for admin 3 destinations
-adm_3_destination <- phone_mobility_dat %>% 
-  group_by(adm_3_destination, destination_lat, destination_long) %>%
+adm_3_destination <- phone_mobility_dat |> 
+  group_by(adm_3_destination, destination_lat, destination_long) |>
   distinct(adm_3_destination, destination_lat, destination_long, .keep_all = FALSE)
 
 # Create all combinations or origin and destination
@@ -83,14 +83,14 @@ names(dimnames(adm_3_dist_mat)) <- c('origin', 'destination')
 adm_2_centroid <- read_excel('./tmp/adm_2_centroid.xlsx')
 
 # Get unique data for admin 2 origins
-adm_2_origin <- adm_2_centroid %>%
-  dplyr::select(c('ADM2_EN', 'x_point', 'y_point')) %>%
+adm_2_origin <- adm_2_centroid |>
+  dplyr::select(c('ADM2_EN', 'x_point', 'y_point')) |>
   dplyr::rename('adm_2_origin' = 'ADM2_EN',
                 'origin_lat' = 'y_point',
                 'origin_long' = 'x_point')
 # Get unique data for admin 2 destinations
-adm_2_destination <- adm_2_centroid %>%
-  dplyr::select(c('ADM2_EN', 'x_point', 'y_point')) %>%
+adm_2_destination <- adm_2_centroid |>
+  dplyr::select(c('ADM2_EN', 'x_point', 'y_point')) |>
   dplyr::rename('adm_2_destination' = 'ADM2_EN',
                 'destination_lat' = 'y_point',
                 'destination_long' = 'x_point')
@@ -127,14 +127,14 @@ names(dimnames(adm_2_dist_mat)) <- c('origin', 'destination')
 adm_1_centroid <- read_excel('./tmp/adm_1_centroid.xlsx')
 
 # Get unique data for admin 1 origins
-adm_1_origin <- adm_1_centroid %>%
-  dplyr::select(c('ADM1_EN', 'x_point', 'y_point')) %>%
+adm_1_origin <- adm_1_centroid |>
+  dplyr::select(c('ADM1_EN', 'x_point', 'y_point')) |>
   dplyr::rename('adm_1_origin' = 'ADM1_EN',
                 'origin_lat' = 'y_point',
                 'origin_long' = 'x_point')
 # Get unique data for admin 1 destinations
-adm_1_destination <- adm_1_centroid %>%
-  dplyr::select(c('ADM1_EN', 'x_point', 'y_point')) %>%
+adm_1_destination <- adm_1_centroid |>
+  dplyr::select(c('ADM1_EN', 'x_point', 'y_point')) |>
   dplyr::rename('adm_1_destination' = 'ADM1_EN',
                 'destination_lat' = 'y_point',
                 'destination_long' = 'x_point')
