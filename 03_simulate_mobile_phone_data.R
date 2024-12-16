@@ -45,7 +45,7 @@ load('./tmp/adm_dist_mat.RData')
 load('./tmp/adm_population_dat.RData')
 
 # Load mobile phone data to create all origin/destination combinations
-load('./tmp/phone_mobility_dat.RData')
+phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
 
 # Load phone mobility formatted data 
 load('./tmp/adm_phone_mobility_dat.RData')
@@ -55,8 +55,8 @@ load('./tmp/adm_phone_mobility_dat.RData')
 ##########################
 
 # Rename/select name data
-adm_3_phone_mobility_dat_name <- adm_3_phone_mobility_dat %>%
-  dplyr::select(c('adm_3_origin', 'adm_3_destination', 'trips_avg')) %>%
+adm_3_phone_mobility_dat_name <- adm_3_phone_mobility_dat |>
+  dplyr::select(c('adm_3_origin', 'adm_3_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_3_origin',
                 'adm_destination' = 'adm_3_destination')
 # Merge on all origin destination combinations
@@ -83,8 +83,8 @@ names(adm_3) <- c('M', 'D', 'N')
 ##########################
 
 # Rename/select name data
-adm_2_phone_mobility_dat_name <- adm_2_phone_mobility_dat %>%
-  dplyr::select(c('adm_2_origin', 'adm_2_destination', 'trips_avg')) %>%
+adm_2_phone_mobility_dat_name <- adm_2_phone_mobility_dat |>
+  dplyr::select(c('adm_2_origin', 'adm_2_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_2_origin',
                 'adm_destination' = 'adm_2_destination')
 
@@ -105,8 +105,8 @@ names(adm_2) <- c('M', 'D', 'N')
 ##########################
 
 # Rename/select name data
-adm_1_phone_mobility_dat_name <- adm_1_phone_mobility_dat %>%
-  dplyr::select(c('adm_1_origin', 'adm_1_destination', 'trips_avg')) %>%
+adm_1_phone_mobility_dat_name <- adm_1_phone_mobility_dat |>
+  dplyr::select(c('adm_1_origin', 'adm_1_destination', 'trips_avg')) |>
   dplyr::rename('adm_origin' = 'adm_1_origin',
                 'adm_destination' = 'adm_1_destination')
 
