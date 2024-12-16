@@ -6,7 +6,7 @@
 #         2. Format phone mobility data                                        #
 #                                                                              #
 # Project: Sri Lanka Spatial Aggregation                                       #
-# Authors: Ronan Corgel                                                        #
+# Author: Ronan Corgel                                                         #
 ################################################################################
 
 ####################
@@ -26,10 +26,10 @@ library(assertr)
 set.seed(12345)
 
 # Set directory 
-setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
+setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project')
 
-# Load format function
-source('./spatial-resolution/02_format_functions.R')
+# Load format functions
+source('./mobility-spatial-scale/02_format_functions.R')
 
 #################################
 # 2. FORMAT PHONE MOBILITY DATA #
@@ -49,9 +49,9 @@ adm_3_phone_mobility_dat_name <- adm_3_phone_mobility_dat %>%
                 'adm_destination' = 'adm_3_destination')
 # Create name matrix and long data
 adm_3_phone_mobility_mat <- format_mobility_data(data = adm_3_phone_mobility_dat_name, 
-                                                 method = 'name', output = 'matrix', na_replace = TRUE)
+                                                 method = 'name', output = 'matrix', na_replace = FALSE)
 adm_3_phone_mobility_long <- format_mobility_data(data = adm_3_phone_mobility_dat_name, 
-                                                  method = 'name', output = 'long', na_replace = TRUE)
+                                                  method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
 adm_3_phone_mobility_dat_code <- adm_3_phone_mobility_dat %>%
@@ -60,9 +60,9 @@ adm_3_phone_mobility_dat_code <- adm_3_phone_mobility_dat %>%
                 'adm_destination_code' = 'adm_3_destination_code')
 # Create code matrix and long data
 adm_3_phone_mobility_mat_code <- format_mobility_data(data = adm_3_phone_mobility_dat_code, 
-                                                 method = 'code', output = 'matrix', na_replace = TRUE)
+                                                 method = 'code', output = 'matrix', na_replace = FALSE)
 adm_3_phone_mobility_long_code <- format_mobility_data(data = adm_3_phone_mobility_dat_code, 
-                                                  method = 'code', output = 'long', na_replace = TRUE)
+                                                  method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
 save(list = c('adm_3_phone_mobility_mat', 
@@ -82,9 +82,9 @@ adm_2_phone_mobility_dat_name <- adm_2_phone_mobility_dat %>%
                 'adm_destination' = 'adm_2_destination')
 # Create name matrix and long data
 adm_2_phone_mobility_mat <- format_mobility_data(data = adm_2_phone_mobility_dat_name, 
-                                                 method = 'name', output = 'matrix', na_replace = TRUE)
+                                                 method = 'name', output = 'matrix', na_replace = FALSE)
 adm_2_phone_mobility_long <- format_mobility_data(data = adm_2_phone_mobility_dat_name, 
-                                                  method = 'name', output = 'long', na_replace = TRUE)
+                                                  method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
 adm_2_phone_mobility_dat_code <- adm_2_phone_mobility_dat %>%
@@ -93,9 +93,9 @@ adm_2_phone_mobility_dat_code <- adm_2_phone_mobility_dat %>%
                 'adm_destination_code' = 'adm_2_destination_code')
 # Create code matrix and long data
 adm_2_phone_mobility_mat_code <- format_mobility_data(data = adm_2_phone_mobility_dat_code, 
-                                                      method = 'code', output = 'matrix', na_replace = TRUE)
+                                                      method = 'code', output = 'matrix', na_replace = FALSE)
 adm_2_phone_mobility_long_code <- format_mobility_data(data = adm_2_phone_mobility_dat_code, 
-                                                       method = 'code', output = 'long', na_replace = TRUE)
+                                                       method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
 save(list = c('adm_2_phone_mobility_mat', 
@@ -115,9 +115,9 @@ adm_1_phone_mobility_dat_name <- adm_1_phone_mobility_dat %>%
                 'adm_destination' = 'adm_1_destination')
 # Create name matrix and long data
 adm_1_phone_mobility_mat <- format_mobility_data(data = adm_1_phone_mobility_dat_name, 
-                                                 method = 'name', output = 'matrix', na_replace = TRUE)
+                                                 method = 'name', output = 'matrix', na_replace = FALSE)
 adm_1_phone_mobility_long <- format_mobility_data(data = adm_1_phone_mobility_dat_name, 
-                                                  method = 'name', output = 'long', na_replace = TRUE)
+                                                  method = 'name', output = 'long', na_replace = FALSE)
 
 # Rename/select code data
 adm_1_phone_mobility_dat_code <- adm_1_phone_mobility_dat %>%
@@ -126,9 +126,9 @@ adm_1_phone_mobility_dat_code <- adm_1_phone_mobility_dat %>%
                 'adm_destination_code' = 'adm_1_destination_code')
 # Create code matrix and long data
 adm_1_phone_mobility_mat_code <- format_mobility_data(data = adm_1_phone_mobility_dat_code, 
-                                                      method = 'code', output = 'matrix', na_replace = TRUE)
+                                                      method = 'code', output = 'matrix', na_replace = FALSE)
 adm_1_phone_mobility_long_code <- format_mobility_data(data = adm_1_phone_mobility_dat_code, 
-                                                       method = 'code', output = 'long', na_replace = TRUE)
+                                                       method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
 save(list = c('adm_1_phone_mobility_mat', 
@@ -139,36 +139,3 @@ save(list = c('adm_1_phone_mobility_mat',
 
 ################################################################################
 ################################################################################
-
-
-
-
-
-
-####################################
-# 3. FORMAT FACEBOOK MOBILITY DATA #
-####################################
-
-# Load FB data
-load('./tmp/adm_fb_mobility_dat.RData')
-
-##################################
-# 4. FORMAT SURVEY MOBILITY DATA #
-##################################
-
-# Load survey data
-load('./tmp/adm_survey_mobility_dat.RData')
-
-adm_3_phone_mobility_dat_rename <- adm_3_phone_mobility_dat %>%
-  dplyr::select(c('adm_3_origin_code', 'adm_3_destination_code', 'trips_avg')) %>%
-  dplyr::rename('adm_origin' = 'adm_3_origin',
-                'adm_destination_code' = 'adm_3_destination_code')
-
-adm_3_fb_mobility_dat_rename <- adm_3_fb_mobility_dat %>%
-  dplyr::select(c('adm_3_origin', 'adm_3_destination', 'trips_avg')) %>%
-  dplyr::rename('adm_origin' = 'adm_3_origin',
-                'adm_destination' = 'adm_3_destination')
-
-test <- format_mobility_data(data = adm_3_fb_mobility_dat_rename, 
-                             method = 'name', output = 'long', na_replace = FALSE)
-data = adm_3_phone_mobility_dat_rename

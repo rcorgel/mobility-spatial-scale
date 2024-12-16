@@ -31,20 +31,20 @@ library(assertr)
 set.seed(12345)
 
 # Set the directory
-setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
+setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project')
 
 ####################################################
 # 2. LOAD AND FORMAT MOBILITY DATA AND SHAPE FILES #
 ####################################################
 
 # Load processed mobility data
-load(file = './tmp/phone_mobility_dat.RData')
+phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
 
 # Select only administrative unit variables
-mobility_dat_merge <- phone_mobility_dat %>% 
-  group_by(adm_3_origin) %>% 
-  distinct(adm_3_origin, adm_2_origin, adm_1_origin, .keep_all = FALSE) %>%
-  filter(adm_3_origin != '[unknown]') %>% # remove unknowns
+mobility_dat_merge <- phone_mobility_dat |> 
+  group_by(adm_3_origin) |>
+  distinct(adm_3_origin, adm_2_origin, adm_1_origin, .keep_all = FALSE) |>
+  filter(adm_3_origin != '[unknown]') |>  # remove unknowns
   mutate(merge = adm_3_origin)            # rename to merge
 
 # Load shape files
@@ -56,8 +56,8 @@ polygon_dat <- read_sf(dsn = './raw/lka_adm_20220816_shp/',
 polygon_dat <- as.data.frame(polygon_dat) 
 
 # Select only administrative unit variables
-polygon_dat_merge <- polygon_dat %>% 
-  dplyr::select(c('ADM3_EN', 'ADM2_EN', 'ADM1_EN')) %>%
+polygon_dat_merge <- polygon_dat |>
+  dplyr::select(c('ADM3_EN', 'ADM2_EN', 'ADM1_EN')) |>
   mutate(merge = ADM3_EN) # rename to merge
 
 ######################################
@@ -109,21 +109,20 @@ merge_dat$adm_3_origin[merge_dat$merge == 'Rathgama'] <- 'Hikkaduwa'
 merge_dat$adm_3_origin[merge_dat$merge == 'Madampagama'] <- 'Hikkaduwa'
 
 # Select mobility data and shape file admin 3 variables and rename
-mobility_shape_xwalk <- merge_dat %>%
-  dplyr::select(c('adm_3_origin', 'ADM3_EN')) %>%
+mobility_shape_xwalk <- merge_dat |>
+  dplyr::select(c('adm_3_origin', 'ADM3_EN')) |>
   dplyr::rename('adm_3_mobility' = 'adm_3_origin',
                 'adm_3_shape' = 'ADM3_EN')
 
 # Assert not missing variables
-mobility_shape_xwalk %>% assert(not_na, adm_3_shape, adm_3_mobility)
+mobility_shape_xwalk |> assert(not_na, adm_3_shape, adm_3_mobility)
 
 # Assert number of districts is correct
 verify(mobility_shape_xwalk, length(unique(adm_3_shape)) == 339)
 verify(mobility_shape_xwalk, length(unique(adm_3_mobility)) == 330)
 
 # Save crosswalk
-write.csv(mobility_shape_xwalk, file = './tmp/mobility_shape_xwalk.csv', 
-          row.names = FALSE)
+saveRDS(mobility_shape_xwalk, './tmp/mobility_shape_xwalk.rds')
 
 ################################################################################
 ################################################################################

@@ -6,7 +6,7 @@
 #         2. Create formatting functions                                       #
 #                                                                              #
 # Project: Sri Lanka Spatial Aggregation                                       #
-# Authors: Ronan Corgel                                                        #
+# Author: Ronan Corgel                                                         #
 ################################################################################
 
 ####################
@@ -20,24 +20,22 @@ rm(list = ls())
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
-library(lubridate)
 library(assertr)
-library(writexl)
-library(readxl)
 
 # Set the seed
 set.seed(12345)
 
 # Set directory 
-setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
+setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project')
 
 ##################################
 # 2. CREATE FORMATTING FUNCTIONS #
 ##################################
 
+# Create function to format mobility data
 format_mobility_data <- function(data, method = c('name', 'code'), 
                                  output = c('matrix', 'long'), na_replace) {
-  # Confirm method set correctly
+  # Confirm method is set correctly
   method <- match.arg(method)
   
   if (method == 'name') {
@@ -92,6 +90,64 @@ format_mobility_data <- function(data, method = c('name', 'code'),
   }
   if (output == 'long') {
     return(adm_day_avg_mat_long)
+  }
+}
+
+# Create function to list all admin route combinations
+all_admin_combos <- function(data, level = c('1', '2', '3'), 
+                             method = c('name', 'code')) {
+  
+  # Confirm level is set correctly
+  level <- match.arg(level)
+  
+  # Create data of unique names and codes at each admin level
+  if (level == '3') {
+    origin <- unique(data$adm_3_origin)
+    adm_origin <- as.data.frame(origin)
+    verify(adm_origin, length(origin) == 330)
+    origin <- unique(data$adm_3_origin_code)
+    adm_origin_code <- as.data.frame(origin)
+    verify(adm_origin_code, length(origin) == 330)
+  }
+  if (level == '2') {
+    origin <- unique(data$adm_2_origin)
+    adm_origin <- as.data.frame(origin)
+    verify(adm_origin, length(origin) == 25)
+    origin <- unique(data$adm_2_origin_code)
+    adm_origin_code <- as.data.frame(origin)
+    verify(adm_origin_code, length(origin) == 25)
+  }
+  if (level == '1') {
+    origin <- unique(data$adm_1_origin)
+    adm_origin <- as.data.frame(origin)
+    verify(adm_origin, length(origin) == 9)
+    origin <- unique(data$adm_1_origin_code)
+    adm_origin_code <- as.data.frame(origin)
+    verify(adm_origin_code, length(origin) == 9)
+  }
+  
+  # Confirm method is set correctly
+  method <- match.arg(method)
+  
+  if (method == 'name') {
+    adm_routes <- as.data.frame(NULL)
+    for (i in adm_origin$origin) {
+      adm_combos <- adm_origin
+      adm_combos$destination <- i
+      adm_routes <- rbind(adm_routes, adm_combos)
+    }
+    # Return all combinations data
+    return(adm_routes)
+  }
+  if (method == 'code') {
+    adm_routes_code <- as.data.frame(NULL)
+    for (i in adm_origin_code$origin) {
+      adm_combos <- adm_origin_code
+      adm_combos$destination <- i
+      adm_routes_code <- rbind(adm_routes_code, adm_combos)
+    }
+    # Return all combinations data
+    return(adm_routes_code)
   }
 }
 

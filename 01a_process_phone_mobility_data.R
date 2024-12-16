@@ -29,7 +29,7 @@ library(assertr)
 set.seed(12345)
 
 # Set the directory
-setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-resolution-project')
+setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project')
 
 ####################################
 # 2. LOAD AND FORMAT MOBILITY DATA #
@@ -37,57 +37,57 @@ setwd('/Users/rcorgel/Library/CloudStorage/OneDrive-Personal/Projects/spatial-re
 
 # Load and format November data
 nov_mobility_dat <- read_csv('./raw/export_for_JHU_November_2021_V2.csv')
-nov_mobility_dat <- nov_mobility_dat %>%
-  dplyr::rename(date = batch_date) %>%
+nov_mobility_dat <- nov_mobility_dat |>
+  dplyr::rename(date = batch_date) |>
   mutate(origin_long = as.numeric(str_extract(origin_area_centroid, "\\d+\\.*\\d+")),
          origin_lat = as.numeric(str_extract(origin_area_centroid, "\\s(\\d+\\.*\\d+)")),
          destination_long = as.numeric(str_extract(destination_area_centroid, "\\d+\\.*\\d+")),
          destination_lat = as.numeric(str_extract(destination_area_centroid, "\\s\\d+\\.*\\d+")),
-         month = month(date)) %>%
+         month = month(date)) |>
   dplyr::select(-c(origin_area_centroid, destination_area_centroid, devices))
 
 # Load and format December data
 dec_mobility_dat <- read_csv('./raw/export_for_JHU_December_2021_V2.csv')
-dec_mobility_dat <- dec_mobility_dat %>%
-  dplyr::rename(date = batch_date) %>%
+dec_mobility_dat <- dec_mobility_dat |>
+  dplyr::rename(date = batch_date) |>
   mutate(origin_long = as.numeric(str_extract(origin_area_centroid, "\\d+\\.\\d+")),
          origin_lat = as.numeric(str_extract(origin_area_centroid, "\\s(\\d+\\.\\d+)")),
          destination_long = as.numeric(str_extract(destination_area_centroid, "\\d+\\.\\d+")),
          destination_lat = as.numeric(str_extract(destination_area_centroid, "\\s\\d+\\.\\d+")),
-         month = month(date)) %>%
+         month = month(date)) |>
   dplyr::select(-c(origin_area_centroid, destination_area_centroid, devices))
 
 # Load and format January data
 jan_mobility_dat <- read_csv('./raw/export_for_JHU_January_2022.csv')
-jan_mobility_dat <- jan_mobility_dat %>%
-  dplyr::rename(date = batch_date) %>%
+jan_mobility_dat <- jan_mobility_dat |>
+  dplyr::rename(date = batch_date) |>
   mutate(origin_long = as.numeric(str_extract(origin_area_centroid, "\\d+\\.\\d+")),
          origin_lat = as.numeric(str_extract(origin_area_centroid, "\\s(\\d+\\.\\d+)")),
          destination_long = as.numeric(str_extract(destination_area_centroid, "\\d+\\.\\d+")),
          destination_lat = as.numeric(str_extract(destination_area_centroid, "\\s\\d+\\.\\d+")),
-         month = month(date)) %>%
+         month = month(date)) |>
   dplyr::select(-c(origin_area_centroid, destination_area_centroid, devices))
 
 # Load and format February data
 feb_mobility_dat <- read_csv('./raw/export_for_JHU_February_2022.csv')
-feb_mobility_dat <- feb_mobility_dat %>%
-  dplyr::rename(date = batch_date) %>%
+feb_mobility_dat <- feb_mobility_dat |>
+  dplyr::rename(date = batch_date) |>
   mutate(origin_long = as.numeric(str_extract(origin_area_centroid, "\\d+\\.\\d+")),
          origin_lat = as.numeric(str_extract(origin_area_centroid, "\\s(\\d+\\.\\d+)")),
          destination_long = as.numeric(str_extract(destination_area_centroid, "\\d+\\.\\d+")),
          destination_lat = as.numeric(str_extract(destination_area_centroid, "\\s\\d+\\.\\d+")),
-         month = month(date)) %>%
+         month = month(date)) |>
   dplyr::select(-c(origin_area_centroid, destination_area_centroid))
 
 # Load and format March data
 mar_mobility_dat <- read_csv('./raw/export_for_JHU_March_2022.csv')
-mar_mobility_dat <- mar_mobility_dat %>%
-  dplyr::rename(date = batch_date) %>%
+mar_mobility_dat <- mar_mobility_dat |>
+  dplyr::rename(date = batch_date) |>
   mutate(origin_long = as.numeric(str_extract(origin_area_centroid, "\\d+\\.\\d+")),
          origin_lat = as.numeric(str_extract(origin_area_centroid, "\\s(\\d+\\.\\d+)")),
          destination_long = as.numeric(str_extract(destination_area_centroid, "\\d+\\.\\d+")),
          destination_lat = as.numeric(str_extract(destination_area_centroid, "\\s\\d+\\.\\d+")),
-         month = month(date)) %>%
+         month = month(date)) |>
   dplyr::select(-c(origin_area_centroid, destination_area_centroid))
 
 # Combine data into one data set
@@ -105,7 +105,7 @@ mobility_dat <- left_join(mobility_dat, district_province_xwalk,
                           by = c('admin_level_2_destination' = 'district'))
 
 # Rename variables to match variable naming conventions
-mobility_dat <- mobility_dat %>%
+mobility_dat <- mobility_dat |>
   dplyr::rename('adm_1_origin' = 'province.x',
          'adm_1_destination' = 'province.y',
          'adm_1_origin_code' = 'province_code.x',
@@ -121,12 +121,12 @@ mobility_dat <- mobility_dat %>%
          'trips' = 'people') 
 
 # Drop unknown destination and/or origin
-mobility_dat <- mobility_dat %>% 
-  filter(adm_3_origin != '[unknown]') %>% 
+mobility_dat <- mobility_dat |>
+  filter(adm_3_origin != '[unknown]') |>
   filter(adm_3_destination != '[unknown]')
 
 # Assert admin variables are not missing
-mobility_dat %>% assert(not_na, 
+mobility_dat |> assert(not_na, 
                         adm_1_origin, adm_1_destination, 
                         adm_1_origin_code, adm_1_destination_code,
                         adm_2_origin, adm_2_destination, 
@@ -135,14 +135,14 @@ mobility_dat %>% assert(not_na,
                         adm_3_origin_code, adm_3_destination_code)
 
 # Save a version without February and March (due to data issue)
-phone_mobility_dat_nov_jan <- mobility_dat %>%
-  filter(month != 2) %>%
+phone_mobility_dat_nov_jan <- mobility_dat |>
+  filter(month != 2) |>
   filter(month != 3)
-save(phone_mobility_dat_nov_jan, file = './tmp/phone_mobility_dat_nov_jan.RData')
+saveRDS(phone_mobility_dat_nov_jan, './tmp/phone_mobility_dat_nov_jan.rds')
 
 # Remove individual month mobility data data
 rm(list = c('nov_mobility_dat', 'dec_mobility_dat', 'jan_mobility_dat', 
-            'feb_mobility_dat', 'mar_mobility_dat', 'mobility_dat_nov_jan'))
+            'feb_mobility_dat', 'mar_mobility_dat', 'phone_mobility_dat_nov_jan'))
 
 ####################################################
 # 3. ADJUST FOR FEBRUARY/MARCH MOBILITY DATA ISSUE #
@@ -169,19 +169,19 @@ rm(list = c('nov_mobility_dat', 'dec_mobility_dat', 'jan_mobility_dat',
 
 # Calculate January, February, and March month average for all routes
 # Some months will have NA as the average if no trips occurred during that month
-mobility_dat <- mobility_dat %>% 
-  group_by(month, adm_3_origin, adm_3_destination) %>%
-  mutate(trips_month_avg = mean(trips, na.rm = TRUE)) %>%
+mobility_dat <- mobility_dat |>
+  group_by(month, adm_3_origin, adm_3_destination) |>
+  mutate(trips_month_avg = mean(trips, na.rm = TRUE)) |>
   ungroup() %>%
   group_by(adm_3_origin, adm_3_destination) %>%
   mutate(trips_month_avg_jan = trips_month_avg[month == 1][1],
          trips_month_avg_feb = trips_month_avg[month == 2][1],
-         trips_month_avg_mar = trips_month_avg[month == 3][1]) %>%
+         trips_month_avg_mar = trips_month_avg[month == 3][1]) |>
   ungroup()
 
 # Create new adjusted trips variable
 # Rename to more explicit name
-phone_mobility_dat <- mobility_dat %>% 
+phone_mobility_dat <- mobility_dat |>
   mutate(trips_adj = ifelse(month == 2, 
                             trips * (trips_month_avg_jan/trips_month_avg_feb),
                             NA),        # for February
@@ -196,10 +196,10 @@ phone_mobility_dat <- mobility_dat %>%
                             trips_adj)) # if lower after adj, replace with observed
 
 # Assert not missing trips_adj
-phone_mobility_dat %>% assert(not_na, trips_adj)
+phone_mobility_dat |> assert(not_na, trips_adj)
 
 # Save full mobility data
-save(phone_mobility_dat, file = './tmp/phone_mobility_dat.RData')
+saveRDS(phone_mobility_dat, './tmp/phone_mobility_dat.rds')
 
 ######################################################
 # 4. AGGREGATE DATA TO ADMINISTRATIVE LEVELS 1, 2, 3 #
@@ -208,15 +208,15 @@ save(phone_mobility_dat, file = './tmp/phone_mobility_dat.RData')
 # Collapse to different admin levels (and day level)
 # Calculate daily average trips between locations
 # Admin level 3
-adm_3_phone_mobility_dat <- phone_mobility_dat %>%                                
-  group_by(adm_3_origin, adm_3_destination) %>%
-  mutate(trips_avg = mean(trips_adj, na.rm = TRUE)) %>%
+adm_3_phone_mobility_dat <- phone_mobility_dat |>                                
+  group_by(adm_3_origin, adm_3_destination) |>
+  mutate(trips_avg = mean(trips_adj, na.rm = TRUE)) |>
   distinct(adm_3_origin, adm_3_destination, trips_avg, 
            adm_3_origin_code, adm_3_destination_code, 
            adm_2_origin, adm_2_destination, 
            adm_2_origin_code, adm_2_destination_code, 
            adm_1_origin, adm_1_destination, 
-           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
   ungroup()
 
 # Check number of units, should be number of adm 3 units
@@ -224,20 +224,22 @@ verify(adm_3_phone_mobility_dat, length(unique(adm_3_origin)) == 330)
 verify(adm_3_phone_mobility_dat, length(unique(adm_3_destination)) == 330)
 
 # Admin level 2
-adm_2_phone_mobility_dat <- phone_mobility_dat %>%                                
-  group_by(adm_2_origin, adm_2_destination, date) %>%
-  mutate(trips_sum = sum(trips_adj)) %>%
+# Aggregate data to admin level 2
+adm_2_phone_mobility_dat <- phone_mobility_dat |>                                
+  group_by(adm_2_origin, adm_2_destination, date) |>
+  mutate(trips_sum = sum(trips_adj)) |>
   distinct(adm_2_origin, adm_2_destination, date, trips_sum, 
            adm_2_origin_code, adm_2_destination_code, 
            adm_1_origin, adm_1_destination, 
-           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
-  ungroup() %>%
-  group_by(adm_2_origin, adm_2_destination) %>%
-  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) %>%
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
+  ungroup() |>
+# Calculate average daily trips
+  group_by(adm_2_origin, adm_2_destination) |>
+  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) |>
   distinct(adm_2_origin, adm_2_destination, trips_avg, 
            adm_2_origin_code, adm_2_destination_code, 
            adm_1_origin, adm_1_destination, 
-           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
   ungroup()
 
 # Check number of units, should be number of adm 2 units
@@ -245,16 +247,18 @@ verify(adm_2_phone_mobility_dat, length(unique(adm_2_origin)) == 25)
 verify(adm_2_phone_mobility_dat, length(unique(adm_2_destination)) == 25)
 
 # Admin level 1
-adm_1_phone_mobility_dat <- phone_mobility_dat %>%                                
-  group_by(adm_1_origin, adm_1_destination, date) %>%
-  mutate(trips_sum = sum(trips_adj)) %>%
+# Aggregate data to admin level 1
+adm_1_phone_mobility_dat <- phone_mobility_dat |>                                
+  group_by(adm_1_origin, adm_1_destination, date) |>
+  mutate(trips_sum = sum(trips_adj)) |>
   distinct(adm_1_origin, adm_1_destination, date, trips_sum, 
-           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
-  ungroup() %>%
-  group_by(adm_1_origin, adm_1_destination) %>%
-  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) %>%
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
+  ungroup() |>
+# Calculate average daily trips
+  group_by(adm_1_origin, adm_1_destination) |>
+  mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) |>
   distinct(adm_1_origin, adm_1_destination, trips_avg, 
-           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) %>%
+           adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
   ungroup()
 
 # Check number of units, should be number of adm 2 units
