@@ -31,13 +31,10 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 # 2. CREATE METAPOPULATION MODEL #
 ##################################
 
-# Load covid-19 data
-load('./tmp/covid_model_case_inputs.RData')
-
 # Create a discrete time sir function
 run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,  
                           adm_name_vec, adm_level = c('1', '2', '3'), pop_vec,
-                          intro_adm = c('Colombo', 'Madhu', 'Random', 'COVID', 'All'), intro_num,
+                          intro_adm = c('Colombo', 'Madhu', 'Random', 'All'), intro_num,
                           adm_x_walk, travel_mat, max_time, time_step, mobility) {
   
   # Set number of locations
@@ -146,20 +143,6 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
       i_mat['Madhu', 1] <- 1
     }
   }
-  if (intro_adm == 'COVID') {
-    if (adm_level == '1') {
-      # Place an infected individual in the admin unit
-      i_mat[, 1] <- round(covid_dat_province_restrict_mat[, 1], digits = 0)
-    }
-    if (adm_level == '2') {
-      # Place an infected individual in the admin unit
-      i_mat[, 1] <- round(covid_dat_district_restrict_mat[, 1], digits = 0)
-    }
-    if (adm_level == '3') {
-      # Place an infected individual in the admin unit
-      i_mat[, 1] <- round(covid_dat_division_restrict_mat[, 1], digits = 0)
-    }
-  }
   
   # Loop through time steps
   for (i in 2:n_steps) {
@@ -244,16 +227,16 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
   combine_dat$adm_name <- c(adm_name_vec)
   # Merge on higher level admin information
   if (adm_level == '1') {
-    combine_dat <- combine_dat %>%
+    combine_dat <- combine_dat |>
       dplyr::rename('adm_1' = 'adm_name')
   }
   if (adm_level == '2') {
-    combine_dat <- combine_dat %>%
+    combine_dat <- combine_dat |>
       dplyr::rename('adm_2' = 'adm_name')
     combine_dat <- left_join(combine_dat, adm_x_walk,  by = c('adm_2' = 'adm_2'))
   }
   if (adm_level == '3') {
-    combine_dat <- combine_dat %>%
+    combine_dat <- combine_dat |>
       dplyr::rename('adm_3' = 'adm_name')
     combine_dat <- left_join(combine_dat, adm_x_walk,  by = c('adm_3' = 'adm_3'))
   }
@@ -267,7 +250,7 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
 run_seir_model_multi <- function(n, density_dep, method = c('average', 'append', 'run_sum'),
                                 R_0, gamma, sigma, prop_s, adm_name_vec, 
                                 adm_level = c('1', '2', '3'), pop_vec,
-                                intro_adm = c('Colombo', 'Gampaha', 'Jaffna', 'Hambantota', 'Madhu'), intro_num,
+                                intro_adm = c('Colombo', 'Madhu', 'Random', 'All'), intro_num,
                                 adm_x_walk, travel_mat, max_time, time_step, mobility) {
   
   # Loop through multiple runs of the SIR model
@@ -303,44 +286,44 @@ run_seir_model_multi <- function(n, density_dep, method = c('average', 'append',
   }
   # If run_sum, sum incident infections by run number
   if (method == 'run_sum') {
-    multi_run <- multi_run %>%
-      group_by(run_num) %>%
-      mutate(incid_I_sum = sum(incid_I)) %>%
+    multi_run <- multi_run |>
+      group_by(run_num) |>
+      mutate(incid_I_sum = sum(incid_I)) |>
       distinct(run_num, incid_I_sum, .keep_all = FALSE)
   }
   # If average, average across time periods and admin units
   # Different by admin level
   if (method == 'average') {
     if (adm_level == '1') {
-      multi_run <- multi_run %>%
-        group_by(time, adm_1) %>%
+      multi_run <- multi_run |>
+        group_by(time, adm_1) |>
         mutate(S_avg = mean(S), 
                E_avg = mean(E),
                I_avg = mean(I),
                incid_I_avg = mean(incid_I),
-               R_avg = mean(R)) %>%
+               R_avg = mean(R)) |>
         distinct(time, adm_1, S_avg, E_avg, I_avg, incid_I_avg, R_avg, adm_level, 
                  .keep_all = FALSE)
     }
     if (adm_level == '2') {
-      multi_run <- multi_run %>%
-        group_by(time, adm_2) %>%
+      multi_run <- multi_run |>
+        group_by(time, adm_2) |>
         mutate(S_avg = mean(S), 
                E_avg = mean(E),
                I_avg = mean(I),
                incid_I_avg = mean(incid_I),
-               R_avg = mean(R)) %>%
+               R_avg = mean(R)) |>
         distinct(time, adm_2, S_avg, E_avg, I_avg, incid_I_avg, R_avg, adm_level, 
                  adm_1, .keep_all = FALSE)
     }
     if (adm_level == '3') {
-      multi_run <- multi_run %>%
-        group_by(time, adm_3) %>%
+      multi_run <- multi_run |>
+        group_by(time, adm_3) |>
         mutate(S_avg = mean(S),
                E_avg = mean(E),
                I_avg = mean(I),
                incid_I_avg = mean(incid_I),
-               R_avg = mean(R)) %>%
+               R_avg = mean(R)) |>
         distinct(time, adm_3, S_avg, E_avg, I_avg, incid_I_avg, R_avg, adm_level,
                  adm_2, adm_1, .keep_all = FALSE)
     }
