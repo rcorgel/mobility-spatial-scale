@@ -1,14 +1,13 @@
 ################################################################################
-# File Name: figure_1                                                          #
+# File Name: 05i_figure_4_example                                              #
 #                                                                              #
-# Purpose:   Create figure 1 for the paper.                                    #
+# Purpose:   Create figure 4 for the manuscript.                               #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Create figure functions                                        #
-#            3. Create map schematic subfigures                                #
-#            4. Create external subfigures                                     #
-#            5. Create internal subfigures                                     #
-#            6. Create final figure                                            #
+#            3. Simulate example epidemics                                     #
+#            4. Create subfigures                                              #
+#            5. Create final figure                                            #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -79,7 +78,7 @@ choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/',
 
 # Load mobility to shape cross walk
 # The mobility data combines multiple admin 3 units, changing the total from 339 to 330
-mobility_shape_xwalk <- read.csv('./tmp/mobility_shape_xwalk.csv')
+mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
 
 # Merge on the cross walk
 choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
@@ -89,13 +88,6 @@ choropleth_3_mobility <- choropleth_3 %>%
   group_by(adm_3_mobility) %>%
   summarise(geometry = sf::st_union(geometry)) %>%
   ungroup()
-
-# Create maps for figure 2
-make_simple_map(data = choropleth_1, coord_data = coordinate_cities) + 
-  coord_sf(ylim = c(8.4, 9.8), xlim = c(79.6, 81.3), expand = TRUE)
-
-make_simple_map(data = choropleth_2, coord_data = coordinate_cities) + 
-  coord_sf(ylim = c(8.4, 9.8), xlim = c(79.6, 81.3), expand = TRUE)
 
 # Main map
 map <- ggplot() +
@@ -246,7 +238,7 @@ adm_3_at_1_obs_mad <- adm_3_obs_mad %>% group_by(time, adm_1, run_num) %>%
   mutate(intro_time = mean(time),
          intro_loc = 'Madhu') %>% dplyr::select(time, adm_1, magnitude, intro_time)
 
-adm_3_sim_col <- run_seir_model_multi(n = 50, density_dep = FALSE, method = 'append',
+adm_3_sim_col <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
                                      R_0 = 1.5, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
                                      adm_name_vec = adm_3_name_vec, adm_level = '3', 
                                      pop_vec = adm_3_pop_vec, intro_adm = 'Colombo', intro_num = 1,
@@ -303,7 +295,7 @@ adm_3_at_1_sim_col <- adm_3_sim_col %>% group_by(time, adm_1, run_num) %>%
   mutate(intro_time = mean(time),
          intro_loc = 'Colombo') %>% dplyr::select(time, adm_1, magnitude, intro_time)
 
-adm_3_sim_mad <- run_seir_model_multi(n = 50, density_dep = FALSE, method = 'append',
+adm_3_sim_mad <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
                                      R_0 = 1.5, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
                                      adm_name_vec = adm_3_name_vec, adm_level = '3', 
                                      pop_vec = adm_3_pop_vec, intro_adm = 'Madhu', intro_num = 1,

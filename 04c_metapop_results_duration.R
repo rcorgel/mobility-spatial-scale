@@ -48,8 +48,6 @@ load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
 # Create function to run multiple simulations at admin level 3 and aggregate to
 # levels 1 and 2, then run in parallel
 run_seir_model_multi_adm_3 <- function(duration, intro_loc, data) {
-  # Show progress
-  print(intro_num)
   
   # Run model
   adm_3 <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',

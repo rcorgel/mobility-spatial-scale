@@ -45,8 +45,6 @@ load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
 # Create function to run multiple simulations at admin level 3 and aggregate to
 # levels 1 and 2, then run in parallel
 run_seir_model_multi_adm_3 <- function(intro_num, data) {
-  # Show progress
-  print(intro_num)
   
   # Run model
   adm_3 <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
@@ -135,6 +133,7 @@ run_seir_model_multi_adm_3 <- function(intro_num, data) {
 # Observed data: loop through all introduction locations and save to object
 adm_3_mp <- mclapply(1:330, run_seir_model_multi_adm_3, data = adm_3_phone_mobility_mat)
 adm_3_mp_df <- bind_rows(adm_3_mp)
+saveRDS(adm_3_mp_df, './tmp/introduction_location_model_results_obs_adm_3.RData')
 adm_3_at_1_mp <- adm_3_mp_df |> filter(level == '1')
 adm_3_at_2_mp <- adm_3_mp_df |> filter(level == '2')
 
@@ -143,6 +142,7 @@ adm_3_sim <- mclapply(1:330, run_seir_model_multi_adm_3, data = adm_3_phone_pred
 adm_3_sim_df <- bind_rows(adm_3_sim)
 adm_3_at_1_sim <- adm_3_sim_df |> filter(level == '1')
 adm_3_at_2_sim <- adm_3_sim_df |> filter(level == '2')
+saveRDS(adm_3_sim_df, './tmp/introduction_location_model_results_sim_adm_3.RData')
 
 #########################################################
 # 3. RUN METAPOPULATION MODEL AT ADMINISTRATIVE LEVEL 2 #
@@ -261,7 +261,7 @@ mobility_dat_adm_1 <- list(adm_1_phone_mobility_mat, adm_1_phone_pred_mobility_m
 for (i in seq(1, 2, 1)) {
   for (j in seq(1, 9, 1)) {
     # Run model
-    adm_1 <- run_seir_model_multi(n = 50, density_dep = FALSE, method = 'append',
+    adm_1 <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
                                  R_0 = 1.5, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
                                  adm_name_vec = adm_1_name_vec, adm_level = '1', 
                                  pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = j,

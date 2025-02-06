@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05_missingness_regression                                         #
+# File Name: 05a_table_S.1_missingness                                         #
 # Purpose:   Find out which variables are significantly related to missing     # 
 #            data.                                                             #
 # Steps:                                                                       # 

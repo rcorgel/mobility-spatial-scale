@@ -2,12 +2,13 @@
 # File Name: 04e_metapop_results_intro_loc_sens                                #
 #                                                                              #
 # Purpose:   Examine differences in metapopulation model results between       #
-#            different mobility spatial scale across introduction locations    #
+#            different mobility spatial scale across introduction locations.   #
+#            Similar to 04a but for the sensitivity analysis where the         #
+#            homogeneous mixing assumption is examined.                        #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Run metapopulation model at administrative level 3             #
 #            3. Run metapopulation model at administrative level 2             #
-#            4. Run metapopulation model at administrative level 1             #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -44,8 +45,6 @@ load('./tmp/rescale_phone_mobility_dat.RData')
 # Create function to run multiple simulations at admin level 3 and aggregate to
 # levels 1 and 2, then run in parallel
 run_seir_model_multi_adm_3 <- function(intro_num, data) {
-  # Show progress
-  print(intro_num)
   
   # Run model
   adm_3 <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
@@ -131,14 +130,14 @@ run_seir_model_multi_adm_3 <- function(intro_num, data) {
   return(list(adm_3_at_2, adm_3_at_1))
 }
 
-# Observed data: loop through all introduction locations and save to object
-adm_3_mp <- mclapply(1:330, run_seir_model_multi_adm_3, data = adm_3_phone_mobility_mat_rescale_adm_1)
+# Observed data: loop through all introduction locations and save to object (Rescaled to adm 1)
+adm_3_mp <- mclapply(1:330, run_seir_model_multi_adm_3, data = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1))
 adm_3_mp_df <- bind_rows(adm_3_mp)
 adm_3_at_1_mp_sens_1 <- adm_3_mp_df |> filter(level == '1')
 adm_3_at_2_mp_sens_1 <- adm_3_mp_df |> filter(level == '2')
 
-# Simulated data: loop through all introduction locations and save to object
-adm_3_mp <- mclapply(1:330, run_seir_model_multi_adm_3, data = adm_3_phone_mobility_mat_rescale_adm_2)
+# Observed Data: loop through all introduction locations and save to object (Rescaled to adm 2)
+adm_3_mp <- mclapply(1:330, run_seir_model_multi_adm_3, data = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2))
 adm_3_mp_df <- bind_rows(adm_3_mp)
 adm_3_at_1_mp_sens_2 <- adm_3_mp_df |> filter(level == '1')
 adm_3_at_2_mp_sens_2 <- adm_3_mp_df |> filter(level == '2')
@@ -154,7 +153,7 @@ adm_2_at_2_mp_sens_2 <- NULL
 adm_2_at_1_mp_sens_2 <- NULL
 
 # Create object for mobility data
-mobility_dat_adm_2 <- list(adm_2_phone_mobility_mat_rescale, adm_2_phone_mobility_mat)
+mobility_dat_adm_2 <- list(as.matrix(adm_2_phone_mobility_mat_rescale), adm_2_phone_mobility_mat)
 
 # Run 50 iterations for each introduction location
 for (i in seq(1, 2, 1)) {
@@ -248,8 +247,12 @@ for (i in seq(1, 2, 1)) {
 # Save results
 save(list = c('adm_3_at_1_mp_sens_1',
               'adm_3_at_2_mp_sens_2', 
-              'adm_2_at_1_mp_sens_1', 
-              'adm_2_at_2_mp_sens_2'), 
+              'adm_2_at_1_mp_sens_1',
+              'adm_2_at_1_mp_sens_2',
+              'adm_2_at_2_mp_sens_2',
+              'adm_2_at_2_mp_sens_1',
+              'adm_3_at_1_mp_sens_2',
+              'adm_3_at_2_mp_sens_1'), 
      file = './tmp/introduction_location_model_results_obs_sens.RData')
 
 ################################################################################
