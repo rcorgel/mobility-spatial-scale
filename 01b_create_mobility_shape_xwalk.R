@@ -122,7 +122,7 @@ verify(mobility_shape_xwalk, length(unique(adm_3_shape)) == 339)
 verify(mobility_shape_xwalk, length(unique(adm_3_mobility)) == 330)
 
 # Save crosswalk
-saveRDS(mobility_shape_xwalk, './tmp/mobility_shape_xwalk.rds')
+saveRDS(mobility_shape_xwalk, './out/mobility_shape_xwalk.rds')
 
 ################################################################################
 ################################################################################

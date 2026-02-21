@@ -271,9 +271,9 @@ verify(adm_1_phone_mobility_dat, length(unique(adm_1_origin)) == 9)
 verify(adm_1_phone_mobility_dat, length(unique(adm_1_destination)) == 9)
 
 # Save various administrative levels of mobile phone data
-saveRDS(adm_3_phone_mobility_dat, './tmp/adm_3_phone_mobility_dat.rds')
-saveRDS(adm_2_phone_mobility_dat, './tmp/adm_2_phone_mobility_dat.rds')
-saveRDS(adm_1_phone_mobility_dat, './tmp/adm_1_phone_mobility_dat.rds')
+saveRDS(adm_3_phone_mobility_dat, './out/adm_3_phone_mobility_dat.rds')
+saveRDS(adm_2_phone_mobility_dat, './out/adm_2_phone_mobility_dat.rds')
+saveRDS(adm_1_phone_mobility_dat, './out/adm_1_phone_mobility_dat.rds')
 
 ################################################################################
 ################################################################################

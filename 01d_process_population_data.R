@@ -155,10 +155,9 @@ sum(adm_2_population_dat$population_2020_adm_2)
 sum(adm_3_population_dat$population_2020_adm_3)
 
 # Save various administrative levels of population data
-save(list = c('adm_3_population_dat', 
-              'adm_2_population_dat', 
-              'adm_1_population_dat'), 
-     file = './tmp/adm_population_dat.RData')
+saveRDS(adm_3_population_dat, './out/adm_3_population_dat.rds')
+saveRDS(adm_2_population_dat, './out/adm_2_population_dat.rds')
+saveRDS(adm_1_population_dat, './out/adm_1_population_dat.rds')
 
 ################################################################################
 ################################################################################

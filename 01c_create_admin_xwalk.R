@@ -60,7 +60,7 @@ verify(admin_xwalk, length(unique(adm_3)) == 330)
 verify(admin_xwalk, length(unique(adm_3_code)) == 330)
 
 # Save crosswalk
-saveRDS(admin_xwalk, './tmp/admin_xwalk.rds')
+saveRDS(admin_xwalk, './out/admin_xwalk.rds')
 
 ################################################################################
 ################################################################################
