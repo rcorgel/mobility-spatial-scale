@@ -97,8 +97,7 @@ mobility_dat <- rbind(nov_mobility_dat, dec_mobility_dat, jan_mobility_dat,
 mobility_dat %>% assert(in_set(c(1, 2, 3, 11, 12)), month)
 
 # Merge on provinces and codes (ADM 1)
-district_province_xwalk <- 
-  read_csv('./raw/district_province_xwalk.csv')
+district_province_xwalk <- read_csv('./raw/district_province_xwalk.csv')
 mobility_dat <- left_join(mobility_dat, district_province_xwalk, 
                           by = c('admin_level_2_origin' = 'district'))
 mobility_dat <- left_join(mobility_dat, district_province_xwalk, 
@@ -121,6 +120,10 @@ mobility_dat <- mobility_dat |>
          'trips' = 'people') 
 
 # Drop unknown destination and/or origin
+# Confirm unknowns are a very low percentage (0.3%)
+nrow(mobility_dat[mobility_dat$adm_3_origin == '[unknown]' | 
+                    mobility_dat$adm_3_destination == '[unknown]',]) / nrow(mobility_dat)
+# Complete drop
 mobility_dat <- mobility_dat |>
   filter(adm_3_origin != '[unknown]') |>
   filter(adm_3_destination != '[unknown]')
@@ -140,7 +143,7 @@ phone_mobility_dat_nov_jan <- mobility_dat |>
   filter(month != 3)
 saveRDS(phone_mobility_dat_nov_jan, './tmp/phone_mobility_dat_nov_jan.rds')
 
-# Remove individual month mobility data data
+# Remove individual month mobility data
 rm(list = c('nov_mobility_dat', 'dec_mobility_dat', 'jan_mobility_dat', 
             'feb_mobility_dat', 'mar_mobility_dat', 'phone_mobility_dat_nov_jan'))
 
@@ -207,8 +210,10 @@ saveRDS(phone_mobility_dat, './tmp/phone_mobility_dat.rds')
 
 # Collapse to different admin levels (and day level)
 # Calculate daily average trips between locations
+
 # Admin level 3
-adm_3_phone_mobility_dat <- phone_mobility_dat |>                                
+adm_3_phone_mobility_dat <- phone_mobility_dat |> 
+  # Calculate average daily trips
   group_by(adm_3_origin, adm_3_destination) |>
   mutate(trips_avg = mean(trips_adj, na.rm = TRUE)) |>
   distinct(adm_3_origin, adm_3_destination, trips_avg, 
@@ -233,7 +238,7 @@ adm_2_phone_mobility_dat <- phone_mobility_dat |>
            adm_1_origin, adm_1_destination, 
            adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
   ungroup() |>
-# Calculate average daily trips
+  # Calculate average daily trips
   group_by(adm_2_origin, adm_2_destination) |>
   mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) |>
   distinct(adm_2_origin, adm_2_destination, trips_avg, 
@@ -254,7 +259,7 @@ adm_1_phone_mobility_dat <- phone_mobility_dat |>
   distinct(adm_1_origin, adm_1_destination, date, trips_sum, 
            adm_1_origin_code, adm_1_destination_code, .keep_all = FALSE) |>
   ungroup() |>
-# Calculate average daily trips
+  # Calculate average daily trips
   group_by(adm_1_origin, adm_1_destination) |>
   mutate(trips_avg = mean(trips_sum, na.rm = TRUE)) |>
   distinct(adm_1_origin, adm_1_destination, trips_avg, 
@@ -266,10 +271,9 @@ verify(adm_1_phone_mobility_dat, length(unique(adm_1_origin)) == 9)
 verify(adm_1_phone_mobility_dat, length(unique(adm_1_destination)) == 9)
 
 # Save various administrative levels of mobile phone data
-save(list = c('adm_3_phone_mobility_dat', 
-              'adm_2_phone_mobility_dat', 
-              'adm_1_phone_mobility_dat'), 
-     file = './tmp/adm_phone_mobility_dat.RData')
+saveRDS(adm_3_phone_mobility_dat, './tmp/adm_3_phone_mobility_dat.rds')
+saveRDS(adm_2_phone_mobility_dat, './tmp/adm_2_phone_mobility_dat.rds')
+saveRDS(adm_1_phone_mobility_dat, './tmp/adm_1_phone_mobility_dat.rds')
 
 ################################################################################
 ################################################################################

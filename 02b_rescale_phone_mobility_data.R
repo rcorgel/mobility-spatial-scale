@@ -76,34 +76,36 @@ adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_3_x_walk,
 adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_3_x_walk,
                                        by = c('destination' = 'adm_3'))
 
-# Create variable to evaluate internal and external travel (Admin 3)
-adm_3_phone_mobility_long$type <- ifelse(adm_3_phone_mobility_long$adm_2.x == 
-                                           adm_3_phone_mobility_long$adm_2.y, 
-                                         'internal', 'external')
+# # Create variable to evaluate internal and external travel (Admin 3)
+# adm_3_phone_mobility_long$type <- ifelse(adm_3_phone_mobility_long$adm_2.x == 
+#                                            adm_3_phone_mobility_long$adm_2.y, 
+#                                          'internal', 'external')
 # Calculate internal and external travel for admin 3 at admin 2
-adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin, type) |>
+adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin, adm_2.y) |>
   mutate(type_sum = sum(value))
 
-# Create variable to evaluate internal and external travel (Admin 2)
-adm_2_phone_mobility_long$type <- ifelse(adm_2_phone_mobility_long$origin == 
-                                           adm_2_phone_mobility_long$destination, 
-                                         'internal', 'external')
+# # Create variable to evaluate internal and external travel (Admin 2)
+# adm_2_phone_mobility_long$type <- ifelse(adm_2_phone_mobility_long$origin == 
+#                                            adm_2_phone_mobility_long$destination, 
+#                                          'internal', 'external')
 # Calculate internal and external travel for admin 2
-adm_2_phone_mobility_long_merge <- adm_2_phone_mobility_long |> group_by(origin, type) |>
-  mutate(type_sum_adm_2 = sum(value)) |> distinct(origin, type, type_sum_adm_2, .keep_all = FALSE)
+# adm_2_phone_mobility_long_merge <- adm_2_phone_mobility_long |> group_by(origin, type) |>
+#   mutate(type_sum_adm_2 = sum(value)) |> distinct(origin, type, type_sum_adm_2, .keep_all = FALSE)
 
 # Join admin 2 travel to admin 3 travel
-adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_2_phone_mobility_long_merge,
-                                       by = c('adm_2.x' = 'origin', 'type' = 'type'))
+adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_2_phone_mobility_long,
+                                       by = c('adm_2.x' = 'origin', 'adm_2.y' = 'destination'))
 
 # Rescale admin 3 travel to match internal and external travel at admin 2
-adm_3_phone_mobility_long$value_rescale <- adm_3_phone_mobility_long$value * 
-  (adm_3_phone_mobility_long$type_sum_adm_2/adm_3_phone_mobility_long$type_sum)
+adm_3_phone_mobility_long$value_rescale <- adm_3_phone_mobility_long$value.x * 
+  (adm_3_phone_mobility_long$value.y/adm_3_phone_mobility_long$type_sum)
 
 # Check to make sure rescale went well
 adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin) |>
-  mutate(check = sum(value_rescale)) |> ungroup() |> group_by(origin, type) |>
-  mutate(check_sum = sum(value_rescale))
+  mutate(check = sum(value_rescale)) |> ungroup() 
+
+# Select variables
+adm_3_phone_mobility_mat_rescale_adm_2_long <- adm_3_phone_mobility_long[, c('origin', 'destination', 'value_rescale')]
 
 # Transform into a matrix
 adm_3_phone_mobility_mat_rescale_adm_2 <- reshape::cast(
@@ -124,7 +126,7 @@ load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
 adm_3_phone_mobility_long$value <- ifelse(is.na(adm_3_phone_mobility_long$value), 
                                           0, adm_3_phone_mobility_long$value)
 
-# Merge admin 2 to admin 3 
+# Merge admin 1 to admin 3 
 # Merge on admin 1 origins
 adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_3_x_walk,
                                        by = c('origin' = 'adm_3'))
@@ -133,33 +135,35 @@ adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_3_x_walk,
                                        by = c('destination' = 'adm_3'))
 
 # Create variable to evaluate internal and external travel (Admin 3)
-adm_3_phone_mobility_long$type <- ifelse(adm_3_phone_mobility_long$adm_1.x == 
-                                           adm_3_phone_mobility_long$adm_1.y, 
-                                         'internal', 'external')
+# adm_3_phone_mobility_long$type <- ifelse(adm_3_phone_mobility_long$adm_1.x == 
+#                                            adm_3_phone_mobility_long$adm_1.y, 
+#                                          'internal', 'external')
 # Calculate internal and external travel for admin 3 at admin 1
-adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin, type) |>
+adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin, adm_1.y) |>
   mutate(type_sum = sum(value))
-
-# Create variable to evaluate internal and external travel (Admin 1)
-adm_1_phone_mobility_long$type <- ifelse(adm_1_phone_mobility_long$origin == 
-                                           adm_1_phone_mobility_long$destination, 
-                                         'internal', 'external')
-# Calculate internal and external travel for admin 2
-adm_1_phone_mobility_long_merge <- adm_1_phone_mobility_long |> group_by(origin, type) |>
-  mutate(type_sum_adm_1 = sum(value)) |> distinct(origin, type, type_sum_adm_1, .keep_all = FALSE)
+# 
+# # Create variable to evaluate internal and external travel (Admin 1)
+# adm_1_phone_mobility_long$type <- ifelse(adm_1_phone_mobility_long$origin == 
+#                                            adm_1_phone_mobility_long$destination, 
+#                                          'internal', 'external')
+# # Calculate internal and external travel for admin 2
+# adm_1_phone_mobility_long_merge <- adm_1_phone_mobility_long |> group_by(origin, type) |>
+#   mutate(type_sum_adm_1 = sum(value)) |> distinct(origin, type, type_sum_adm_1, .keep_all = FALSE)
 
 # Join admin 2 travel to admin 3 travel
-adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_1_phone_mobility_long_merge,
-                                       by = c('adm_1.x' = 'origin', 'type' = 'type'))
+adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, adm_1_phone_mobility_long,
+                                       by = c('adm_1.x' = 'origin', 'adm_1.y' = 'destination'))
 
 # Rescale admin 3 travel to match internal and external travel at admin 2
-adm_3_phone_mobility_long$value_rescale <- adm_3_phone_mobility_long$value * 
-  (adm_3_phone_mobility_long$type_sum_adm_1/adm_3_phone_mobility_long$type_sum)
+adm_3_phone_mobility_long$value_rescale <- adm_3_phone_mobility_long$value.x * 
+  (adm_3_phone_mobility_long$value.y/adm_3_phone_mobility_long$type_sum)
 
 # Check to make sure rescale went well
 adm_3_phone_mobility_long <- adm_3_phone_mobility_long |> group_by(origin) |>
-  mutate(check = sum(value_rescale)) |> ungroup() |> group_by(origin, type) |>
-  mutate(check_sum = sum(value_rescale))
+  mutate(check = sum(value_rescale)) 
+
+# Select variables
+adm_3_phone_mobility_mat_rescale_adm_1_long <- adm_3_phone_mobility_long[, c('origin', 'destination', 'value_rescale')]
 
 # Transform into a matrix
 adm_3_phone_mobility_mat_rescale_adm_1 <- reshape::cast(
@@ -184,34 +188,36 @@ adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, adm_2_x_walk,
 adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, adm_2_x_walk,
                                        by = c('destination' = 'adm_2'))
 
-# Create variable to evaluate internal and external travel (Admin 2)
-adm_2_phone_mobility_long$type <- ifelse(adm_2_phone_mobility_long$adm_1.x == 
-                                           adm_2_phone_mobility_long$adm_1.y, 
-                                         'internal', 'external')
+# # Create variable to evaluate internal and external travel (Admin 2)
+# adm_2_phone_mobility_long$type <- ifelse(adm_2_phone_mobility_long$adm_1.x == 
+#                                            adm_2_phone_mobility_long$adm_1.y, 
+#                                          'internal', 'external')
 # Calculate internal and external travel for admin 2 at admin 1
-adm_2_phone_mobility_long <- adm_2_phone_mobility_long |> group_by(origin, type) |>
+adm_2_phone_mobility_long <- adm_2_phone_mobility_long |> group_by(origin, adm_1.y) |>
   mutate(type_sum = sum(value))
 
-# Create variable to evaluate internal and external travel (Admin 1)
-adm_1_phone_mobility_long$type <- ifelse(adm_1_phone_mobility_long$origin == 
-                                           adm_1_phone_mobility_long$destination, 
-                                         'internal', 'external')
-# Calculate internal and external travel for admin 1
-adm_1_phone_mobility_long_merge <- adm_1_phone_mobility_long |> group_by(origin, type) |>
-  mutate(type_sum_adm_1 = sum(value)) |> distinct(origin, type, type_sum_adm_1, .keep_all = FALSE)
+# # Create variable to evaluate internal and external travel (Admin 1)
+# adm_1_phone_mobility_long$type <- ifelse(adm_1_phone_mobility_long$origin == 
+#                                            adm_1_phone_mobility_long$destination, 
+#                                          'internal', 'external')
+# # Calculate internal and external travel for admin 1
+# adm_1_phone_mobility_long_merge <- adm_1_phone_mobility_long |> group_by(origin, type) |>
+#   mutate(type_sum_adm_1 = sum(value)) |> distinct(origin, type, type_sum_adm_1, .keep_all = FALSE)
 
 # Join admin 1 travel to admin 2 travel
-adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, adm_1_phone_mobility_long_merge,
-                                       by = c('adm_1.x' = 'origin', 'type' = 'type'))
+adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, adm_1_phone_mobility_long,
+                                       by = c('adm_1.x' = 'origin', 'adm_1.y' = 'destination'))
 
 # Rescale admin 2 travel to match internal and external travel at admin 1
-adm_2_phone_mobility_long$value_rescale <- adm_2_phone_mobility_long$value * 
-  (adm_2_phone_mobility_long$type_sum_adm_1/adm_2_phone_mobility_long$type_sum)
+adm_2_phone_mobility_long$value_rescale <- adm_2_phone_mobility_long$value.x * 
+  (adm_2_phone_mobility_long$value.y/adm_2_phone_mobility_long$type_sum)
 
 # Check to make sure rescale went well
 adm_2_phone_mobility_long <- adm_2_phone_mobility_long |> group_by(origin) |>
-  mutate(check = sum(value_rescale)) |> ungroup() |> group_by(origin, type) |>
-  mutate(check_sum = sum(value_rescale))
+  mutate(check = sum(value_rescale))
+
+# Select variables
+adm_2_phone_mobility_mat_rescale_long <- adm_2_phone_mobility_long[, c('origin', 'destination', 'value_rescale')]
 
 # Transform into a matrix
 adm_2_phone_mobility_mat_rescale <- reshape::cast(
@@ -226,8 +232,11 @@ adm_2_phone_mobility_mat_rescale <- adm_2_phone_mobility_mat_rescale[, -1]
 
 save(list = c('adm_3_phone_mobility_mat_rescale_adm_2', 
               'adm_3_phone_mobility_mat_rescale_adm_1', 
-              'adm_2_phone_mobility_mat_rescale'), 
-     file = './tmp/rescale_phone_mobility_dat.RData')
+              'adm_2_phone_mobility_mat_rescale',
+              'adm_3_phone_mobility_mat_rescale_adm_2_long', 
+              'adm_3_phone_mobility_mat_rescale_adm_1_long', 
+              'adm_2_phone_mobility_mat_rescale_long'), 
+     file = './tmp/rescale_phone_mobility_dat_2.RData')
 
 ################################################################################
 ################################################################################

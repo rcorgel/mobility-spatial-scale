@@ -238,6 +238,19 @@ adm_2_obs_col <- run_seir_model_multi(n = 50, density_dep = FALSE, method = 'app
                                       adm_x_walk = adm_2_x_walk, 
                                       travel_mat = adm_2_phone_mobility_mat, 
                                       max_time = 365, time_step = 1, mobility = TRUE)
+
+
+ggplot(adm_2_obs_col[adm_2_obs_col$adm_2 == 'Kandy',]) +
+  geom_line(aes(x = time, y = incid_I, group = run_num), 
+            color = '#607AE0', linewidth = 1, alpha = 0.5) + 
+  theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(), panel.background = element_blank(),
+        axis.text = element_blank(), axis.title=element_text(size=26)) + 
+  xlab("Time") + ylab("Cases")
+
+
+
 # Average at the Admin 2 level
 adm_2_at_2_obs_col <- adm_2_obs_col %>%
   group_by(time, adm_2) %>%
@@ -256,7 +269,7 @@ adm_2_at_0_obs_col <- adm_2_at_2_obs_col %>%
 # Graph an epidemic curve at the national level
 line <- ggplot() +
   geom_line(data = adm_2_at_0_obs_col, aes(x = time, y = avg_incid_I_adm_2), 
-            color = '#DDBAA4', linewidth = 3, alpha = 1) + 
+            color = '#347DC1', linewidth = 3, alpha = 1) + 
   theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         axis.ticks = element_blank(), panel.background = element_blank(),
@@ -298,8 +311,24 @@ line <- ggplot() +
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         axis.ticks = element_blank(), panel.background = element_blank(),
         axis.text = element_blank(), axis.title=element_text(size=26),
-        legend.position = 'none') + ylim(0, 12000) +
-  xlab("Time") + ylab("Cases") + scale_color_manual(values = c("#ABDDA4", "#A4C7DD","#D6A4DD"))
+        legend.position = 'none') + ylim(0, 5000) +
+  xlab("Time") + ylab("Cases") + scale_color_manual(values = c('#9B59B6', '#d7642c', '#3cbb75ff'))
+
+line <- ggplot() +
+  geom_line(data = adm_2_at_2_obs_col_filt, aes(x = time, y = avg_incid_I_adm_2, color = adm_2), 
+            linewidth = 4, alpha = 1) + 
+  theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(), panel.background = element_blank(),
+        axis.text = element_blank(), axis.title=element_text(size=26),
+        axis.line.y = element_blank(), axis.line.x = element_blank(),
+        legend.position = 'none') + ylim(0, 5000) +
+  xlab("") + ylab("") + scale_color_manual(values = c('#9B59B6', '#d7642c', '#3cbb75ff'))
+line
+
+line
+#"#ABDDA4", "#A4C7DD","#D6A4DD"
+
 
 # Save
 ggsave('./figs/subnational_level_curve.jpg', plot = line, height = 4, width = 6)

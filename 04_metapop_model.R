@@ -32,7 +32,7 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 ##################################
 
 # Create a discrete time sir function
-run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,  
+run_seir_model <- function(j, density_dep , R_0, gamma, sigma, prop_s,  
                           adm_name_vec, adm_level = c('1', '2', '3'), pop_vec,
                           intro_adm = c('Colombo', 'Madhu', 'Random', 'All'), intro_num,
                           adm_x_walk, travel_mat, max_time, time_step, mobility) {
@@ -59,11 +59,11 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
   if (density_dep == TRUE) {
     divisor <- 1
     # Mean admin population is used to calculate beta
-    beta <- (R_0 * gamma) / mean(pop_vec)
+    beta <- (R_0 * (gamma)) / mean(pop_vec)
   }
   if (density_dep == FALSE) {
     divisor <- pop_vec
-    beta <- R_0 * gamma
+    beta <- R_0 * (gamma)
   }
   
   # Create empty matrices to fill with each location's SIR results
@@ -149,10 +149,11 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
     # Replace NAs with 0 in travel matrix
     travel_mat[is.na(travel_mat)] <- 0
     # Create population matrix for travel stochastic element so trips are estimated based on population
-    pop_mat <- matrix(ceiling(pop_vec), nrow = length(pop_vec), ncol = length(pop_vec))
+    #pop_mat <- matrix(ceiling(pop_vec), nrow = length(pop_vec), ncol = length(pop_vec))
     # Stochastic element of  travel, pulling from a binomial distribution
-    travel_mat_binom <- matrix(rbinom(length(travel_mat), pop_mat, travel_mat), 
-                               nrow = nrow(travel_mat))
+    #travel_mat_binom <- matrix(rbinom(length(travel_mat), pop_mat, travel_mat), 
+                               #nrow = nrow(travel_mat))
+    travel_mat_binom <- travel_mat
     # There should not be NAs, but replace just in case
     travel_mat_binom[is.na(travel_mat_binom)] <- 0
     # Normalize new travel matrix since output it no longer proportions
@@ -173,17 +174,21 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
     # Estimate probability of exposure
     # Equation 2 from https://www.medrxiv.org/content/medrxiv/early/2024/03/11/2023.11.22.23298916.full.pdf
     if (mobility == TRUE) {
+      n_eff <- t(travel_mat_binom_norm) %*% divisor
+      n_eff_rep <- matrix(n_eff, nrow=length(n_eff), ncol=length(n_eff), byrow=FALSE)
+      i_eff <- t(travel_mat_binom_norm) %*% i_mat[, i-1]
+
       prob_expose <- 1 - exp(-time_step *
-                               ((beta * p_stay * (i_mat[, i-1] / divisor)) +
-                                (beta * (p_stay_rep * p_visit) %*% (i_mat[, i-1] / divisor)) +
-                                (beta * p_return %*% (i_mat[, i-1] / divisor))))
+                               ((beta * p_stay * (i_mat[, i-1] / n_eff)) +
+                                (beta * rowSums((diag(travel_mat_binom_norm) * p_visit) * t((i_mat[, i-1] / t(n_eff_rep))))) +
+                                (beta * p_return %*% (i_eff / n_eff))))
 
       # Old FOI equation
       # # Equation 2 from https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006600
       # prob_expose <- 1 - exp(-time_step * beta * (travel_mat_binom_norm %*%
-      #                                               ((t(travel_mat_binom_norm) %*% (i_mat[, i-1] / divisor)) /
-      #                                                  ((t(travel_mat_binom_norm) %*% ((s_mat[, i-1] + r_mat[, i-1] + e_mat[, i-1]) / divisor)) +
-      #                                                     (t(travel_mat_binom_norm) %*% (i_mat[, i-1] / divisor))))))
+      #                                              ((t(travel_mat_binom_norm) %*% (i_mat[, i-1] / divisor)) /
+      #                                                ((t(travel_mat_binom_norm) %*% ((s_mat[, i-1] + r_mat[, i-1] + e_mat[, i-1]) / divisor)) +
+      #                                                   (t(travel_mat_binom_norm) %*% (i_mat[, i-1] / divisor))))))
     }
     if (mobility == FALSE) {
       prob_expose <- 1 - exp(-time_step * beta * (i_mat[, i-1] / divisor))
@@ -225,6 +230,9 @@ run_seir_model <- function(density_dep , R_0, gamma, sigma, prop_s,
   combine_dat$adm_level <- adm_level
   # Add district name variable
   combine_dat$adm_name <- c(adm_name_vec)
+  # Add run number
+  combine_dat$run_num <- j
+  
   # Merge on higher level admin information
   if (adm_level == '1') {
     combine_dat <- combine_dat |>
