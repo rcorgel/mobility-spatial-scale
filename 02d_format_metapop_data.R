@@ -36,7 +36,9 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 #############################
 
 # Load population data for all administrative units
-load('./tmp/adm_population_dat.RData')
+adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
+adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
+adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
 
 # Administrative Unit 3
 adm_3_population_dat <- adm_3_population_dat |>
@@ -58,16 +60,26 @@ adm_1_pop_vec <- adm_1_population_dat$population_2020_adm_1
 ################################
 
 # Administrative Unit 3
-load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
+adm_3_phone_mobility_mat <- readRDS('./out/adm_3_phone_mobility_mat.rds')
 adm_3_name_vec <- colnames(adm_3_phone_mobility_mat)
+sorted_vector <- sort(adm_3_name_vec)
+adm_3_name_vec == sorted_vector # confirm sorting is alphabetical
+adm_3_population_dat$adm_3_mobility == sorted_vector # confirm population is alphabetical
 
 # Administrative Unit 2
-load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
+adm_2_phone_mobility_mat <- readRDS('./out/adm_2_phone_mobility_mat.rds')
 adm_2_name_vec <- colnames(adm_2_phone_mobility_mat)
+sorted_vector <- sort(adm_2_name_vec)
+adm_2_name_vec == sorted_vector # confirm sorting is alphabetical
+adm_2_population_dat$adm_2 == sorted_vector # confirm population is alphabetical
+
 
 # Administrative Unit 1
-load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
+adm_1_phone_mobility_mat <- readRDS('./out/adm_1_phone_mobility_mat.rds')
 adm_1_name_vec <- colnames(adm_1_phone_mobility_mat)
+sorted_vector <- sort(adm_1_name_vec)
+adm_1_name_vec == sorted_vector # confirm sorting is alphabetical
+adm_1_population_dat$adm_1 == sorted_vector # confirm population is alphabetical
 
 ####################################
 # 4. CREATE ADMIN LEVEL CROSSWALKS #
@@ -96,19 +108,21 @@ adm_2_x_walk <- admin_xwalk |>
 ################
 
 # Administrative Unit 3
-save(list = c('adm_3_phone_mobility_mat',
-              'adm_3_name_vec', 'adm_3_pop_vec', 'adm_3_x_walk'), 
-     file = './tmp/adm_3_metapop_dat.RData')
+saveRDS(adm_3_phone_mobility_mat, './out/adm_3_phone_mobility_mat.rds')
+saveRDS(adm_3_name_vec, './out/adm_3_name_vec.rds')
+saveRDS(adm_3_pop_vec, './out/adm_3_pop_vec.rds')
+saveRDS(adm_3_x_walk, './out/adm_3_x_walk.rds')
 
 # Administrative Unit 2
-save(list = c('adm_2_phone_mobility_mat', 
-              'adm_2_name_vec', 'adm_2_pop_vec', 'adm_2_x_walk'), 
-     file = './tmp/adm_2_metapop_dat.RData')
+saveRDS(adm_2_phone_mobility_mat, './out/adm_2_phone_mobility_mat.rds')
+saveRDS(adm_2_name_vec, './out/adm_2_name_vec.rds')
+saveRDS(adm_2_pop_vec, './out/adm_2_pop_vec.rds')
+saveRDS(adm_2_x_walk, './out/adm_2_x_walk.rds')
 
-# Administrative Unit 1
-save(list = c('adm_1_phone_mobility_mat',
-              'adm_1_name_vec', 'adm_1_pop_vec'), 
-     file = './tmp/adm_1_metapop_dat.RData')
+# Administrative Unit 3
+saveRDS(adm_1_phone_mobility_mat, './out/adm_1_phone_mobility_mat.rds')
+saveRDS(adm_1_name_vec, './out/adm_1_name_vec.rds')
+saveRDS(adm_1_pop_vec, './out/adm_1_pop_vec.rds')
 
 ################################################################################
 ################################################################################

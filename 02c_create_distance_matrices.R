@@ -167,9 +167,12 @@ names(dimnames(adm_1_dist_mat)) <- c('origin', 'destination')
 # 3. SAVE DATA #
 ################
 
-save(list = c('adm_1_dist_mat', 'adm_2_dist_mat', 'adm_3_dist_mat', 
-              'adm_1_dist', 'adm_2_dist', 'adm_3_dist'), 
-     file = './tmp/adm_dist_mat.RData')
+saveRDS(adm_1_dist, './out/adm_1_dist.rds')
+saveRDS(adm_1_dist_mat, './out/adm_1_dist_mat.rds')
+saveRDS(adm_2_dist, './out/adm_2_dist.rds')
+saveRDS(adm_2_dist_mat, './out/adm_2_dist_mat.rds')
+saveRDS(adm_3_dist, './out/adm_3_dist.rds')
+saveRDS(adm_3_dist_mat, './out/adm_3_dist_mat.rds')
 
 ################################################################################
 ################################################################################

@@ -36,7 +36,9 @@ source('./mobility-spatial-scale/02_format_functions.R')
 #################################
 
 # Load mobile phone data
-load('./tmp/adm_phone_mobility_dat.RData')
+adm_3_phone_mobility_dat <- readRDS('./out/adm_3_phone_mobility_dat.rds')
+adm_2_phone_mobility_dat <- readRDS('./out/adm_2_phone_mobility_dat.rds')
+adm_1_phone_mobility_dat <- readRDS('./out/adm_1_phone_mobility_dat.rds')
 
 ##########################
 # Administrative Level 3 #
@@ -65,11 +67,10 @@ adm_3_phone_mobility_long_code <- format_mobility_data(data = adm_3_phone_mobili
                                                   method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_3_phone_mobility_mat', 
-              'adm_3_phone_mobility_long', 
-              'adm_3_phone_mobility_mat_code', 
-              'adm_3_phone_mobility_long_code'), 
-     file = './tmp/fmt_adm_3_phone_mobility_dat.RData')
+saveRDS(adm_3_phone_mobility_mat, './out/adm_3_phone_mobility_mat.rds')
+saveRDS(adm_3_phone_mobility_long, './out/adm_3_phone_mobility_long.rds')
+saveRDS(adm_3_phone_mobility_mat_code, './out/adm_3_phone_mobility_mat_code.rds')
+saveRDS(adm_3_phone_mobility_long_code, './out/adm_3_phone_mobility_long_code.rds')
 
 ##########################
 # Administrative Level 2 #
@@ -98,11 +99,10 @@ adm_2_phone_mobility_long_code <- format_mobility_data(data = adm_2_phone_mobili
                                                        method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_2_phone_mobility_mat', 
-              'adm_2_phone_mobility_long', 
-              'adm_2_phone_mobility_mat_code', 
-              'adm_2_phone_mobility_long_code'), 
-     file = './tmp/fmt_adm_2_phone_mobility_dat.RData')
+saveRDS(adm_2_phone_mobility_mat, './out/adm_2_phone_mobility_mat.rds')
+saveRDS(adm_2_phone_mobility_long, './out/adm_2_phone_mobility_long.rds')
+saveRDS(adm_2_phone_mobility_mat_code, './out/adm_2_phone_mobility_mat_code.rds')
+saveRDS(adm_2_phone_mobility_long_code, './out/adm_2_phone_mobility_long_code.rds')
 
 ##########################
 # Administrative Level 1 #
@@ -131,11 +131,10 @@ adm_1_phone_mobility_long_code <- format_mobility_data(data = adm_1_phone_mobili
                                                        method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_1_phone_mobility_mat', 
-              'adm_1_phone_mobility_long', 
-              'adm_1_phone_mobility_mat_code', 
-              'adm_1_phone_mobility_long_code'), 
-     file = './tmp/fmt_adm_1_phone_mobility_dat.RData')
+saveRDS(adm_1_phone_mobility_mat, './out/adm_1_phone_mobility_mat.rds')
+saveRDS(adm_1_phone_mobility_long, './out/adm_1_phone_mobility_long.rds')
+saveRDS(adm_1_phone_mobility_mat_code, './out/adm_1_phone_mobility_mat_code.rds')
+saveRDS(adm_1_phone_mobility_long_code, './out/adm_1_phone_mobility_long_code.rds')
 
 ################################################################################
 ################################################################################
