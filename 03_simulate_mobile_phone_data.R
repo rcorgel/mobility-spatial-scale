@@ -42,13 +42,17 @@ source('./mobility-spatial-scale/02_format_functions.R')
 load('./tmp/adm_dist_mat.RData')
 
 # Population data
-load('./tmp/adm_population_dat.RData')
+adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
+adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
+adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
 
 # Load mobile phone data to create all origin/destination combinations
 phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
 
 # Load phone mobility formatted data 
-load('./tmp/adm_phone_mobility_dat.RData')
+adm_3_phone_mobility_dat <- readRDS('./out/adm_3_phone_mobility_dat.rds')
+adm_2_phone_mobility_dat <- readRDS('./out/adm_2_phone_mobility_dat.rds')
+adm_1_phone_mobility_dat <- readRDS('./out/adm_1_phone_mobility_dat.rds')
 
 ##########################
 # Administrative Level 3 #
@@ -65,6 +69,10 @@ adm_3_combos_name <- all_admin_combos(data = phone_mobility_dat,
 adm_3_phone_mobility_dat_name <- full_join(adm_3_phone_mobility_dat_name, adm_3_combos_name,
                                         by = c('adm_origin' = 'origin', 
                                                'adm_destination' = 'destination'))
+
+# Replace NA values with 0
+adm_3_phone_mobility_dat_name$trips_avg <- ifelse(is.na(adm_3_phone_mobility_dat_name$trips_avg), 
+                                                  0, adm_3_phone_mobility_dat_name$trips_avg)
 
 # Create mobility matrix
 M_3 <- ceiling(get_mob_matrix(orig = adm_3_phone_mobility_dat_name$adm_origin,
@@ -158,11 +166,14 @@ model_1 <- mobility(data=adm_1,
 
 # Predict for Admin 1, Admin 2, Admin 3 and average across iterations
 phone_mobility_adm_1_pred <- predict(model_1, nsim = 100)
-phone_mobility_adm_1_pred <- apply(phone_mobility_adm_1_pred , 1:2, mean)
+phone_mobility_adm_1_pred[phone_mobility_adm_1_pred < 1] <- 0 # censor trips < 1
+phone_mobility_adm_1_pred <- apply(phone_mobility_adm_1_pred, 1:2, mean)
 phone_mobility_adm_2_pred <- predict(model_2, nsim = 100)
-phone_mobility_adm_2_pred <- apply(phone_mobility_adm_2_pred , 1:2, mean)
+phone_mobility_adm_2_pred[phone_mobility_adm_2_pred < 1] <- 0 # censor trips < 1
+phone_mobility_adm_2_pred <- apply(phone_mobility_adm_2_pred, 1:2, mean)
 phone_mobility_adm_3_pred <- predict(model_3, nsim = 100)
-phone_mobility_adm_3_pred <- apply(phone_mobility_adm_3_pred , 1:2, mean)
+phone_mobility_adm_3_pred[phone_mobility_adm_3_pred < 1] <- 0 # censor trips < 1
+phone_mobility_adm_3_pred <- apply(phone_mobility_adm_3_pred, 1:2, mean)
 
 # Model checks
 check(model_1)
@@ -174,24 +185,16 @@ adm_1_phone_pred_mobility_mat <- phone_mobility_adm_1_pred / rowSums(phone_mobil
 adm_2_phone_pred_mobility_mat <- phone_mobility_adm_2_pred / rowSums(phone_mobility_adm_2_pred)
 adm_3_phone_pred_mobility_mat <- phone_mobility_adm_3_pred / rowSums(phone_mobility_adm_3_pred)
 
-# Save predicted count and proportion data
-# Proportion
-save(list = c('adm_1_phone_pred_mobility_mat', 
-              'adm_2_phone_pred_mobility_mat', 
-              'adm_3_phone_pred_mobility_mat'), 
-     file = './mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
-
-# Count
-save(list = c('phone_mobility_adm_1_pred', 
-              'phone_mobility_adm_2_pred', 
-              'phone_mobility_adm_3_pred'), 
-     file = './mobility-spatial-scale/simulated data/mobile_phone_sim_count_dat.RData')
-
-# Model Results
-save(list = c('model_1', 
-              'model_2', 
-              'model_3'), 
-     file = './mobility-spatial-scale/simulated data/mobility_model_fits.RData')
+# Save predicted count, proportion data, and model fits
+saveRDS(phone_mobility_adm_3_pred, './mobility-spatial-scale/simulated data/adm_3_predictions_count.rds')
+saveRDS(adm_3_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_3_predictions_proportion.rds')
+saveRDS(model_3, './mobility-spatial-scale/simulated data/adm_3_model_fit.rds')
+saveRDS(phone_mobility_adm_2_pred, './mobility-spatial-scale/simulated data/adm_2_predictions_count.rds')
+saveRDS(adm_2_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_2_predictions_proportion.rds')
+saveRDS(model_2, './mobility-spatial-scale/simulated data/adm_2_model_fit.rds')
+saveRDS(phone_mobility_adm_1_pred, './mobility-spatial-scale/simulated data/adm_1_predictions_count.rds')
+saveRDS(adm_1_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_1_predictions_proportion.rds')
+saveRDS(model_1, './mobility-spatial-scale/simulated data/adm_1_model_fit.rds')
 
 ################################################################################
 ################################################################################

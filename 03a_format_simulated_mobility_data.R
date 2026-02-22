@@ -36,7 +36,12 @@ source('./mobility-spatial-scale/02_format_functions.R')
 #####################################
 
 # Load simulated trip count data
-load('./mobility-spatial-scale/simulated data/mobile_phone_sim_count_dat.RData')
+phone_mobility_adm_3_pred <- readRDS('./mobility-spatial-scale/simulated data/adm_3_predictions_count.rds')
+phone_mobility_adm_3_pred_prop <- readRDS('./mobility-spatial-scale/simulated data/adm_3_predictions_proportion.rds')
+phone_mobility_adm_2_pred <- readRDS('./mobility-spatial-scale/simulated data/adm_2_predictions_count.rds')
+phone_mobility_adm_2_pred_prop <- readRDS('./mobility-spatial-scale/simulated data/adm_2_predictions_proportion.rds')
+phone_mobility_adm_1_pred <- readRDS('./mobility-spatial-scale/simulated data/adm_1_predictions_count.rds')
+phone_mobility_adm_1_pred_prop <- readRDS('./mobility-spatial-scale/simulated data/adm_1_predictions_proportion.rds')
 
 # Reshape the simulated matrices from wide to long
 # Administrative Level 1
@@ -63,11 +68,10 @@ adm_3_sim_mobility_dat <- adm_3_long_pred |>
   dplyr::rename('adm_3_origin' = 'Var1',
                 'adm_3_destination' = 'Var2')
 
-# Save long data
-save(list = c('adm_1_sim_mobility_dat', 
-              'adm_2_sim_mobility_dat',
-              'adm_3_sim_mobility_dat'), 
-     file = './tmp/adm_sim_mobility_dat.RData')
+# Save long count data
+saveRDS(adm_3_sim_mobility_dat, './out/adm_3_sim_mobility_dat.rds')
+saveRDS(adm_2_sim_mobility_dat, './out/adm_2_sim_mobility_dat.rds')
+saveRDS(adm_1_sim_mobility_dat, './out/adm_1_sim_mobility_dat.rds')
 
 ##########################
 # Administrative Level 3 #
@@ -110,11 +114,10 @@ adm_3_sim_mobility_long_code <- format_mobility_data(data = adm_3_sim_mobility_d
                                                        method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_3_sim_mobility_mat', 
-              'adm_3_sim_mobility_long',
-              'adm_3_sim_mobility_long_code',
-              'adm_3_sim_mobility_mat_code'), 
-     file = './tmp/fmt_adm_3_sim_mobility_dat.RData')
+saveRDS(adm_3_sim_mobility_mat, './out/adm_3_sim_mobility_mat.rds')
+saveRDS(adm_3_sim_mobility_long, './out/adm_3_sim_mobility_long.rds')
+saveRDS(adm_3_sim_mobility_mat_code, './out/adm_3_sim_mobility_mat_code.rds')
+saveRDS(adm_3_sim_mobility_long_code, './out/adm_3_sim_mobility_long_code.rds')
 
 ##########################
 # Administrative Level 2 #
@@ -158,11 +161,10 @@ adm_2_sim_mobility_long_code <- format_mobility_data(data = adm_2_sim_mobility_d
                                                        method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_2_sim_mobility_mat', 
-              'adm_2_sim_mobility_long',
-              'adm_2_sim_mobility_mat_code',
-              'adm_2_sim_mobility_long_code'), 
-     file = './tmp/fmt_adm_2_sim_mobility_dat.RData')
+saveRDS(adm_2_sim_mobility_mat, './out/adm_2_sim_mobility_mat.rds')
+saveRDS(adm_2_sim_mobility_long, './out/adm_2_sim_mobility_long.rds')
+saveRDS(adm_2_sim_mobility_mat_code, './out/adm_2_sim_mobility_mat_code.rds')
+saveRDS(adm_2_sim_mobility_long_code, './out/adm_2_sim_mobility_long_code.rds')
 
 ##########################
 # Administrative Level 1 #
@@ -206,11 +208,10 @@ adm_1_sim_mobility_long_code <- format_mobility_data(data = adm_1_sim_mobility_d
                                                        method = 'code', output = 'long', na_replace = FALSE)
 
 # Save data
-save(list = c('adm_1_sim_mobility_mat', 
-              'adm_1_sim_mobility_long',
-              'adm_1_sim_mobility_mat_code',
-              'adm_1_sim_mobility_long_code'), 
-     file = './tmp/fmt_adm_1_sim_mobility_dat.RData')
+saveRDS(adm_1_sim_mobility_mat, './out/adm_1_sim_mobility_mat.rds')
+saveRDS(adm_1_sim_mobility_long, './out/adm_1_sim_mobility_long.rds')
+saveRDS(adm_1_sim_mobility_mat_code, './out/adm_1_sim_mobility_mat_code.rds')
+saveRDS(adm_1_sim_mobility_long_code, './out/adm_1_sim_mobility_long_code.rds')
 
 ################################################################################
 ################################################################################
