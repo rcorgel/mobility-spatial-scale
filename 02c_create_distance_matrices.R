@@ -40,7 +40,7 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 #########################
 
 # Do not need to load centroid data because it is in the mobility data
-phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
+phone_mobility_dat <- readRDS('./out/phone_mobility_dat_full.rds')
 
 # Get unique data for admin 3 origins
 adm_3_origin <- phone_mobility_dat |> 

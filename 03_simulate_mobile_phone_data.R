@@ -47,7 +47,7 @@ adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
 adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
 
 # Load mobile phone data to create all origin/destination combinations
-phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
+phone_mobility_dat <- readRDS('./out/phone_mobility_dat_full.rds')
 
 # Load phone mobility formatted data 
 adm_3_phone_mobility_dat <- readRDS('./out/adm_3_phone_mobility_dat.rds')

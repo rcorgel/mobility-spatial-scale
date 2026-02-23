@@ -38,7 +38,7 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 ####################################################
 
 # Load processed mobility data
-phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
+phone_mobility_dat <- readRDS('./out/phone_mobility_dat_full.rds')
 
 # Select only administrative unit variables
 mobility_dat_merge <- phone_mobility_dat |> 

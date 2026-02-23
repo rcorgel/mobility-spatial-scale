@@ -33,7 +33,7 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 ##############################################
 
 # Load processed mobility data
-phone_mobility_dat <- readRDS('./tmp/phone_mobility_dat.rds')
+phone_mobility_dat <- readRDS('./out/phone_mobility_dat_full.rds')
 
 # Restrict data to administrative names and codes for levels 1, 2, and 3
 admin_xwalk <- phone_mobility_dat |>

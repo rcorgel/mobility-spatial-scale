@@ -6,7 +6,8 @@
 #            1. Set-up script                                                  #
 #            2. Load and format mobility data                                  #
 #            3. Adjust for February/March mobility data issue                  #
-#            4. Aggregate data to administrative levels 1, 2, 3                #
+#            4. Add in missing days and routes                                 #
+#            5. Aggregate data to administrative levels 1, 2, 3                #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -201,18 +202,67 @@ phone_mobility_dat <- mobility_dat |>
 # Assert not missing trips_adj
 phone_mobility_dat |> assert(not_na, trips_adj)
 
+# Remove old data
+remove(mobility_dat)
+
+#####################################
+# 4. ADD IN MISSING DAYS AND ROUTES #
+#####################################
+
+# List of all dates
+dates <- phone_mobility_dat |> 
+  distinct(date) |>
+  arrange(date)
+
+# List all locations
+origin <- sort(unique(phone_mobility_dat$adm_3_origin))
+adm_origin <- as.data.frame(origin)
+verify(adm_origin, length(origin) == 330)
+
+# Create all combinations of date and route
+phone_mobility_dat_full <- expand.grid(date = dates$date, 
+                                       adm_3_origin = adm_origin$origin,
+                                       adm_3_destination = adm_origin$origin)
+
+# Merge on codes and admin information
+origin_merge <- phone_mobility_dat |>
+  distinct(adm_3_origin, adm_3_origin_code, 
+           adm_2_origin, adm_2_origin_code,
+           adm_1_origin, adm_1_origin_code, 
+           origin_lat, origin_long)
+dest_merge <- phone_mobility_dat |>
+  distinct(adm_3_destination, adm_3_destination_code, 
+           adm_2_destination, adm_2_destination_code,
+           adm_1_destination, adm_1_destination_code, 
+           destination_lat, destination_long)
+phone_mobility_dat_full <- left_join(phone_mobility_dat_full, origin_merge,
+                                     by = c('adm_3_origin' = 'adm_3_origin'))
+phone_mobility_dat_full <- left_join(phone_mobility_dat_full, dest_merge,
+                                     by = c('adm_3_destination' = 'adm_3_destination'))
+
+# Assert no missing values
+phone_mobility_dat_full |> assert(not_na, date:destination_long)
+
+# Merge on adjusted trips
+phone_mobility_dat_full <- left_join(phone_mobility_dat_full, phone_mobility_dat[, c(1, 4, 5, 34)],
+                                     by = c('adm_3_origin', 'adm_3_destination', 'date'))
+
+# Replace NA values with 0
+phone_mobility_dat_full$trips_adj <- ifelse(is.na(phone_mobility_dat_full$trips_adj),
+                                            0, phone_mobility_dat_full$trips_adj)
+
 # Save full mobility data
-saveRDS(phone_mobility_dat, './tmp/phone_mobility_dat.rds')
+saveRDS(phone_mobility_dat_full, './out/phone_mobility_dat_full.rds')
 
 ######################################################
-# 4. AGGREGATE DATA TO ADMINISTRATIVE LEVELS 1, 2, 3 #
+# 5. AGGREGATE DATA TO ADMINISTRATIVE LEVELS 1, 2, 3 #
 ######################################################
 
 # Collapse to different admin levels (and day level)
 # Calculate daily average trips between locations
 
 # Admin level 3
-adm_3_phone_mobility_dat <- phone_mobility_dat |> 
+adm_3_phone_mobility_dat <- phone_mobility_dat_full |> 
   # Calculate average daily trips
   group_by(adm_3_origin, adm_3_destination) |>
   mutate(trips_avg = mean(trips_adj, na.rm = TRUE)) |>
@@ -230,7 +280,7 @@ verify(adm_3_phone_mobility_dat, length(unique(adm_3_destination)) == 330)
 
 # Admin level 2
 # Aggregate data to admin level 2
-adm_2_phone_mobility_dat <- phone_mobility_dat |>                                
+adm_2_phone_mobility_dat <- phone_mobility_dat_full |>                                
   group_by(adm_2_origin, adm_2_destination, date) |>
   mutate(trips_sum = sum(trips_adj)) |>
   distinct(adm_2_origin, adm_2_destination, date, trips_sum, 
@@ -253,7 +303,7 @@ verify(adm_2_phone_mobility_dat, length(unique(adm_2_destination)) == 25)
 
 # Admin level 1
 # Aggregate data to admin level 1
-adm_1_phone_mobility_dat <- phone_mobility_dat |>                                
+adm_1_phone_mobility_dat <- phone_mobility_dat_full |>                                
   group_by(adm_1_origin, adm_1_destination, date) |>
   mutate(trips_sum = sum(trips_adj)) |>
   distinct(adm_1_origin, adm_1_destination, date, trips_sum, 

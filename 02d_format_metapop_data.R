@@ -73,7 +73,6 @@ sorted_vector <- sort(adm_2_name_vec)
 adm_2_name_vec == sorted_vector # confirm sorting is alphabetical
 adm_2_population_dat$adm_2 == sorted_vector # confirm population is alphabetical
 
-
 # Administrative Unit 1
 adm_1_phone_mobility_mat <- readRDS('./out/adm_1_phone_mobility_mat.rds')
 adm_1_name_vec <- colnames(adm_1_phone_mobility_mat)
@@ -108,19 +107,16 @@ adm_2_x_walk <- admin_xwalk |>
 ################
 
 # Administrative Unit 3
-saveRDS(adm_3_phone_mobility_mat, './out/adm_3_phone_mobility_mat.rds')
 saveRDS(adm_3_name_vec, './out/adm_3_name_vec.rds')
 saveRDS(adm_3_pop_vec, './out/adm_3_pop_vec.rds')
 saveRDS(adm_3_x_walk, './out/adm_3_x_walk.rds')
 
 # Administrative Unit 2
-saveRDS(adm_2_phone_mobility_mat, './out/adm_2_phone_mobility_mat.rds')
 saveRDS(adm_2_name_vec, './out/adm_2_name_vec.rds')
 saveRDS(adm_2_pop_vec, './out/adm_2_pop_vec.rds')
 saveRDS(adm_2_x_walk, './out/adm_2_x_walk.rds')
 
 # Administrative Unit 3
-saveRDS(adm_1_phone_mobility_mat, './out/adm_1_phone_mobility_mat.rds')
 saveRDS(adm_1_name_vec, './out/adm_1_name_vec.rds')
 saveRDS(adm_1_pop_vec, './out/adm_1_pop_vec.rds')
 
