@@ -30,15 +30,15 @@ library(ggpubr)
 library(forcats)
 
 # Set the seed
-set.seed(12345)
+set.seed(123456)
 
 # Set the directory
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
 # Load model 
-source('./mobility-spatial-scale/04_metapop_model_2.R')
+source('./mobility-spatial-scale/04_metapop_model.R')
 
-load('./tmp/rescale_phone_mobility_dat.RData')
+#load('./tmp/rescale_phone_mobility_dat.RData')
 
 #################################
 # 2. SIMULATE EXAMPLE EPIDEMICS #
@@ -50,14 +50,14 @@ load('./tmp/adm_2_metapop_dat.RData')
 load('./tmp/adm_1_metapop_dat.RData')
 
 # Load simulated mobility data
-load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
+#load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
 
 ##########################
 # Administrative Level 3 #
 ##########################
 
 # Create object for mobility data
-mobility_dat_adm_3 <- list(as.matrix(adm_3_phone_mobility_mat_rescale_adm_1), adm_3_phone_pred_mobility_mat)
+#mobility_dat_adm_3 <- list(as.matrix(adm_3_phone_mobility_mat_rescale_adm_1), adm_3_phone_pred_mobility_mat)
 
 adm_3_col <- mclapply(1:150, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
@@ -681,7 +681,7 @@ take_off_mad_plot <- ggplot(take_off_mad, aes(x=Scale, y=take_off_perc, fill = S
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.6)) +
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.65)) +
   ylab('Proportion') + xlab('Scale') + ggtitle('Epidemic Occurance')
 
 take_off_col_plot <- ggplot(take_off_col, aes(x=Scale, y=take_off_perc, fill = Scale)) + 
@@ -695,7 +695,7 @@ take_off_col_plot <- ggplot(take_off_col, aes(x=Scale, y=take_off_perc, fill = S
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.6)) +
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.65)) +
   ylab('Proportion') + xlab('Scale') + ggtitle('Epidemic Occurance')
 
 line_mad_obs_all$Scale <- factor(line_mad_obs_all$Scale, levels=c('Division', 'District', 'Province'))
@@ -737,8 +737,12 @@ plot <- cowplot::plot_grid(ggplot() + theme_void(), row_1_1,
 # Call Outs
 line_mad_obs_all |> group_by(Scale) |> mutate(sum= sum(perc_50)) |> distinct(Scale, sum)
 line_col_obs_all |> group_by(Scale) |> mutate(sum= sum(perc_50)) |> distinct(Scale, sum)
-test <- int_col_obs_all |> group_by(Count, Scale) |> mutate(med = median(time)) |> distinct(Count, Scale, med)
-test <- int_mad_obs_all |> group_by(Count, Scale) |> mutate(med = median(time)) |> distinct(Count, Scale, med)
+test <- int_col_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
+test <- int_mad_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
+
+max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Northern' & line_mad_obs_all$Scale == 'Division',]$perc_50)
+max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Northern' & line_mad_obs_all$Scale == 'District',]$perc_50)
+
 
 ggsave('./figs/figure_4_example.jpg', plot = plot , height = 17, width = 25)
 

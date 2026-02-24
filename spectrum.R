@@ -37,7 +37,7 @@ set.seed(123456)
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
 # Load model 
-source('./mobility-spatial-scale/04_metapop_model_2.R')
+source('./mobility-spatial-scale/04_metapop_model.R')
 
 load('./tmp/rescale_phone_mobility_dat.RData')
 
