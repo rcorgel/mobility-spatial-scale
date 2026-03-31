@@ -74,7 +74,7 @@ remove(adm_3_sim_col)
 # Adm 3 Delft introduction, R_0 = 1.5
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = adm_3_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_3_sim_del <- do.call(rbind, adm_3_del)
@@ -102,7 +102,7 @@ remove(adm_2_sim_col)
 # Adm 2 Delft introduction, R_0 = 1.5
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_2_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_2_sim_del <- do.call(rbind, adm_2_del)
@@ -130,7 +130,7 @@ remove(adm_1_sim_col)
 # Adm 1 Delft introduction, R_0 = 1.5
 adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
+                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 8,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_1_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_1_sim_del <- do.call(rbind, adm_1_del)
@@ -162,7 +162,7 @@ remove(adm_3_sim_col)
 # Adm 3 Delft introduction, R_0 = 1.1
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = adm_3_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_3_sim_del <- do.call(rbind, adm_3_del)
@@ -190,7 +190,7 @@ remove(adm_2_sim_col)
 # Adm 2 Delft introduction, R_0 = 1.1
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_2_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_2_sim_del <- do.call(rbind, adm_2_del)
@@ -218,7 +218,7 @@ remove(adm_1_sim_col)
 # Adm 1 Delft introduction, R_0 = 1.1
 adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
+                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 8,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_1_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_1_sim_del <- do.call(rbind, adm_1_del)
@@ -250,7 +250,7 @@ remove(adm_3_sim_col)
 # Adm 3 Delft introduction, R_0 = 3.0
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = adm_3_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_3_sim_del <- do.call(rbind, adm_3_del)
@@ -278,7 +278,7 @@ remove(adm_2_sim_col)
 # Adm 2 Delft introduction, R_0 = 3.0
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_2_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_2_sim_del <- do.call(rbind, adm_2_del)
@@ -306,7 +306,7 @@ remove(adm_1_sim_col)
 # Adm 1 Delft introduction, R_0 = 3.0
 adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
+                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 8,
                       adm_x_walk = adm_2_x_walk, travel_mat = adm_1_sim_mobility_mat,
                       max_time = 365, time_step = 1)
 adm_1_sim_del <- do.call(rbind, adm_1_del)

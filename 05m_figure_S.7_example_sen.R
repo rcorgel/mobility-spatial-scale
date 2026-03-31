@@ -27,431 +27,650 @@ library(sf)
 library(scales)
 library(reshape2)
 library(ggpubr)
+library(forcats)
 
 # Set the seed
-set.seed(12345)
+set.seed(123456)
 
 # Set the directory
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
-
-# Load model 
-source('./mobility-spatial-scale/04_metapop_model.R')
 
 #################################
 # 2. SIMULATE EXAMPLE EPIDEMICS #
 #################################
 
-# First, load metapopulation model data at different scales
-load('./tmp/adm_3_metapop_dat.RData')
-load('./tmp/adm_2_metapop_dat.RData')
-load('./tmp/adm_1_metapop_dat.RData')
+adm_3_obs_col <- readRDS('./out/adm_3_sim_col_1.5.rds')
+adm_2_obs_col <- readRDS('./out/adm_2_sim_col_1.5.rds')
+adm_1_obs_col <- readRDS('./out/adm_1_sim_col_1.5.rds')
 
-# Load simulated mobility data
-load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
-load('./tmp/rescale_phone_mobility_dat.RData')
+adm_3_obs_mad <- readRDS('./out/adm_3_sim_del_1.5.rds')
+adm_2_obs_mad <- readRDS('./out/adm_2_sim_del_1.5.rds')
+adm_1_obs_mad <- readRDS('./out/adm_1_sim_del_1.5.rds')
 
 ##########################
 # Administrative Level 3 #
 ##########################
 
 # Create object for mobility data
-mobility_dat_adm_3 <- list(adm_3_phone_mobility_mat, as.matrix(adm_3_phone_mobility_mat_rescale_adm_1))
-
-adm_3_sim_col <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
-                                      R_0 = 1.8, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
-                                      adm_name_vec = adm_3_name_vec, adm_level = '3', 
-                                      pop_vec = adm_3_pop_vec, intro_adm = 'Colombo', intro_num = 1,
-                                      adm_x_walk = adm_3_x_walk, travel_mat = mobility_dat_adm_3[[2]], 
-                                      max_time = 365, time_step = 1, mobility = TRUE)
-
-adm_3_sim_mad <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
-                                      R_0 = 1.8, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
-                                      adm_name_vec = adm_3_name_vec, adm_level = '3', 
-                                      pop_vec = adm_3_pop_vec, intro_adm = 'Madhu', intro_num = 1,
-                                      adm_x_walk = adm_3_x_walk, travel_mat = mobility_dat_adm_3[[2]], 
-                                      max_time = 365, time_step = 1, mobility = TRUE)
-
-##########################
-# Administrative Level 2 #
-##########################
-
-# Create object for mobility data
-mobility_dat_adm_2 <- list(adm_2_phone_mobility_mat, as.matrix(adm_2_phone_mobility_mat_rescale))
-
-adm_2_sim_col <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
-                                      R_0 = 1.8, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
-                                      adm_name_vec = adm_2_name_vec, adm_level = '2', 
-                                      pop_vec = adm_2_pop_vec, intro_adm = 'Colombo', intro_num = 1,
-                                      adm_x_walk = adm_2_x_walk, travel_mat = mobility_dat_adm_2[[2]], 
-                                      max_time = 365, time_step = 1, mobility = TRUE)
-
-adm_2_sim_mad <- run_seir_model_multi(n = 100, density_dep = FALSE, method = 'append',
-                                      R_0 = 1.8, gamma = 1/7, sigma = 1/2, prop_s = 0.90, 
-                                      adm_name_vec = adm_2_name_vec, adm_level = '2', 
-                                      pop_vec = adm_2_pop_vec, intro_adm = 'Madhu', intro_num = 1,
-                                      adm_x_walk = adm_2_x_walk, travel_mat = mobility_dat_adm_2[[2]], 
-                                      max_time = 365, time_step = 1, mobility = TRUE)
+#mobility_dat_adm_3 <- list(as.matrix(adm_3_phone_mobility_mat_rescale_adm_1), adm_3_phone_pred_mobility_mat)
+# 
+# adm_3_at_1_obs_col_int <- adm_3_obs_col |>
+#   # Restrict to simulations that took off
+#   group_by(run_num) |>
+#   dplyr::filter(sum(incid_I) > 100) |>
+#   ungroup() |>
+#   # Sum to relevant spatial scale
+#   group_by(run_num, time, adm_3) |> 
+#   mutate(sum_incid_I = sum(incid_I)) |>
+#   distinct(run_num, time, adm_3, sum_incid_I) |> 
+#   ungroup() |>
+#   group_by(run_num, adm_3) |> 
+#   # Calculate cumulative cases at the spatial scale
+#   mutate(cum_sum_I = cumsum(sum_incid_I),
+#          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+#   # Indicate the first instance when cumulative > 1
+#   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+#   # Filter to first instance for all admin
+#   dplyr::filter(intro_first == TRUE) |>
+#   ungroup() |>
+#   arrange(run_num, time) |>
+#   group_by(run_num) |>
+#   arrange(time) |>
+#   mutate(intro_loc = 'Col',
+#          Scale = 'Division',
+#          Count = row_number()) |>
+#   dplyr::select(run_num, time, adm_3, time, Count, Scale) 
+# 
+# 
+# (unique(adm_3_at_1_obs_col_int$run_num))
+# 
+# test <- adm_3_at_1_obs_col_int |> dplyr::filter(Count < 18) |>
+#   mutate(count = 1) |>
+#   group_by(adm_3) |>
+#   mutate(unit_count = sum(count),
+#          unit_prop = unit_count / 47) |>
+#   distinct(adm_3, unit_count, unit_prop) 
+# 
+# choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/', 
+#                         layer = 'lka_admbnda_adm3_slsd_20220816')
+# 
+# library(sf)
+# # Load population data
+# load('./tmp/adm_population_dat.RData')
+# 
+# # Load mobility to shape cross walk
+# # The mobility data combines multiple admin 3 units, changing the total from 339 to 330
+# mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
+# 
+# # Merge on the cross walk
+# choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
+# 
+# # Join polygons to create 330 mobility admin 3 units
+# choropleth_3_mobility <- choropleth_3 |> 
+#   group_by(adm_3_mobility) |>
+#   summarise(geometry = sf::st_union(geometry)) |>
+#   ungroup()
+# 
+# choropleth_3_mobility <- left_join(choropleth_3_mobility, test, by = c('adm_3_mobility' = 'adm_3'))
+# 
+# 
+# ggplot(data = choropleth_3_mobility) +
+#   geom_sf(aes(fill = unit_prop), color= 'black', linewidth = 0.20) +
+#   scale_fill_distiller(palette = 'Blues', direction = 1, name = 'invasion') +
+#   theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.90),
+#                                       plot.title = element_text(size = 30, hjust = 0.5),
+#                                       legend.text = element_text(size = 22),
+#                                       legend.title = element_text(size = 24)) +
+#   coord_sf()
 
 ########################
 # 3. CREATE SUBFIGURES #
 ########################
 
-# Load observed results
-load('./tmp/figure_4_plots_obs.RData')
+#######################
+# Make disease curves #
+#######################
 
-###########################
-# Make introduction lines #
-###########################
+take_off_3 <- adm_3_obs_col |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'Division') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_2 <- adm_2_obs_col |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'District') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_1 <- adm_1_obs_col |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'Province') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_col <- rbind(take_off_1, take_off_2, take_off_3)
+
+take_off_3_mad <- adm_3_obs_mad |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'Division') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_2_mad <- adm_2_obs_mad |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'District') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_1_mad <- adm_1_obs_mad |> group_by(run_num) |>
+  mutate(sum = sum(incid_I)) |> 
+  distinct(run_num, sum) |>
+  ungroup() |>
+  mutate(take_off = ifelse(sum > 100, 1, 0),
+         take_off_perc = sum(take_off) / 100,
+         Scale = 'Province') |> 
+  distinct(Scale, take_off_perc)
+
+take_off_mad <- rbind(take_off_1_mad, take_off_2_mad, take_off_3_mad)
 
 ############
-# Rescaled #
+# Observed #
 ############
 
-adm_3_sim_col_avg <- adm_3_sim_col |>
+adm_3_obs_col_avg <- adm_3_obs_col |>
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
-  group_by(time, adm_3) |>
-  mutate(avg_incid_I_adm_3 = mean(incid_I)) |>
-  distinct(time, adm_3, avg_incid_I_adm_3) |> 
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(run_num, time, incid_I_sum) |>
   ungroup() |>
-  group_by(time) |> 
-  mutate(avg_incid_I = sum(avg_incid_I_adm_3)) |>
-  distinct(time, avg_incid_I) |> ungroup() |>
-  mutate(cum_sum_I = cumsum(avg_incid_I)) |>
-  mutate(Scale = 'Division')
+  group_by(time, adm_1) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(adm_1, time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50),
+         cum_sum_I_95 = cumsum(perc_95),
+         cum_sum_I_05 = cumsum(perc_05)) |>
+  mutate(Scale = 'Division') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
-adm_2_sim_col_avg <- adm_2_sim_col |>
+adm_2_obs_col_avg <- adm_2_obs_col |>
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
-  group_by(time, adm_2) |>
-  mutate(avg_incid_I_adm_2 = mean(incid_I)) |>
-  distinct(time, adm_2, avg_incid_I_adm_2) |> 
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(run_num, time, incid_I_sum) |>
   ungroup() |>
-  group_by(time) |> 
-  mutate(avg_incid_I = sum(avg_incid_I_adm_2)) |>
-  distinct(time, avg_incid_I) |> ungroup() |>
-  mutate(cum_sum_I = cumsum(avg_incid_I)) |>
-  mutate(Scale = 'District')
+  group_by(time, adm_1) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(adm_1, time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50),
+         cum_sum_I_95 = cumsum(perc_95),
+         cum_sum_I_05 = cumsum(perc_05)) |>
+  mutate(Scale = 'District') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
-adm_1_sim_col_avg <- line_col_obs_all[line_col_obs_all$Scale == 'Province',]
-
-line_col_sim_all <- rbind(adm_3_sim_col_avg, adm_2_sim_col_avg, adm_1_sim_col_avg)
-
-adm_3_sim_mad_avg <- adm_3_sim_mad |>
+adm_1_obs_col_avg <- adm_1_obs_col |>
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
-  group_by(time, adm_3) |>
-  mutate(avg_incid_I_adm_3 = mean(incid_I)) |>
-  distinct(time, adm_3, avg_incid_I_adm_3) |> 
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(run_num, time, incid_I_sum) |>
   ungroup() |>
-  group_by(time) |> 
-  mutate(avg_incid_I = sum(avg_incid_I_adm_3)) |>
-  distinct(time, avg_incid_I) |> ungroup() |>
-  mutate(cum_sum_I = cumsum(avg_incid_I)) |>
-  mutate(Scale = 'Division')
+  group_by(adm_1, time) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(adm_1, time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50),
+         cum_sum_I_95 = cumsum(perc_95),
+         cum_sum_I_05 = cumsum(perc_05)) |>
+  mutate(Scale = 'Province') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
-adm_2_sim_mad_avg <- adm_2_sim_mad |>
+line_col_obs_all <- rbind(adm_3_obs_col_avg, adm_2_obs_col_avg, adm_1_obs_col_avg)
+
+adm_3_obs_mad_avg <- adm_3_obs_mad |>
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
-  group_by(time, adm_2) |>
-  mutate(avg_incid_I_adm_2 = mean(incid_I)) |>
-  distinct(time, adm_2, avg_incid_I_adm_2) |> 
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(adm_1, run_num, time, incid_I_sum) |>
   ungroup() |>
-  group_by(time) |> 
-  mutate(avg_incid_I = sum(avg_incid_I_adm_2)) |>
-  distinct(time, avg_incid_I) |> ungroup() |>
-  mutate(cum_sum_I = cumsum(avg_incid_I)) |>
-  mutate(Scale = 'District')
+  group_by(time, adm_1) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(adm_1, time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50)) |>
+  mutate(Scale = 'Division') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
-adm_1_sim_mad_avg <- line_mad_obs_all[line_mad_obs_all$Scale == 'Province',]
+adm_2_obs_mad_avg <- adm_2_obs_mad |>
+  group_by(run_num) |>
+  dplyr::filter(sum(incid_I) > 100) |>
+  ungroup() |>
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(run_num, time, incid_I_sum) |>
+  ungroup() |>
+  group_by(time, adm_1) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(adm_1, time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50)) |>
+  mutate(Scale = 'District') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
-line_mad_sim_all <- rbind(adm_3_sim_mad_avg, adm_2_sim_mad_avg, adm_1_sim_mad_avg)
+adm_1_obs_mad_avg <- adm_1_obs_mad |>
+  group_by(run_num) |>
+  dplyr::filter(sum(incid_I) > 100) |>
+  ungroup() |>
+  group_by(run_num, time, adm_1) |>
+  mutate(incid_I_sum = sum(incid_I)) |>
+  distinct(run_num, time, incid_I_sum) |>
+  ungroup() |>
+  group_by(adm_1, time) |>
+  mutate(perc_50 = quantile(incid_I_sum, probs = 0.50),
+         perc_95 = quantile(incid_I_sum, probs = 0.75),
+         perc_05 = quantile(incid_I_sum, probs = 0.25)) |>
+  distinct(time, perc_50, perc_95, perc_05) |> 
+  ungroup() |>
+  mutate(cum_sum_I = cumsum(perc_50)) |>
+  mutate(Scale = 'Province') |>
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
+
+line_mad_obs_all <- rbind(adm_3_obs_mad_avg, adm_2_obs_mad_avg, adm_1_obs_mad_avg)
 
 ######################
 # Introduction count #
 ######################
 
 ############
-# Rescaled #
+# Observed #
 ############
 
-adm_3_at_1_sim_col_int <- adm_3_sim_col |>
+adm_3_at_1_obs_col_int <- adm_3_obs_col |>
   # Restrict to simulations that took off
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
-  ungroup() |>
-  # Calculate average across simulations
-  group_by(time, adm_3) |>
-  mutate(avg_incid_I_adm_3 = mean(incid_I)) |>
-  distinct(time, adm_3, adm_1, avg_incid_I_adm_3) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
   # Sum to relevant spatial scale
-  group_by(time, adm_1) |> 
-  mutate(avg_incid_I_adm_1 = sum(avg_incid_I_adm_3)) |>
-  distinct(time, adm_1, avg_incid_I_adm_1) |> 
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
   ungroup() |>
-  group_by(adm_1) |> 
+  group_by(run_num, adm_1) |> 
   # Calculate cumulative cases at the spatial scale
-  mutate(cum_sum_I = cumsum(avg_incid_I_adm_1),
+  mutate(cum_sum_I = cumsum(sum_incid_I),
          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
   # Indicate the first instance when cumulative > 1
   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
   # Filter to first instance for all admin
-  filter(intro_first == TRUE) |>
+  dplyr::filter(intro_first == TRUE) |>
   ungroup() |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
   arrange(time) |>
   mutate(intro_loc = 'Col',
          Scale = 'Division',
-         Count = seq(1, 9, 1)) |>
-  dplyr::select(time, adm_1, time, Count, Scale)
+         Count = row_number()) |>
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
 
-adm_2_at_1_sim_col_int <- adm_2_sim_col |>
+adm_2_at_1_obs_col_int <- adm_2_obs_col |>
   # Restrict to simulations that took off
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
-  ungroup() |>
-  # Calculate average across simulations
-  group_by(time, adm_2) |>
-  mutate(avg_incid_I_adm_2 = mean(incid_I)) |>
-  distinct(time, adm_2, adm_1, avg_incid_I_adm_2) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
   # Sum to relevant spatial scale
-  group_by(time, adm_1) |> 
-  mutate(avg_incid_I_adm_1 = sum(avg_incid_I_adm_2)) |>
-  distinct(time, adm_1, avg_incid_I_adm_1) |> 
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
   ungroup() |>
-  group_by(adm_1) |> 
+  group_by(run_num, adm_1) |> 
   # Calculate cumulative cases at the spatial scale
-  mutate(cum_sum_I = cumsum(avg_incid_I_adm_1),
+  mutate(cum_sum_I = cumsum(sum_incid_I),
          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
   # Indicate the first instance when cumulative > 1
   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
   # Filter to first instance for all admin
-  filter(intro_first == TRUE) |>
+  dplyr::filter(intro_first == TRUE) |>
   ungroup() |>
-  arrange(time) |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
   mutate(intro_loc = 'Col',
          Scale = 'District',
          Count = seq(1, 9, 1)) |>
-  dplyr::select(time, adm_1, time, Count, Scale)
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
 
-adm_1_sim_col_int <- int_col_obs_all[int_col_obs_all$Scale == 'Province',]
-
-int_col_sim_all <- rbind(adm_1_sim_col_int, adm_2_at_1_sim_col_int, adm_3_at_1_sim_col_int)
-
-adm_3_at_1_sim_mad_int <- adm_3_sim_mad |>
+adm_1_obs_col_int <- adm_1_obs_col |>
   # Restrict to simulations that took off
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
-  ungroup() |>
-  # Calculate average across simulations
-  group_by(time, adm_3) |>
-  mutate(avg_incid_I_adm_3 = mean(incid_I)) |>
-  distinct(time, adm_3, adm_1, avg_incid_I_adm_3) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
   # Sum to relevant spatial scale
-  group_by(time, adm_1) |> 
-  mutate(avg_incid_I_adm_1 = sum(avg_incid_I_adm_3)) |>
-  distinct(time, adm_1, avg_incid_I_adm_1) |> 
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
   ungroup() |>
-  group_by(adm_1) |> 
+  group_by(run_num, adm_1) |> 
   # Calculate cumulative cases at the spatial scale
-  mutate(cum_sum_I = cumsum(avg_incid_I_adm_1),
+  mutate(cum_sum_I = cumsum(sum_incid_I),
          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
   # Indicate the first instance when cumulative > 1
   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
   # Filter to first instance for all admin
-  filter(intro_first == TRUE) |>
+  dplyr::filter(intro_first == TRUE) |>
   ungroup() |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
+  mutate(intro_loc = 'Col',
+         Scale = 'Province',
+         Count = seq(1, 9, 1)) |>
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
+
+int_col_obs_all <- rbind(adm_1_obs_col_int, adm_2_at_1_obs_col_int, adm_3_at_1_obs_col_int)
+
+data_summary <- function(x) {
+  m <- median(x)
+  ymin <- quantile(x, probs = 0.25)
+  ymax <- quantile(x, probs = 0.75)
+  return(c(y = m,ymin = ymin,ymax = ymax))
+}
+
+int_col_obs_all <- int_col_obs_all |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+adm_3_at_1_obs_mad_int <- adm_3_obs_mad |>
+  # Restrict to simulations that took off
+  group_by(run_num) |>
+  dplyr::filter(sum(incid_I) > 100) |>
+  ungroup() |>
+  # Sum to relevant spatial scale
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
+  ungroup() |>
+  group_by(run_num, adm_1) |> 
+  # Calculate cumulative cases at the spatial scale
+  mutate(cum_sum_I = cumsum(sum_incid_I),
+         intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+  # Indicate the first instance when cumulative > 1
+  mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+  # Filter to first instance for all admin
+  dplyr::filter(intro_first == TRUE) |>
+  ungroup() |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
   arrange(time) |>
   mutate(intro_loc = 'Col',
          Scale = 'Division',
-         Count = seq(1, 9, 1)) |>
-  dplyr::select(time, adm_1, time, Count, Scale)
+         Count = row_number()) |>
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
 
-adm_2_at_1_sim_mad_int <- adm_2_sim_mad |>
+adm_2_at_1_obs_mad_int <- adm_2_obs_mad |>
   # Restrict to simulations that took off
   group_by(run_num) |>
-  filter(sum(incid_I) > 100) |>
-  ungroup() |>
-  # Calculate average across simulations
-  group_by(time, adm_2) |>
-  mutate(avg_incid_I_adm_2 = mean(incid_I)) |>
-  distinct(time, adm_2, adm_1, avg_incid_I_adm_2) |>
+  dplyr::filter(sum(incid_I) > 100) |>
   ungroup() |>
   # Sum to relevant spatial scale
-  group_by(time, adm_1) |> 
-  mutate(avg_incid_I_adm_1 = sum(avg_incid_I_adm_2)) |>
-  distinct(time, adm_1, avg_incid_I_adm_1) |> 
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
   ungroup() |>
-  group_by(adm_1) |> 
+  group_by(run_num, adm_1) |> 
   # Calculate cumulative cases at the spatial scale
-  mutate(cum_sum_I = cumsum(avg_incid_I_adm_1),
+  mutate(cum_sum_I = cumsum(sum_incid_I),
          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
   # Indicate the first instance when cumulative > 1
   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
   # Filter to first instance for all admin
-  filter(intro_first == TRUE) |>
+  dplyr::filter(intro_first == TRUE) |>
   ungroup() |>
-  arrange(time) |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
   mutate(intro_loc = 'Col',
          Scale = 'District',
          Count = seq(1, 9, 1)) |>
-  dplyr::select(time, adm_1, time, Count, Scale)
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
 
-adm_1_sim_mad_int <- int_mad_obs_all[int_mad_obs_all$Scale == 'Province',]
+adm_1_obs_mad_int <- adm_1_obs_mad |>
+  # Restrict to simulations that took off
+  group_by(run_num) |>
+  dplyr::filter(sum(incid_I) > 100) |>
+  ungroup() |>
+  # Sum to relevant spatial scale
+  group_by(run_num, time, adm_1) |> 
+  mutate(sum_incid_I = sum(incid_I)) |>
+  distinct(run_num, time, adm_1, sum_incid_I) |> 
+  ungroup() |>
+  group_by(run_num, adm_1) |> 
+  # Calculate cumulative cases at the spatial scale
+  mutate(cum_sum_I = cumsum(sum_incid_I),
+         intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+  # Indicate the first instance when cumulative > 1
+  mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+  # Filter to first instance for all admin
+  dplyr::filter(intro_first == TRUE) |>
+  ungroup() |>
+  arrange(run_num, time) |>
+  group_by(run_num) |>
+  mutate(intro_loc = 'Col',
+         Scale = 'Province',
+         Count = seq(1, 9, 1)) |>
+  dplyr::select(run_num, time, adm_1, time, Count, Scale) 
 
-int_mad_sim_all <- rbind(adm_1_sim_mad_int, adm_2_at_1_sim_mad_int, adm_3_at_1_sim_mad_int)
+int_mad_obs_all <- rbind(adm_1_obs_mad_int, adm_2_at_1_obs_mad_int, adm_3_at_1_obs_mad_int)
 
+data_summary <- function(x) {
+  m <- mean(x)
+  ymin <- m - sd(x)
+  ymax <- m + sd(x)
+  return(c(y = m,ymin = ymin,ymax = ymax))
+}
 
+int_mad_obs_all <- int_mad_obs_all |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
 
+adm_1_order_mad <- adm_1_obs_mad_int |>
+  group_by(adm_1) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, median) |>
+  ungroup() |>
+  arrange(median) |>
+  mutate(Order = row_number())
 
+adm_1_order_col <- adm_1_obs_col_int |>
+  group_by(adm_1) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, median) |>
+  ungroup() |>
+  arrange(median) |>
+  mutate(Order = row_number())
 
-line_plot_col_obs <- ggplot(data = int_col_obs_all) + geom_line(aes(x = time, y = Count, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Count') + xlab('Time (days)') + ggtitle('Units Infected') +
+int_mad_obs_all <- left_join(int_mad_obs_all, adm_1_order_mad, by = c('adm_1' = 'adm_1'))
+int_col_obs_all <- left_join(int_col_obs_all, adm_1_order_col, by = c('adm_1' = 'adm_1'))
+
+line_plot_col_obs <- ggplot(int_col_obs_all, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale)) +
+  #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
+  #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
+  geom_boxplot(position = position_dodge(width = 0.65), width=0.5, color = 'black', outlier.shape = NA, coef = 0) +
+  theme_minimal() + coord_cartesian(xlim = c(0, 150)) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  theme(legend.position = 'none') +
+  ylab('Province') +
+  xlab('Time (days)') +
+  ggtitle('Province Infection Time') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30)) 
+line_plot_col_obs
+
+line_plot_mad_obs <- ggplot(int_mad_obs_all, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale)) +
+  #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
+  #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
+  geom_boxplot(position = position_dodge(width = 0.65), width=0.5, color = 'black', outlier.shape = NA, coef = 0) +
+  theme_minimal() + coord_cartesian(xlim = c(0, 150)) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  theme(legend.position = 'none') +
+  ylab('Province') +
+  xlab('Time (days)') +
+  ggtitle('Province Infection Time') +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30)) 
+line_plot_mad_obs
+
+dis_plot_col_obs <- ggplot(line_col_obs_all, aes(x = time, y = perc_50)) +
+  geom_ribbon(aes(ymin = perc_05, ymax = perc_95, fill = Scale), alpha = 0.2) +
+  geom_line(aes(color = Scale), size = 1.75) + #xlim(0, 100) + ylim(0, 50) +
+  theme_minimal() + scale_color_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30),
+        strip.text = element_text(size = 30)) +
+  ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Province Disease Curves') + 
+  facet_wrap(vars(adm_1), nrow = 2, scale = 'free') 
+
+dis_plot_col_obs
+dis_plot_mad_obs <- ggplot(line_mad_obs_all, aes(x = time, y = perc_50)) +
+  geom_ribbon(aes(ymin = perc_05, ymax = perc_95, fill = Scale), alpha = 0.2) +
+  geom_line(aes(color = Scale), size = 1.75) + #xlim(0, 100) + ylim(0, 50) +
+  theme_minimal() + scale_color_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30),
+        strip.text = element_text(size = 30)) +
+  ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Province Disease Curves') + 
+  facet_wrap(vars(adm_1), nrow = 2, scale = 'free') 
+dis_plot_mad_obs
+
+take_off_col <- take_off_col |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+take_off_mad <- take_off_mad |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+
+take_off_mad_plot <- ggplot(take_off_mad, aes(x=Scale, y=take_off_perc, fill = Scale)) + 
+  geom_bar(stat = "identity", width=0.42, color = 'black', alpha = 0.9) +
+  theme_minimal() + scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks=c(0, 3, 6, 9)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.65)) +
+  ylab('Proportion') + xlab('Scale') + ggtitle('Epidemic Occurance')
 
-
-line_plot_mad_obs <- ggplot(data = int_mad_obs_all) + geom_line(aes(x = time, y = Count, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Count') + xlab('Time (days)') + ggtitle('Units Infected') +
+take_off_col_plot <- ggplot(take_off_col, aes(x=Scale, y=take_off_perc, fill = Scale)) + 
+  geom_bar(stat = "identity", width=0.42, color = 'black', alpha = 0.9) +
+  theme_minimal() + scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks=c(0, 3, 6, 9)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6), limits = c(0, 0.65)) +
+  ylab('Proportion') + xlab('Scale') + ggtitle('Epidemic Occurance')
 
-line_plot_col_sim <- ggplot(data = int_col_sim_all) + geom_line(aes(x = time, y = Count, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Count') + xlab('Time (days)') + ggtitle('Units Infected') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks=c(0, 3, 6, 9)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-
-line_plot_mad_sim <- ggplot(data = int_mad_sim_all) + geom_line(aes(x = time, y = Count, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Count') + xlab('Time (days)') + ggtitle('Units Infected') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_y_continuous(breaks=c(0, 3, 6, 9)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-dis_plot_col_obs <- ggplot(data = line_col_obs_all) + geom_line(aes(x = time, y = avg_incid_I, color = Scale), linewidth = 3.5, alpha = 0.8) + 
+line_mad_obs_all$Scale <- factor(line_mad_obs_all$Scale, levels=c('Division', 'District', 'Province'))
+legend <- ggplot(data = line_mad_obs_all) + geom_line(aes(x = time, y = perc_50, color = Scale), linewidth = 3.5, alpha = 1) + 
+  geom_ribbon(aes(x = time, ymin = perc_05, ymax = perc_95, fill = Scale), alpha = 0.2) +
   theme_minimal() + ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Disease Curves') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-
-dis_plot_mad_obs <- ggplot(data = line_mad_obs_all) + geom_line(aes(x = time, y = avg_incid_I, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Disease Curves') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-dis_plot_col_sim <- ggplot(data = line_col_sim_all) + geom_line(aes(x = time, y = avg_incid_I, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Disease Curves') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-
-dis_plot_mad_sim <- ggplot(data = line_mad_sim_all) + geom_line(aes(x = time, y = avg_incid_I, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Disease Curves') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
-
-
-legend <- ggplot(data = line_mad_sim_all) + geom_line(aes(x = time, y = avg_incid_I, color = Scale), linewidth = 3.5, alpha = 0.8) + 
-  theme_minimal() + ylab('Incident Cases') + xlab('Time (days)') + ggtitle('Disease Curves') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'bottom',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) +
-  scale_color_manual(values = c("#41AE76", "#9e9ac8", "#4292C6"))
+        legend.text = element_text(size = 40),
+        legend.title = element_text(size = 40),
+        legend.key.size = unit(1.2, "cm")) +
+  scale_color_manual(values = c( "#41AE76", "#9e9ac8","#4292C6")) +
+  scale_fill_manual(values = c( "#41AE76","#9e9ac8", "#4292C6"))
+
 legend_get <- get_legend(legend)
 
-row_1_1 <- cowplot::plot_grid(line_plot_col_obs, dis_plot_col_obs,
-                              nrow = 1, labels = c('', ''))
-row_1_2 <- cowplot::plot_grid(line_plot_mad_obs, dis_plot_mad_obs, 
-                              nrow = 1, labels = c('', ''))
-row_2_1 <- cowplot::plot_grid(line_plot_col_sim, dis_plot_col_sim, 
-                              nrow = 1, labels = c('', ''))
-row_2_2 <- cowplot::plot_grid(line_plot_mad_sim, dis_plot_mad_sim, 
-                              nrow = 1, labels = c('', ''))
+row_1_1 <- cowplot::plot_grid(take_off_col_plot,
+                              line_plot_col_obs, dis_plot_col_obs, 
+                              nrow = 1, labels = c('(a)', '(b)', '(c)'),
+                              rel_widths = c(0.70, 1.1, 0.8),
+                              label_size = 34)
+row_1_2 <- cowplot::plot_grid(take_off_mad_plot,
+                              line_plot_mad_obs, dis_plot_mad_obs,
+                              nrow = 1, labels = c('(d)', '(e)', '(f)'),
+                              rel_widths = c(0.70, 1.1, 0.8),
+                              label_size = 34)
 
-figure_4 <- cowplot::plot_grid(ggplot() + theme_void(), ggplot() + theme_void(),
-                               row_1_1, row_1_2,
-                               ggplot() + theme_void(), ggplot() + theme_void(),
-                               row_2_1, row_2_2,
-                               nrow = 4, ncol = 2, 
-                               rel_heights = c(0.10, 1, 0.10, 1),
-                               labels = c('Observed Data, Colombo Introduction', 
-                                          'Observed Data, Madhu Introduction', 
-                                          '(a)', '(b)', 
-                                          'Rescaled Data, Colombo Introduction', 
-                                          ' Data, Madhu Introduction', 
-                                          '(c)', '(d)'),
-                               label_size = 26, hjust = -0.5)    
+plot <- cowplot::plot_grid(ggplot() + theme_void(), row_1_1,
+                           ggplot() + theme_void(), row_1_2, legend_get,
+                           nrow = 5, labels = c('Colombo Introduction Event', '',
+                                                'Sevanagala Introduction Event', '', ''),
+                           label_size = 34, hjust = 0,
+                           rel_heights = c(0.08, 1, 0.08, 1, 0.1))
 
-figure_4_final <- cowplot::plot_grid(figure_4, legend_get, nrow = 2, rel_heights = c(1, 0.05))
+# Call Outs
+line_mad_obs_all |> group_by(Scale) |> mutate(sum= sum(perc_50)) |> distinct(Scale, sum)
+line_col_obs_all |> group_by(Scale) |> mutate(sum= sum(perc_50)) |> distinct(Scale, sum)
+test <- int_col_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
+test <- int_mad_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
 
-ggsave('./figs/SENS_TEST.jpg', plot = figure_4_final, height = 13, width = 25)
+max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Uva' & line_mad_obs_all$Scale == 'Division',]$perc_50)
+max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Uva' & line_mad_obs_all$Scale == 'District',]$perc_50)
+
+
+ggsave('./figs/figure_4_example_sim.jpg', plot = plot , height = 17, width = 25)
+
+################################################################################
+################################################################################

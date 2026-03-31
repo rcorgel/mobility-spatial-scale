@@ -40,12 +40,12 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 #####################################
 
 # Load mobility data for each data source
-load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_3_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_2_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_1_sim_mobility_dat.RData')
+adm_3_phone_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_2_phone_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
+adm_1_phone_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
+adm_3_sim_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_2_sim_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
+adm_1_sim_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
 
 # Load admin crosswalk
 admin_xwalk <- read_csv('./tmp/admin_xwalk.csv')
@@ -196,17 +196,19 @@ mu <- clust |> group_by(Group) |>
 
 # Create density plot
 cluster_plot <- ggplot(clust, aes(x=diff, color=Group, fill = Group)) +
-  geom_density(aes(), alpha = 0.5)+
+  geom_density(aes(), alpha = 0.5) +
   geom_vline(data=mu, aes(xintercept=grp.mean, color=Group),
-             linetype="dashed") + theme_minimal() + 
-  xlab('Internal - External Trip Proportion Difference') + ylab('Density') +
+             linetype="dashed", linewidth = 1.5) + theme_minimal() + 
+  xlab('Within - Between Unit Travel Probability Difference') + ylab('Density') +
+  scale_color_manual('Scale', values=c('#e6a532', '#5b7dc6', '#af4b91')) +
+  scale_fill_manual('Scale', values=c('#e6a532', '#5b7dc6', '#af4b91')) +
   theme(legend.position = 'bottom')
 
 # Plot
 cluster_plot
 
 # Save
-ggsave('./figs/figure_S.3_cluster.jpg', plot = cluster_plot, height = 6, width = 9)
+ggsave('./figs/figure_S.5_cluster.jpg', plot = cluster_plot, height = 6, width = 9)
 
 ################################################################################
 ################################################################################

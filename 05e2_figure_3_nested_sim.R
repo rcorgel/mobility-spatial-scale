@@ -1,12 +1,12 @@
 ################################################################################
-# File Name: 05e_figure_3_nested                                               #
+# File Name: 05e_figure_3_nested_sim                                           #
 #                                                                              #
 # Purpose:   Create figure 3 for the manuscript.                               #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Create figure functions                                        #
-#            3. Create subfigures                                              #
-#            4. Create final figure                                            #
+#            4. Create subfigures                                              #
+#            5. Create final figure                                            #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -86,9 +86,9 @@ choropleth_3_mobility <- choropleth_3 |>
 admin_xwalk <- read_csv('./tmp/admin_xwalk.csv')
 
 # Load mobility data for each data source
-adm_3_phone_mobility_long <- readRDS('./out/adm_3_phone_mobility_long.rds')
-adm_2_phone_mobility_long <- readRDS('./out/adm_2_phone_mobility_long.rds')
-adm_1_phone_mobility_long <- readRDS('./out/adm_1_phone_mobility_long.rds')
+adm_3_phone_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_2_phone_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
+adm_1_phone_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
 adm_3_sim_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
 adm_2_sim_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
 adm_1_sim_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
@@ -136,32 +136,32 @@ network_odd_prop <- network_odd |>
 
 # Add outgoing propotion to map
 choropleth_1_3_prop_odd <- left_join(choropleth_1, network_odd_prop[network_odd_prop$origin == "Sevanagala",], by = 
-                                     c('ADM1_EN' = 'destination'))
+                                       c('ADM1_EN' = 'destination'))
 # Create map
 plot_1_3_map_prop_odd <- ggplot() +
   geom_sf(data = choropleth_1_3_prop_odd, aes(fill = proportion), color= 'black', linewidth = 0.25, alpha = 1) +
   theme_void() + ggtitle('\nOutgoing Travel\nSevanagala Division') + theme(legend.position = 'right',
-                                     plot.title = element_text(size = 30, hjust = 0.5),
-                                     legend.text = element_text(size = 24),
-                                     legend.title = element_text(size = 28),
-                                     panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
+                                                                           plot.title = element_text(size = 30, hjust = 0.5),
+                                                                           legend.text = element_text(size = 24),
+                                                                           legend.title = element_text(size = 28),
+                                                                           panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
   coord_sf() +
   scale_colour_gradient('Proportion',
-                         low = 'white', high = '#41AE76',aesthetics = 'fill', limits=c(0, 0.65),
+                        low = 'white', high = '#41AE76',aesthetics = 'fill', limits=c(0, 0.65),
                         breaks = c(0, 0.30, 0.60),
                         labels = function(x) sprintf("%.2f", x))
 
 # Add outgoing proportion to map
 choropleth_1_1_prop_odd <- left_join(choropleth_1, network_odd_prop[network_odd_prop$origin == "Uva",], by = 
-                                   c('ADM1_EN' = 'destination'))
+                                       c('ADM1_EN' = 'destination'))
 # Create map
 plot_1_1_map_prop_odd <- ggplot() +
   geom_sf(data = choropleth_1_1_prop_odd, aes(fill = proportion), color= 'black', linewidth = 0.25, alpha = 1) +
   theme_void() + ggtitle('\nOutgoing Travel\nUva Province') + theme(legend.position = 'right',
-                                     plot.title = element_text(size = 30, hjust = 0.5),
-                                     legend.text = element_text(size = 24),
-                                     legend.title = element_text(size = 28),
-                                     panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
+                                                                    plot.title = element_text(size = 30, hjust = 0.5),
+                                                                    legend.text = element_text(size = 24),
+                                                                    legend.title = element_text(size = 28),
+                                                                    panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
   coord_sf() + 
   scale_colour_gradient('Proportion',
                         low = 'white', high = '#4292C6',aesthetics = 'fill', limits=c(0, 0.65),
@@ -215,35 +215,35 @@ network_even_prop <- network_even |>
 
 # Add outgoing propotion to map
 choropleth_1_3_prop_even <- left_join(choropleth_1, network_even_prop[network_even_prop$origin == "Colombo",], by = 
-                                   c('ADM1_EN' = 'destination'))
+                                        c('ADM1_EN' = 'destination'))
 # Map
 plot_1_3_map_prop_even <- ggplot() +
   geom_sf(data = choropleth_1_3_prop_even, aes(fill = proportion), color= 'black', linewidth = 0.25, alpha = 1) +
   theme_void() + ggtitle('\nOutgoing Travel\nColombo Division') + theme(legend.position = 'right',
-                                     plot.title = element_text(size = 30, hjust = 0.5),
-                                     legend.text = element_text(size = 24),
-                                     legend.title = element_text(size = 28),
-                                     panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
+                                                                        plot.title = element_text(size = 30, hjust = 0.5),
+                                                                        legend.text = element_text(size = 24),
+                                                                        legend.title = element_text(size = 28),
+                                                                        panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
   coord_sf() + 
   scale_colour_gradient('Proportion',
-                        low = 'white', high = '#41AE76',aesthetics = 'fill', limits=c(0, 0.35),
-                        breaks = c(0, 0.15, 0.30))
+                        low = 'white', high = '#41AE76',aesthetics = 'fill', limits=c(0, 0.65),
+                        breaks = c(0, 0.30, 0.60))
 
 # Add outgoing propotion to map
 choropleth_1_1_prop_even <- left_join(choropleth_1, network_even_prop[network_even_prop$origin == "Western",], by = 
-                                   c('ADM1_EN' = 'destination'))
+                                        c('ADM1_EN' = 'destination'))
 # Map
 plot_1_1_map_prop_even <- ggplot() +
   geom_sf(data = choropleth_1_1_prop_even, aes(fill = proportion), color= 'black', linewidth = 0.25, alpha = 1) +
   theme_void() + ggtitle('\nOutgoing Travel\nWestern Province') + theme(legend.position = 'right',
-                                     plot.title = element_text(size = 30, hjust = 0.5),
-                                     legend.text = element_text(size = 24),
-                                     legend.title = element_text(size = 28),
-                                     panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
+                                                                        plot.title = element_text(size = 30, hjust = 0.5),
+                                                                        legend.text = element_text(size = 24),
+                                                                        legend.title = element_text(size = 28),
+                                                                        panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
   coord_sf() + 
   scale_colour_gradient('Proportion',
-                        low = 'white', high = '#4292C6',aesthetics = 'fill', limits=c(0, 0.35),
-                        breaks = c(0, 0.15, 0.30))
+                        low = 'white', high = '#4292C6',aesthetics = 'fill', limits=c(0, 0.65),
+                        breaks = c(0, 0.30, 0.60))
 
 # Create bar plot
 net_even <- ggplot(data=network_even, aes(x=destination, y=value_sum * 100, fill = origin)) + 
@@ -266,8 +266,8 @@ net_even <- ggplot(data=network_even, aes(x=destination, y=value_sum * 100, fill
 ######################
 
 # Load mobility data for each data source
-adm_3_phone_mobility_long <- readRDS('./out/adm_3_phone_mobility_long.rds')
-adm_1_phone_mobility_long <- readRDS('./out/adm_1_phone_mobility_long.rds')
+adm_3_phone_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_1_phone_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
 
 # Load population data
 adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
@@ -301,10 +301,10 @@ adm_3_adm_1_phone_leave <- adm_3_adm_1_phone |>
   mutate(adm_3_leave = 1 - adm_3_sum,
          adm_1_leave = 1 - value,
          difference = adm_3_leave - adm_1_leave)
-  
+
 # Merge on admin 3 population
 adm_3_adm_1_phone_leave <- left_join(adm_3_adm_1_phone_leave, adm_3_population_dat[, c(1, 4)], 
-                               by = c('origin' = 'adm_3_mobility'))
+                                     by = c('origin' = 'adm_3_mobility'))
 
 ################
 # PLOT SCATTER #
@@ -353,7 +353,7 @@ plot_3_1_map <- ggplot() +
   coord_sf() + 
   scale_colour_gradient2('Difference',
                          low = '#41AE76', mid = "white", high = '#4292C6',
-                         midpoint = 0, aesthetics = 'fill', limits=c(-0.30, 0.60)) 
+                         midpoint = 0, aesthetics = 'fill', limits=c(-0.30, 0.60))
 
 ##########################
 # 4. CREATE FINAL FIGURE #
@@ -383,11 +383,10 @@ figure_3 <- cowplot::plot_grid(col_1, ggplot() + theme_void(),
                                labels = c('', '', ''),
                                label_size = 26, hjust = 0)                            
 # Save plot
-ggsave('./figs/figure_3_nested_new.jpg', plot = figure_3, height = 25, width = 25)
+ggsave('./figs/figure_3_nested_new_sim.jpg', plot = figure_3, height = 25, width = 25)
 
-####################
-# 5. TEXT CALLOUTS #
-####################
+################################################################################
+################################################################################
 
 # At the province level, the probability of remaining in the Western province was 93%. 
 network_even[network_even$origin == 'Western' & network_even$destination == 'Western',]$value_sum
@@ -406,295 +405,3 @@ network_odd[network_odd$origin == 'Uva' & network_odd$destination == 'Uva',]$val
 mean(adm_3_adm_1_phone_leave$difference)
 min(adm_3_adm_1_phone_leave$difference)
 max(adm_3_adm_1_phone_leave$difference)
-
-################################################################################
-################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-######################
-# ADMIN 3 to ADMIN 2 #
-######################
-
-# Load mobility data for each data source
-adm_3_phone_mobility_long <- readRDS('./out/adm_3_phone_mobility_long.rds')
-adm_2_phone_mobility_long <- readRDS('./out/adm_2_phone_mobility_long.rds')
-adm_1_phone_mobility_long <- readRDS('./out/adm_1_phone_mobility_long.rds')
-adm_3_sim_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
-adm_2_sim_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
-adm_1_sim_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
-
-# Load population data
-adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
-adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
-adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
-
-#####################
-# MOBILE PHONE DATA #
-#####################
-
-# Merge on admin 2 destination
-adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, admin_xwalk[, c(1, 2)], 
-                                       by = c('destination' = 'adm_3'))
-# Merge on admin 2 origin
-adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long, admin_xwalk[, c(1, 2)],
-                                       by = c('origin' = 'adm_3'))
-
-# Calculate out of district travel at the admin 3 unit
-adm_3_adm_2_phone <- adm_3_phone_mobility_long |>
-  # Filter to trips leaving the district
-  dplyr::filter(adm_2.x != adm_2.y) |>
-  group_by(origin) |>
-  # Calculate the external district travel proportions
-  mutate(adm_3_sum = sum(value, na.rm = TRUE)) |>
-  distinct(origin, adm_2.y, adm_3_sum, .keep_all = FALSE) |>
-  dplyr::rename('adm_2_origin' = 'adm_2.y')
-
-# Merge on origin from admin 2 and internal travel proportion
-adm_3_adm_2_phone <- left_join(adm_3_adm_2_phone, 
-                               adm_2_phone_mobility_long[
-                                 adm_2_phone_mobility_long$origin == 
-                                   adm_2_phone_mobility_long$destination, ], 
-                               by = c('adm_2_origin' = 'origin'))
-
-# Calculate 1 - stays to convert to an external travel proportion
-adm_3_adm_2_phone$adm_2_value <- 1 - adm_3_adm_2_phone$value
-
-# Calculate difference between nested units
-adm_3_adm_2_phone$diff <- adm_3_adm_2_phone$adm_2_value - adm_3_adm_2_phone$adm_3_sum
-
-# Merge on admin 3 population
-adm_3_adm_2_phone <- left_join(adm_3_adm_2_phone, adm_3_population_dat[, c(1, 4)], 
-                               by = c('origin' = 'adm_3_mobility'))
-
-################
-# PLOT SCATTER #
-################
-
-# Create scatter plot by population
-plot_3_2_scatter <- ggplot(adm_3_adm_2_phone) +
-  geom_point(aes(x = log(population_2020_adm_3), y = diff*100, 
-                 fill = diff*100), color = '#565656', alpha = 0.8, size = 5, shape = 21) + 
-  geom_hline(aes(yintercept = 0), color = 'black', linetype = 2, linewidth = 2) +
-  geom_smooth(aes(x = log(population_2020_adm_3), y = diff*100), color = '#565656', 
-              method = "lm", se = FALSE, linewidth = 3.5, alpha = 9) + 
-  ylim(-0.75*100, 0.25*100) +
-  ggtitle('District - Division\nTravel Difference') +
-  xlab('Log Population (Division)') + 
-  ylab('External District Travel\nProbability Difference (%)') +
-  theme_minimal() +
-  theme(
-        axis.title = element_text(size=26),
-        axis.text = element_text(size=26),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 24),
-        legend.key.height = unit(1.5, 'cm'),
-        plot.title = element_text(size=30, hjust = 0.5)) +
-  scale_fill_gradient2('Difference\n',
-                       low = '#41AE76', mid = "white", high = '#807DBA',
-                       midpoint = 0, limits=c(-0.75*100, 0.25*100))
-
-############
-# PLOT MAP #
-############
-
-choropleth_3_mobility <- left_join(choropleth_3_mobility, adm_3_adm_2_phone[ c('origin', 'diff')], by = 
-                                     c('adm_3_mobility' = 'origin'))
-plot_3_2_map <- ggplot() +
-  geom_sf(data = choropleth_3_mobility, aes(fill = diff), color= 'black', linewidth = 0.25, alpha = 1) +
-  geom_sf(data = choropleth_2, aes(), fill = '#FFFFFF00', color= 'black', linewidth = 1) +
-  theme_void() + ggtitle('') + theme(legend.position = 'none',
-                                                    plot.title = element_text(size = 30, hjust = 0.5),
-                                                    legend.text = element_text(size = 20),
-                                                    legend.title = element_text(size = 24),
-                                                    panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
-  coord_sf() + 
-  scale_colour_gradient2('Difference',
-                         low = '#41AE76', mid = "white", high = '#807DBA',
-    midpoint = 0, aesthetics = 'fill', limits=c(-0.75, 0.25))
-
-
-
-
-
-######################
-# ADMIN 2 to ADMIN 1 #
-######################
-
-#####################
-# MOBILE PHONE DATA #
-#####################
-
-# Change admin cross walk to admin 2 level
-admin_xwalk_adm_2 <- admin_xwalk |>
-  group_by(adm_2, adm_1) |>
-  distinct(adm_2, adm_1, .keep_all = FALSE)
-
-# Merge on destination
-adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, admin_xwalk_adm_2, 
-                                       by = c('destination' = 'adm_2'))
-# Merge on origin
-adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long, admin_xwalk_adm_2,
-                                       by = c('origin' = 'adm_2'))
-
-# Calculate out of province travel at the admin 2 unit
-adm_2_adm_1_phone <- adm_2_phone_mobility_long |>
-  dplyr::filter(adm_1.x != adm_1.y) |>
-  group_by(origin) |>
-  mutate(adm_2_sum = sum(value, na.rm = TRUE)) |>
-  distinct(origin, adm_1.y, adm_2_sum, .keep_all = FALSE) |>
-  dplyr::rename('adm_1_origin' = 'adm_1.y')
-
-# Merge on origin from admin 1 to get internal proportion
-adm_2_adm_1_phone <- left_join(adm_2_adm_1_phone, 
-                               adm_1_phone_mobility_long[
-                                 adm_1_phone_mobility_long$origin == 
-                                   adm_1_phone_mobility_long$destination, ], 
-                               by = c('adm_1_origin' = 'origin'))
-
-# Calculate 1 - stays to get external proportion
-adm_2_adm_1_phone$adm_1_value <- 1 - adm_2_adm_1_phone$value
-
-# Calculate difference between nested units
-adm_2_adm_1_phone$diff <- adm_2_adm_1_phone$adm_1_value - adm_2_adm_1_phone$adm_2_sum
-
-# Load population data
-# Merge on admin 2 population
-adm_2_adm_1_phone <- left_join(adm_2_adm_1_phone, adm_2_population_dat[, c(1, 3)], 
-                               by = c('origin' = 'adm_2'))
-
-################
-# PLOT SCATTER #
-################
-
-# Create scatter plot by population
-plot_2_1_scatter <- ggplot(adm_2_adm_1_phone) +
-  geom_point(aes(x = log(population_2020_adm_2), y = diff*100, 
-                 fill = diff*100), color = '#565656', alpha = 0.8, size = 5, shape = 21) + 
-  geom_hline(aes(yintercept = 0), color = 'black', linetype = 2, linewidth = 2) +
-  geom_smooth(aes(x = log(population_2020_adm_2), y = diff*100), color = '#565656', 
-              method = "lm", se = FALSE, linewidth = 3.5, alpha = 9) + 
-  ylim(-0.75*100, 0.25*100) +
-  ggtitle('Province - District\nTravel Difference') +
-  xlab('Log Population (District)') + 
-  ylab('External Province Travel\nProbability Difference (%)') +
-  theme_minimal() +
-  theme(
-        axis.title = element_text(size=26),
-        axis.text = element_text(size=26),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 24),
-        legend.key.height = unit(1.5, 'cm'),
-        plot.title = element_text(size=30, hjust = 0.5)) +
-  scale_fill_gradient2('Difference\n',
-                       low = '#41AE76', mid = "white", high = '#807DBA',
-                       midpoint = 0, limits=c(-0.75*100, 0.25*100))
-
-############
-# PLOT MAP #
-############
-
-choropleth_2 <- left_join(choropleth_2, adm_2_adm_1_phone[ c('origin', 'diff')], by = 
-                                     c('ADM2_EN' = 'origin'))
-plot_2_1_map <- ggplot() +
-  geom_sf(data = choropleth_2, aes(fill = diff), color= 'black', linewidth = 0.25, alpha = 1) +
-  geom_sf(data = choropleth_1, aes(), fill = '#FFFFFF00', color= 'black', linewidth = 1) +
-  theme_void() + ggtitle('') + theme(legend.position = 'none',
-    plot.title = element_text(size = 30, hjust = 0.5),
-    legend.title = element_text(size = 24),
-    legend.text = element_text(size = 20),
-    panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white')) + 
-  coord_sf() + 
-  scale_colour_gradient2('Difference',
-                         low = '#41AE76', mid = "white", high = '#807DBA',
-                         midpoint = 0, aesthetics = 'fill', limits=c(-0.75, 0.25))
-
-
-
-# col_1 <- cowplot::plot_grid(map, bar, density, 
-#                             nrow = 3, labels = c('(a)', '(b)', '(c)'),
-#                             label_size = 34, hjust = 0,
-#                             rel_heights = c(1, 1, 1))
-# 
-# col_2 <- cowplot::plot_grid(net_del, net_col, 
-#                             nrow = 2, labels = c('(d)','(e)'),
-#                             label_size = 34, hjust = 0,
-#                             rel_heights = c(1, 1))
-# 
-# col_3 <- cowplot::plot_grid(plot_3_1_scatter,
-#                             ggplot() + theme_void(), 
-#                             plot_3_1_map,
-#                             nrow = 1, labels = c('(f)', '', ''),
-#                             label_size = 34, hjust = 0,
-#                             rel_widths = c(1, 0.1, 1))
-# 
-# col_4 <- cowplot::plot_grid(col_2, col_3, nrow = 2, rel_heights = c(1, 0.5))
-
-
-
-
-# CALL OUTS
-max(adm_2_adm_1_phone$diff)
-min(adm_2_adm_1_phone$diff)
-mean(adm_2_adm_1_phone$diff)
-max(adm_3_adm_1_phone$diff)
-min(adm_3_adm_1_phone$diff)
-mean(adm_3_adm_1_phone$diff)
-max(adm_3_adm_2_phone$diff)
-min(adm_3_adm_2_phone$diff)
-mean(adm_3_adm_2_phone$diff)
-
-################################################################################
-################################################################################
-
-
-
-
-adm_3_phone_mobility_mat_0 <- adm_3_phone_mobility_mat
-
-adm_3_phone_mobility_mat_0[is.na(adm_3_phone_mobility_mat_0)] <- 0
-
-test <-  adm_3_phone_mobility_mat_0 %*% adm_3_adm_1_phone$diff
-
-
-test_1 <-  adm_3_phone_mobility_mat_0 %*% adm_3_adm_2_phone$diff
-
-rownames(test)
-
-test <- as.data.frame(test)
-test$adm_3 <- rownames(test)
-
-
-
-
-test$V2 <- as.data.frame(test_1)$V1
-
-test <- left_join(test, adm_3_adm_2_phone[, c(1, 2)], by = c('adm_3' = 'origin'))
-
-
-test_2 <-  adm_2_phone_mobility_mat %*% adm_2_adm_1_phone$diff
-test_2 <- as.data.frame(test_2)
-test_2$adm_2 <- rownames(test_2)
-test_2 <- test_2 |> rename(V3 = V1)
-  
-test <- left_join(test, test_2, by = c('adm_2_origin' = 'adm_2'))

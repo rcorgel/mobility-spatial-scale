@@ -23,8 +23,11 @@ rm(list = ls())
 library(tidyverse)
 library(parallel)
 
+# Set the RNG kind for parallel reproducibility
+RNGkind("L'Ecuyer-CMRG")
+
 # Set the seed
-set.seed(123456)
+set.seed(12345)
 
 # Set the directory
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
@@ -70,7 +73,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 2 Delft introduction, R_0 = 1.5
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -96,7 +99,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 1 Delft introduction, R_0 = 1.5
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -122,7 +125,7 @@ remove(adm_2_sen_col)
 # Adm 2 Delft introduction, R_0 = 1.5
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
                       max_time = 365, time_step = 1)
 adm_2_sen_del <- do.call(rbind, adm_2_del)
@@ -153,7 +156,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 2 Delft introduction, R_0 = 1.1
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -179,7 +182,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 1 Delft introduction, R_0 = 1.1
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -205,7 +208,7 @@ remove(adm_2_sen_col)
 # Adm 2 Delft introduction, R_0 = 1.1
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
                       max_time = 365, time_step = 1)
 adm_2_sen_del <- do.call(rbind, adm_2_del)
@@ -235,7 +238,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 2 Delft introduction, R_0 = 3.0
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -261,7 +264,7 @@ remove(adm_3_sen_col)
 # Adm 3 at 1 Delft introduction, R_0 = 3.0
 adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
+                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 267,
                       adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
                       max_time = 365, time_step = 1)
 adm_3_sen_del <- do.call(rbind, adm_3_del)
@@ -287,7 +290,7 @@ remove(adm_2_sen_col)
 # Adm 2 Delft introduction, R_0 = 3.0
 adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
                       adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 18,
                       adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
                       max_time = 365, time_step = 1)
 adm_2_sen_del <- do.call(rbind, adm_2_del)

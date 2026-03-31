@@ -35,22 +35,17 @@ set.seed(123456)
 # Set the directory
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
-# Load model 
-source('./mobility-spatial-scale/04_metapop_model.R')
-
-#load('./tmp/rescale_phone_mobility_dat.RData')
-
 #################################
 # 2. SIMULATE EXAMPLE EPIDEMICS #
 #################################
 
-# First, load metapopulation model data at different scales
-load('./tmp/adm_3_metapop_dat.RData')
-load('./tmp/adm_2_metapop_dat.RData')
-load('./tmp/adm_1_metapop_dat.RData')
+adm_3_obs_col <- readRDS('./out/adm_3_obs_col_1.5.rds')
+adm_2_obs_col <- readRDS('./out/adm_2_obs_col_1.5.rds')
+adm_1_obs_col <- readRDS('./out/adm_1_obs_col_1.5.rds')
 
-# Load simulated mobility data
-#load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
+adm_3_obs_mad <- readRDS('./out/adm_3_obs_del_1.5.rds')
+adm_2_obs_mad <- readRDS('./out/adm_2_obs_del_1.5.rds')
+adm_1_obs_mad <- readRDS('./out/adm_1_obs_del_1.5.rds')
 
 ##########################
 # Administrative Level 3 #
@@ -58,137 +53,75 @@ load('./tmp/adm_1_metapop_dat.RData')
 
 # Create object for mobility data
 #mobility_dat_adm_3 <- list(as.matrix(adm_3_phone_mobility_mat_rescale_adm_1), adm_3_phone_pred_mobility_mat)
-
-adm_3_col <- mclapply(1:150, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-
-adm_3_at_1_obs_col_int <- adm_3_obs_col |>
-  # Restrict to simulations that took off
-  group_by(run_num) |>
-  dplyr::filter(sum(incid_I) > 100) |>
-  ungroup() |>
-  # Sum to relevant spatial scale
-  group_by(run_num, time, adm_3) |> 
-  mutate(sum_incid_I = sum(incid_I)) |>
-  distinct(run_num, time, adm_3, sum_incid_I) |> 
-  ungroup() |>
-  group_by(run_num, adm_3) |> 
-  # Calculate cumulative cases at the spatial scale
-  mutate(cum_sum_I = cumsum(sum_incid_I),
-         intro = ifelse(cum_sum_I > 1, 1, 0)) |>
-  # Indicate the first instance when cumulative > 1
-  mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
-  # Filter to first instance for all admin
-  dplyr::filter(intro_first == TRUE) |>
-  ungroup() |>
-  arrange(run_num, time) |>
-  group_by(run_num) |>
-  arrange(time) |>
-  mutate(intro_loc = 'Col',
-         Scale = 'Division',
-         Count = row_number()) |>
-  dplyr::select(run_num, time, adm_3, time, Count, Scale) 
-
-
-(unique(adm_3_at_1_obs_col_int$run_num))
-
-test <- adm_3_at_1_obs_col_int |> dplyr::filter(Count < 18) |>
-  mutate(count = 1) |>
-  group_by(adm_3) |>
-  mutate(unit_count = sum(count),
-         unit_prop = unit_count / 47) |>
-  distinct(adm_3, unit_count, unit_prop) 
-
-choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/', 
-                        layer = 'lka_admbnda_adm3_slsd_20220816')
-
-library(sf)
-# Load population data
-load('./tmp/adm_population_dat.RData')
-
-# Load mobility to shape cross walk
-# The mobility data combines multiple admin 3 units, changing the total from 339 to 330
-mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
-
-# Merge on the cross walk
-choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
-
-# Join polygons to create 330 mobility admin 3 units
-choropleth_3_mobility <- choropleth_3 |> 
-  group_by(adm_3_mobility) |>
-  summarise(geometry = sf::st_union(geometry)) |>
-  ungroup()
-
-choropleth_3_mobility <- left_join(choropleth_3_mobility, test, by = c('adm_3_mobility' = 'adm_3'))
-
-
-ggplot(data = choropleth_3_mobility) +
-  geom_sf(aes(fill = unit_prop), color= 'black', linewidth = 0.20) +
-  scale_fill_distiller(palette = 'Blues', direction = 1, name = 'invasion') +
-  theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.90),
-                                      plot.title = element_text(size = 30, hjust = 0.5),
-                                      legend.text = element_text(size = 22),
-                                      legend.title = element_text(size = 24)) +
-  coord_sf()
-
-
-
-
-
-adm_3_mad <- mclapply(1:100, run_seir_model, beta =   0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-
-adm_3_obs_mad <- do.call(rbind, adm_3_mad)
-
-##########################
-# Administrative Level 2 #
-##########################
-
-adm_2_col <- mclapply(1:100, run_seir_model, beta =   0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_2_mad <- mclapply(1:100, run_seir_model, beta =   0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-
-adm_2_obs_mad <- do.call(rbind, adm_2_mad)
-
-##########################
-# Administrative Level 1 #
-##########################
-
-adm_1_col <- mclapply(1:100, run_seir_model, beta =   0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_1_mad <- mclapply(1:100, run_seir_model, beta =   0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-
-adm_1_obs_col <- do.call(rbind, adm_1_col)
-
-adm_1_obs_mad <- do.call(rbind, adm_1_mad)
+# 
+# adm_3_at_1_obs_col_int <- adm_3_obs_col |>
+#   # Restrict to simulations that took off
+#   group_by(run_num) |>
+#   dplyr::filter(sum(incid_I) > 100) |>
+#   ungroup() |>
+#   # Sum to relevant spatial scale
+#   group_by(run_num, time, adm_3) |> 
+#   mutate(sum_incid_I = sum(incid_I)) |>
+#   distinct(run_num, time, adm_3, sum_incid_I) |> 
+#   ungroup() |>
+#   group_by(run_num, adm_3) |> 
+#   # Calculate cumulative cases at the spatial scale
+#   mutate(cum_sum_I = cumsum(sum_incid_I),
+#          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+#   # Indicate the first instance when cumulative > 1
+#   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+#   # Filter to first instance for all admin
+#   dplyr::filter(intro_first == TRUE) |>
+#   ungroup() |>
+#   arrange(run_num, time) |>
+#   group_by(run_num) |>
+#   arrange(time) |>
+#   mutate(intro_loc = 'Col',
+#          Scale = 'Division',
+#          Count = row_number()) |>
+#   dplyr::select(run_num, time, adm_3, time, Count, Scale) 
+# 
+# 
+# (unique(adm_3_at_1_obs_col_int$run_num))
+# 
+# test <- adm_3_at_1_obs_col_int |> dplyr::filter(Count < 18) |>
+#   mutate(count = 1) |>
+#   group_by(adm_3) |>
+#   mutate(unit_count = sum(count),
+#          unit_prop = unit_count / 47) |>
+#   distinct(adm_3, unit_count, unit_prop) 
+# 
+# choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/', 
+#                         layer = 'lka_admbnda_adm3_slsd_20220816')
+# 
+# library(sf)
+# # Load population data
+# load('./tmp/adm_population_dat.RData')
+# 
+# # Load mobility to shape cross walk
+# # The mobility data combines multiple admin 3 units, changing the total from 339 to 330
+# mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
+# 
+# # Merge on the cross walk
+# choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
+# 
+# # Join polygons to create 330 mobility admin 3 units
+# choropleth_3_mobility <- choropleth_3 |> 
+#   group_by(adm_3_mobility) |>
+#   summarise(geometry = sf::st_union(geometry)) |>
+#   ungroup()
+# 
+# choropleth_3_mobility <- left_join(choropleth_3_mobility, test, by = c('adm_3_mobility' = 'adm_3'))
+# 
+# 
+# ggplot(data = choropleth_3_mobility) +
+#   geom_sf(aes(fill = unit_prop), color= 'black', linewidth = 0.20) +
+#   scale_fill_distiller(palette = 'Blues', direction = 1, name = 'invasion') +
+#   theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.90),
+#                                       plot.title = element_text(size = 30, hjust = 0.5),
+#                                       legend.text = element_text(size = 22),
+#                                       legend.title = element_text(size = 24)) +
+#   coord_sf()
 
 ########################
 # 3. CREATE SUBFIGURES #
@@ -278,7 +211,7 @@ adm_3_obs_col_avg <- adm_3_obs_col |>
          cum_sum_I_95 = cumsum(perc_95),
          cum_sum_I_05 = cumsum(perc_05)) |>
   mutate(Scale = 'Division') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 adm_2_obs_col_avg <- adm_2_obs_col |>
   group_by(run_num) |>
@@ -298,7 +231,7 @@ adm_2_obs_col_avg <- adm_2_obs_col |>
          cum_sum_I_95 = cumsum(perc_95),
          cum_sum_I_05 = cumsum(perc_05)) |>
   mutate(Scale = 'District') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 adm_1_obs_col_avg <- adm_1_obs_col |>
   group_by(run_num) |>
@@ -318,7 +251,7 @@ adm_1_obs_col_avg <- adm_1_obs_col |>
          cum_sum_I_95 = cumsum(perc_95),
          cum_sum_I_05 = cumsum(perc_05)) |>
   mutate(Scale = 'Province') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 line_col_obs_all <- rbind(adm_3_obs_col_avg, adm_2_obs_col_avg, adm_1_obs_col_avg)
 
@@ -338,7 +271,7 @@ adm_3_obs_mad_avg <- adm_3_obs_mad |>
   ungroup() |>
   mutate(cum_sum_I = cumsum(perc_50)) |>
   mutate(Scale = 'Division') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 adm_2_obs_mad_avg <- adm_2_obs_mad |>
   group_by(run_num) |>
@@ -356,7 +289,7 @@ adm_2_obs_mad_avg <- adm_2_obs_mad |>
   ungroup() |>
   mutate(cum_sum_I = cumsum(perc_50)) |>
   mutate(Scale = 'District') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 adm_1_obs_mad_avg <- adm_1_obs_mad |>
   group_by(run_num) |>
@@ -374,7 +307,7 @@ adm_1_obs_mad_avg <- adm_1_obs_mad |>
   ungroup() |>
   mutate(cum_sum_I = cumsum(perc_50)) |>
   mutate(Scale = 'Province') |>
-  dplyr::filter(adm_1 == 'Northern' | adm_1 == 'Western')
+  dplyr::filter(adm_1 == 'Uva' | adm_1 == 'Western')
 
 line_mad_obs_all <- rbind(adm_3_obs_mad_avg, adm_2_obs_mad_avg, adm_1_obs_mad_avg)
 
@@ -600,7 +533,6 @@ line_plot_col_obs <- ggplot(int_col_obs_all, aes(x = time, y = fct_reorder(adm_1
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -620,7 +552,6 @@ line_plot_mad_obs <- ggplot(int_mad_obs_all, aes(x = time, y = fct_reorder(adm_1
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -635,7 +566,6 @@ dis_plot_col_obs <- ggplot(line_col_obs_all, aes(x = time, y = perc_50)) +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -653,7 +583,6 @@ dis_plot_mad_obs <- ggplot(line_mad_obs_all, aes(x = time, y = perc_50)) +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -676,7 +605,6 @@ take_off_mad_plot <- ggplot(take_off_mad, aes(x=Scale, y=take_off_perc, fill = S
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -690,7 +618,6 @@ take_off_col_plot <- ggplot(take_off_col, aes(x=Scale, y=take_off_perc, fill = S
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -705,7 +632,6 @@ legend <- ggplot(data = line_mad_obs_all) + geom_line(aes(x = time, y = perc_50,
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'bottom',
         legend.text = element_text(size = 40),
@@ -730,7 +656,7 @@ row_1_2 <- cowplot::plot_grid(take_off_mad_plot,
 plot <- cowplot::plot_grid(ggplot() + theme_void(), row_1_1,
                            ggplot() + theme_void(), row_1_2, legend_get,
                             nrow = 5, labels = c('Colombo Introduction Event', '',
-                                                 'Delft Introduction Event', '', ''),
+                                                 'Sevanagala Introduction Event', '', ''),
                             label_size = 34, hjust = 0,
                             rel_heights = c(0.08, 1, 0.08, 1, 0.1))
 
@@ -740,18 +666,31 @@ line_col_obs_all |> group_by(Scale) |> mutate(sum= sum(perc_50)) |> distinct(Sca
 test <- int_col_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
 test <- int_mad_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) |> distinct(adm_1, Scale, med)
 
-max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Northern' & line_mad_obs_all$Scale == 'Division',]$perc_50)
-max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Northern' & line_mad_obs_all$Scale == 'District',]$perc_50)
+max(line_col_obs_all[line_col_obs_all$adm_1 == 'Western' & line_col_obs_all$Scale == 'Division',]$perc_50)
+max(line_col_obs_all[line_col_obs_all$adm_1 == 'Western' & line_col_obs_all$Scale == 'District',]$perc_50)
 
+
+test <- int_mad_obs_all |>
+  group_by(adm_1, Scale) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, median) |>
+  ungroup() |>
+  arrange(median) |>
+  mutate(Order = row_number())
+
+test_2 <- int_col_obs_all |>
+  group_by(adm_1, Scale) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, median) |>
+  ungroup() |>
+  arrange(median) |>
+  mutate(Order = row_number())
+
+take_off_mad
+
+take_off_col
 
 ggsave('./figs/figure_4_example.jpg', plot = plot , height = 17, width = 25)
-
-# Save observed plots for sensitivity analysis
-save(list = c('line_col_obs_all', 
-              'line_mad_obs_all',
-              'int_col_obs_all', 
-              'int_mad_obs_all'), 
-     file = './tmp/figure_4_plots_obs.RData')
 
 ################################################################################
 ################################################################################

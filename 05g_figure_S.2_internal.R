@@ -7,6 +7,7 @@
 #            2. Create figure functions                                        #
 #            3. Create sub figures                                             #
 #            4. Combine sub figures                                            #
+#            5. Text callouts                                                  #
 #                                                                              #
 # Project:   Sri Lanka Spatial Aggregation                                     #
 # Author:    Ronan Corgel                                                      #
@@ -56,11 +57,10 @@ make_violin_plot <- function(data, color) {
     scale_fill_manual(values=c(color, 'grey70')) +
     theme(legend.position = 'none') +
     xlab('') + 
-    ylab('\nInternal Trip Proportion') +
+    ylab('\nStay Probability') +
     ggtitle(' ') +
     theme(axis.title = element_text(size=26),
           axis.text = element_text(size=22),
-          panel.grid.major.x = element_blank(),
           panel.grid.minor = element_blank(),
           plot.title = element_text(size=30, hjust = 0.5))
   return(plot)
@@ -72,15 +72,14 @@ make_scatter_plot <- function(data) {
     geom_point(aes(x = log(population), y = value, color = level), alpha = 0.25, size = 4) +
     geom_smooth(method = lm, aes(x = log(population), y = value, color = level), 
                 alpha = 0.8, se = FALSE, linewidth = 2.5) +
-    ylim(0, 1) + xlim(6, 16.5) +
+    ylim(0, 1) + xlim(6, 16) +
     scale_color_manual('Scale', values=c('#41AE76', '#807DBA', '#4292C6')) +
     xlab('Log Population') + 
-    ylab('Internal Trip Proportion') +
+    ylab('Stay Probability') +
     ggtitle(' ') +
     theme_minimal() + 
     theme(axis.title = element_text(size=26),
           axis.text = element_text(size=20),
-          panel.grid.major.x = element_blank(),
           legend.text = element_text(size = 22),
           legend.title = element_text(size = 22),
           panel.grid.minor = element_blank(),
@@ -98,12 +97,14 @@ make_scatter_plot <- function(data) {
 ############################
 
 # Load phone mobility data
-load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
+adm_3_phone_mobility_long <- readRDS('./out/adm_3_phone_mobility_long.rds')
+adm_2_phone_mobility_long <- readRDS('./out/adm_2_phone_mobility_long.rds')
+adm_1_phone_mobility_long <- readRDS('./out/adm_1_phone_mobility_long.rds')
 
 # Load population data
-load('./tmp/adm_population_dat.RData')
+adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
+adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
+adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
 
 # Calculate internal trip proportions
 # Administrative Level 3
@@ -134,10 +135,10 @@ adm_1_phone_dat <- adm_1_phone_dat |> dplyr::rename('population' = 'population_2
 # SIMULATED MOBILE PHONE DATA #
 ###############################
 
-# Load sim mobility data
-load('./tmp/fmt_adm_3_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_2_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_1_sim_mobility_dat.RData')
+# Load simulated mobility data
+adm_3_sim_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_2_sim_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
+adm_1_sim_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
 
 # Calculate internal trip proportions
 # Administrative Level 3
@@ -192,8 +193,8 @@ adm_3_plot <- rbind(adm_3_phone_dat, adm_3_sim_dat)
 
 # Create mobility data violin plots
 phone_violin_plot_1 <- make_violin_plot(data = adm_1_plot, color = '#4292C6')
-phone_violin_plot_2 <- make_violin_plot(data = adm_2_plot, color = '#41AE76')
-phone_violin_plot_3 <- make_violin_plot(data = adm_3_plot, color = '#807DBA')
+phone_violin_plot_2 <- make_violin_plot(data = adm_2_plot, color = '#807DBA')
+phone_violin_plot_3 <- make_violin_plot(data = adm_3_plot, color = '#41AE76')
 
 # Combine all data
 adm_3_phone_dat$level <- 'Division'
@@ -207,11 +208,18 @@ adm_1_sim_dat$level <- 'Province'
 adm_sim_dat <- rbind(adm_1_sim_dat, adm_2_sim_dat, adm_3_sim_dat)
 
 # Create scatter plots
+adm_phone_dat <- adm_phone_dat |>
+  mutate(level = factor(level, levels=c("Division", "District", "Province"))) 
+
+adm_sim_dat <- adm_sim_dat |>
+  mutate(level = factor(level, levels=c("Division", "District", "Province"))) 
+
+
 phone_scatter_plot <- make_scatter_plot(data = adm_phone_dat)
 phone_scatter_plot_sim <- make_scatter_plot(data = adm_sim_dat)
 
 #########################
-# 3. COMBINE SUBFIGURES #
+# 4. COMBINE SUBFIGURES #
 #########################
 
 # Create figure, with labels
@@ -240,8 +248,21 @@ internal_plots_final <- plot_grid(internal_plots, internal_plots_pop,
                                   nrow = 2)
 
 # Save figure
-ggsave('./figs/figure_S.1_internal.jpg', plot = internal_plots_final, height = 12, width = 18)
+ggsave('./figs/figure_S.2_internal.jpg', plot = internal_plots_final, height = 12, width = 18)
+
+####################
+# 5. TEXT CALLOUTS #
+####################
+
+# For example, the average probability of staying at the province scale was 88% compared 
+# to 77% at the district scale and 24% at the division scale. 
+mean(adm_1_plot[adm_1_plot$level == 'Observed',]$value)
+mean(adm_2_plot[adm_2_plot$level == 'Observed',]$value)
+mean(adm_3_plot[adm_3_plot$level == 'Observed',]$value)
+
+mean(adm_1_plot[adm_1_plot$level == 'Simulated',]$value)
+mean(adm_2_plot[adm_2_plot$level == 'Simulated',]$value)
+mean(adm_3_plot[adm_3_plot$level == 'Simulated',]$value)
 
 ################################################################################
 ################################################################################
-

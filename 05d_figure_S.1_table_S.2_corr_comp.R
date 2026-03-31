@@ -42,16 +42,24 @@ setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-p
 ######################################
 
 # Load simulated trip count data
-load('./tmp/adm_sim_mobility_dat.RData')
+adm_3_sim_mobility_dat <- readRDS('./out/adm_3_sim_mobility_dat.rds')
+adm_2_sim_mobility_dat <- readRDS('./out/adm_2_sim_mobility_dat.rds')
+adm_1_sim_mobility_dat <- readRDS('./out/adm_1_sim_mobility_dat.rds')
 
 # Load distance data
-load('./tmp/adm_dist_mat.RData')
+adm_1_dist <- readRDS('./out/adm_1_dist.rds')
+adm_2_dist <- readRDS('./out/adm_2_dist.rds')
+adm_3_dist <- readRDS('./out/adm_3_dist.rds')
 
 # Load observed trip count data
-load('./tmp/adm_phone_mobility_dat.RData')
+adm_3_phone_mobility_dat <- readRDS('./out/adm_3_phone_mobility_dat.rds')
+adm_2_phone_mobility_dat <- readRDS('./out/adm_2_phone_mobility_dat.rds')
+adm_1_phone_mobility_dat <- readRDS('./out/adm_1_phone_mobility_dat.rds')
 
 # Load population data
-load('./tmp/adm_population_dat.RData')
+adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
+adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
+adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
 
 ##########################
 # Administrative Level 1 #
@@ -97,9 +105,6 @@ sim_comp_1 <- ggplot(data = adm_1_long_pred) +
                             plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
 
-# Text call out
-cor(adm_1_long_pred$trips_avg, adm_1_long_pred$value)
-
 ##########################
 # Administrative Level 2 #
 ##########################
@@ -142,9 +147,6 @@ sim_comp_2 <- ggplot(data = adm_2_long_pred) +
                            axis.title = element_text(size=26),
                            plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
-
-# Text call out
-cor(adm_2_long_pred$trips_avg, adm_2_long_pred$value)
 
 ##########################
 # Administrative Level 3 #
@@ -189,22 +191,19 @@ sim_comp_3 <- ggplot(data = adm_3_long_pred) +
                                             plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
 
-# Text call out
-cor(adm_3_long_pred$trips_avg, adm_3_long_pred$value, use = 'pairwise.complete.obs')
-
 #######################################
 # 3. CREATE S.2 PROPORTION SUBFIGURES #
 #######################################
 
 # Load phone mobility data
-load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
+adm_3_phone_mobility_long <- readRDS('./out/adm_3_phone_mobility_long.rds')
+adm_2_phone_mobility_long <- readRDS('./out/adm_2_phone_mobility_long.rds')
+adm_1_phone_mobility_long <- readRDS('./out/adm_1_phone_mobility_long.rds')
 
 # Load simulated mobility data
-load('./tmp/fmt_adm_3_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_2_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_1_sim_mobility_dat.RData')
+adm_3_sim_mobility_long <- readRDS('./out/adm_3_sim_mobility_long.rds')
+adm_2_sim_mobility_long <- readRDS('./out/adm_2_sim_mobility_long.rds')
+adm_1_sim_mobility_long <- readRDS('./out/adm_1_sim_mobility_long.rds')
 
 ##########################
 # Administrative Level 3 #
@@ -225,9 +224,6 @@ sim_comp_3_prop <- ggplot(data = adm_3_phone_mobility_long) +
                                   plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
 
-# Text call out
-cor(adm_3_phone_mobility_long$value.y, adm_3_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
-
 ##########################
 # Administrative Level 2 #
 ##########################
@@ -247,9 +243,6 @@ sim_comp_2_prop <- ggplot(data = adm_2_phone_mobility_long) +
                                   plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
 
-# Text call out
-cor(adm_2_phone_mobility_long$value.y, adm_2_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
-
 ##########################
 # Administrative Level 1 #
 ##########################
@@ -268,9 +261,6 @@ sim_comp_1_prop <- ggplot(data = adm_1_phone_mobility_long) +
                                   axis.title = element_text(size=26),
                                   plot.title = element_text(size=30, hjust = 0.5)) + xlab('Observed Value') +
   ylab('Simulated Value')
-
-# Text call out
-cor(adm_1_phone_mobility_long$value.y, adm_1_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
 
 #########################
 # 4. COMBINE SUBFIGURES #
@@ -301,14 +291,26 @@ supp_2 <- plot_grid(
   label_size = 34, hjust = -1.45)
 
 # Save
-ggsave('./figs/figure_S.2_correlations.jpg', plot = supp_2, height = 30, width = 25)
+ggsave('./figs/figure_S.1_correlations.jpg', plot = supp_2, height = 35, width = 25)
 
 ####################
 # 5. TEXT CALLOUTS #
 ####################
 
-# What percent of admin 3 routes are missing?
-sum(is.na(adm_3_phone_mobility_long$value.x)) / length(adm_3_phone_mobility_long$value.x)
+# "While the agreement between simulated and observed trip counts was strong 
+# (Pearson correlation coefficients of 0.99 for province, 0.97 for district, and 0.83 
+# for division levels), the accuracy and fit of these models were poorest for finer 
+# spatial scales"
+cor(adm_1_long_pred$trips_avg, adm_1_long_pred$value)
+cor(adm_2_long_pred$trips_avg, adm_2_long_pred$value)
+cor(adm_3_long_pred$trips_avg, adm_3_long_pred$value)
+
+# Supplement:
+# "Correlations of 0.99, 0.98, and 0.82 between observed and simulated trip proportions 
+# at the province, district, and division levels, respectively"
+cor(adm_1_phone_mobility_long$value.y, adm_1_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
+cor(adm_2_phone_mobility_long$value.y, adm_2_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
+cor(adm_3_phone_mobility_long$value.y, adm_3_phone_mobility_long$value.x, use = 'pairwise.complete.obs')
 
 ################################################################################
 ################################################################################

@@ -50,11 +50,51 @@ load('./tmp/adm_3_metapop_dat.RData')
 load('./tmp/adm_2_metapop_dat.RData')
 load('./tmp/adm_1_metapop_dat.RData')
 
-# Load simulated mobility data
-load('./mobility-spatial-scale/simulated data/mobile_phone_sim_prop_dat.RData')
+# Load results
+adm_3_obs_col <- readRDS('./out/adm_3_obs_col_1.5.rds')
+adm_2_obs_col <- readRDS('./out/adm_2_obs_col_1.5.rds')
+adm_1_obs_col <- readRDS('./out/adm_1_obs_col_1.5.rds')
+adm_3_obs_del <- readRDS('./out/adm_3_obs_del_1.5.rds')
+adm_2_obs_del <- readRDS('./out/adm_2_obs_del_1.5.rds')
+adm_1_obs_del <- readRDS('./out/adm_1_obs_del_1.5.rds')
 
-# Load rescaled mobility data
-load('./tmp/rescale_phone_mobility_dat_2.RData')
+adm_3_obs_col_1.1 <- readRDS('./out/adm_3_obs_col_1.1.rds')
+adm_2_obs_col_1.1 <- readRDS('./out/adm_2_obs_col_1.1.rds')
+adm_1_obs_col_1.1 <- readRDS('./out/adm_1_obs_col_1.1.rds')
+adm_3_obs_del_1.1 <- readRDS('./out/adm_3_obs_del_1.1.rds')
+adm_2_obs_del_1.1 <- readRDS('./out/adm_2_obs_del_1.1.rds')
+adm_1_obs_del_1.1 <- readRDS('./out/adm_1_obs_del_1.1.rds')
+
+adm_3_obs_col_3.0 <- readRDS('./out/adm_3_obs_col_3.0.rds')
+adm_2_obs_col_3.0 <- readRDS('./out/adm_2_obs_col_3.0.rds')
+adm_1_obs_col_3.0 <- readRDS('./out/adm_1_obs_col_3.0.rds')
+adm_3_obs_del_3.0 <- readRDS('./out/adm_3_obs_del_3.0.rds')
+adm_2_obs_del_3.0 <- readRDS('./out/adm_2_obs_del_3.0.rds')
+adm_1_obs_del_3.0 <- readRDS('./out/adm_1_obs_del_3.0.rds')
+
+adm_3_at_2_sen_col_1.5 <- readRDS('./out/adm_3_at_2_sen_col_1.5.rds')
+adm_3_at_1_sen_col_1.5 <- readRDS('./out/adm_3_at_1_sen_col_1.5.rds')
+adm_2_sen_col_1.5 <- readRDS('./out/adm_2_sen_col_1.5.rds')
+
+adm_3_at_2_sen_del_1.5 <- readRDS('./out/adm_3_at_2_sen_del_1.5.rds')
+adm_3_at_1_sen_del_1.5 <- readRDS('./out/adm_3_at_1_sen_del_1.5.rds')
+adm_2_sen_del_1.5 <- readRDS('./out/adm_2_sen_del_1.5.rds')
+
+adm_3_at_2_sen_col_1.1 <- readRDS('./out/adm_3_at_2_sen_col_1.1.rds')
+adm_3_at_1_sen_col_1.1 <- readRDS('./out/adm_3_at_1_sen_col_1.1.rds')
+adm_2_sen_col_1.1 <- readRDS('./out/adm_2_sen_col_1.1.rds')
+
+adm_3_at_2_sen_del_1.1 <- readRDS('./out/adm_3_at_2_sen_del_1.1.rds')
+adm_3_at_1_sen_del_1.1 <- readRDS('./out/adm_3_at_1_sen_del_1.1.rds')
+adm_2_sen_del_1.1 <- readRDS('./out/adm_2_sen_del_1.1.rds')
+
+adm_3_at_2_sen_col_3.0 <- readRDS('./out/adm_3_at_2_sen_col_3.0.rds')
+adm_3_at_1_sen_col_3.0 <- readRDS('./out/adm_3_at_1_sen_col_3.0.rds')
+adm_2_sen_col_3.0 <- readRDS('./out/adm_2_sen_col_3.0.rds')
+
+adm_3_at_2_sen_del_3.0 <- readRDS('./out/adm_3_at_2_sen_del_3.0.rds')
+adm_3_at_1_sen_del_3.0 <- readRDS('./out/adm_3_at_1_sen_del_3.0.rds')
+adm_2_sen_del_3.0 <- readRDS('./out/adm_2_sen_del_3.0.rds')
 
 ################################
 # CREATE AGGREGATION FUNCTIONS #
@@ -89,7 +129,7 @@ agg_to_adm_2 <- function(results, intro_loc, scale, trans) {
     ungroup() |>
     group_by(run_num) |>
     arrange(time) |>
-    slice(1:13) |>
+    slice(1:25) |>
     mutate(time = max(time),
            intro_loc = intro_loc,
            Scale = scale,
@@ -126,7 +166,7 @@ agg_to_adm_1 <- function(results, intro_loc, scale, trans) {
     ungroup() |>
     group_by(run_num) |>
     arrange(time) |>
-    slice(1:5) |>
+    slice(1:9) |>
     mutate(time = max(time),
            intro_loc = intro_loc,
            Scale = scale,
@@ -205,250 +245,108 @@ invasion_run_adm_2 <- function(results, intro_loc, scale, type) {
 #############
 
 # Adm 3 Colombo introduction, R_0 = 1.5
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
 adm_3_at_2_col <- agg_to_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.5') 
 adm_3_at_2_col_inv <- invasion_run_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
 adm_3_at_1_col <- agg_to_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.5') 
 adm_3_at_1_col_inv <- invasion_run_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
-remove(adm_3_obs_col)
 
-# Adm 3 Delft introduction, R_0 = 1.5
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 2', trans = '1.5') 
-adm_3_at_2_del_inv <- invasion_run_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = 'Division', type = 'Original') 
-adm_3_at_1_del <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 1', trans = '1.5') 
-adm_3_at_1_del_inv <- invasion_run_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = 'Division', type = 'Original') 
-remove(adm_3_obs_del)
+# Adm 3 Sevanagala introduction, R_0 = 1.5
+adm_3_at_2_del <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '1.5') 
+adm_3_at_2_del_inv <- invasion_run_adm_2(results = adm_3_obs_del, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
+adm_3_at_1_del <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '1.5') 
+adm_3_at_1_del_inv <- invasion_run_adm_1(results = adm_3_obs_del, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
 
 # Adm 2 Colombo introduction, R_0 = 1.5
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
 adm_2_at_2_col <- agg_to_adm_2(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2', trans = '1.5') 
 adm_2_at_2_col_inv <- invasion_run_adm_2(results = adm_2_obs_col, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
 adm_2_at_1_col <- agg_to_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.5') 
 adm_2_at_1_col_inv <- invasion_run_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
-remove(adm_2_obs_col)
 
-# Adm 2 Delft introduction, R_0 = 1.5
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_2_del <- agg_to_adm_2(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2', trans = '1.5') 
-adm_2_at_2_del_inv <- invasion_run_adm_2(results = adm_2_obs_del, intro_loc = 'Delft', scale = 'District', type = 'Original') 
-adm_2_at_1_del <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2 at 1', trans = '1.5') 
-adm_2_at_1_del_inv <- invasion_run_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = 'District', type = 'Original') 
-remove(adm_2_obs_del)
+# Adm 2 Sevanagala introduction, R_0 = 1.5
+adm_2_at_2_del <- agg_to_adm_2(results = adm_2_obs_del, intro_loc = 'Sevanagala', scale = '2', trans = '1.5') 
+adm_2_at_2_del_inv <- invasion_run_adm_2(results = adm_2_obs_del, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
+adm_2_at_1_del <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '1.5') 
+adm_2_at_1_del_inv <- invasion_run_adm_1(results = adm_2_obs_del, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
 
 # Adm 1 Colombo introduction, R_0 = 1.5
-adm_1_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_col <- do.call(rbind, adm_1_col)
-remove(adm_1_col)
-# Aggregate results
 adm_1_at_1_col <- agg_to_adm_1(results = adm_1_obs_col, intro_loc = 'Colombo', scale = '1', trans = '1.5') 
 adm_1_at_1_col_inv <- invasion_run_adm_1(results = adm_1_obs_col, intro_loc = 'Colombo', scale = 'Province', type = 'Original') 
-remove(adm_1_obs_col)
 
-# Adm 1 Delft introduction, R_0 = 1.5
-adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_del <- do.call(rbind, adm_1_del)
-remove(adm_1_del)
-# Aggregate results
-adm_1_at_1_del <- agg_to_adm_1(results = adm_1_obs_del, intro_loc = 'Delft', scale = '1', trans = '1.5') 
-adm_1_at_1_del_inv <- invasion_run_adm_1(results = adm_1_obs_del, intro_loc = 'Delft', scale = 'Province', type = 'Original') 
-remove(adm_1_obs_del)
+# Adm 1 Sevanagala introduction, R_0 = 1.5
+adm_1_at_1_del <- agg_to_adm_1(results = adm_1_obs_del, intro_loc = 'Sevanagala', scale = '1', trans = '1.5') 
+adm_1_at_1_del_inv <- invasion_run_adm_1(results = adm_1_obs_del, intro_loc = 'Sevanagala', scale = 'Province', type = 'Original') 
 
 #############
 # R_0 = 1.1 #
 #############
 
 # Adm 3 Colombo introduction, R_0 = 1.1
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_2_col_1.1 <- agg_to_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.1') 
-adm_3_at_1_col_1.1 <- agg_to_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.1') 
-remove(adm_3_obs_col)
+adm_3_at_2_col_1.1 <- agg_to_adm_2(results = adm_3_obs_col_1.1, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.1') 
+adm_3_at_2_col_inv_1.1 <- invasion_run_adm_2(results = adm_3_obs_col_1.1, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
+adm_3_at_1_col_1.1 <- agg_to_adm_1(results = adm_3_obs_col_1.1, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.1') 
+adm_3_at_1_col_inv_1.1 <- invasion_run_adm_1(results = adm_3_obs_col_1.1, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
 
-# Adm 3 Delft introduction, R_0 = 1.1
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del_1.1 <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 2', trans = '1.1') 
-adm_3_at_1_del_1.1 <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 1', trans = '1.1') 
-remove(adm_3_obs_del)
+# Adm 3 Sevanagala introduction, R_0 = 1.1
+adm_3_at_2_del_1.1 <- agg_to_adm_2(results = adm_3_obs_del_1.1, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '1.1') 
+adm_3_at_2_del_inv_1.1 <- invasion_run_adm_2(results = adm_3_obs_del_1.1, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
+adm_3_at_1_del_1.1 <- agg_to_adm_1(results = adm_3_obs_del_1.1, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '1.1') 
+adm_3_at_1_del_inv_1.1 <- invasion_run_adm_1(results = adm_3_obs_del_1.1, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
 
 # Adm 2 Colombo introduction, R_0 = 1.1
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
-adm_2_at_2_col_1.1 <- agg_to_adm_2(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2', trans = '1.1') 
-adm_2_at_1_col_1.1 <- agg_to_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.1') 
-remove(adm_2_obs_col)
+adm_2_at_2_col_1.1 <- agg_to_adm_2(results = adm_2_obs_col_1.1, intro_loc = 'Colombo', scale = '2', trans = '1.1') 
+adm_2_at_2_col_inv_1.1 <- invasion_run_adm_2(results = adm_2_obs_col_1.1, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
+adm_2_at_1_col_1.1 <- agg_to_adm_1(results = adm_2_obs_col_1.1, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.1') 
+adm_2_at_1_col_inv_1.1 <- invasion_run_adm_1(results = adm_2_obs_col_1.1, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
 
-# Adm 2 Delft introduction, R_0 = 1.1
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_2_del_1.1 <- agg_to_adm_2(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2', trans = '1.1') 
-adm_2_at_1_del_1.1 <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2 at 1', trans = '1.1') 
-remove(adm_2_obs_del)
+# Adm 2 Sevanagala introduction, R_0 = 1.1
+adm_2_at_2_del_1.1 <- agg_to_adm_2(results = adm_2_obs_del_1.1, intro_loc = 'Sevanagala', scale = '2', trans = '1.1') 
+adm_2_at_2_del_inv_1.1 <- invasion_run_adm_2(results = adm_2_obs_del_1.1, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
+adm_2_at_1_del_1.1 <- agg_to_adm_1(results = adm_2_obs_del_1.1, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '1.1') 
+adm_2_at_1_del_inv_1.1 <- invasion_run_adm_1(results = adm_2_obs_del_1.1, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
 
 # Adm 1 Colombo introduction, R_0 = 1.1
-adm_1_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_col <- do.call(rbind, adm_1_col)
-remove(adm_1_col)
-# Aggregate results
-adm_1_at_1_col_1.1 <- agg_to_adm_1(results = adm_1_obs_col, intro_loc = 'Colombo', scale = '1', trans = '1.1') 
-remove(adm_1_obs_col)
+adm_1_at_1_col_1.1 <- agg_to_adm_1(results = adm_1_obs_col_1.1, intro_loc = 'Colombo', scale = '1', trans = '1.1') 
+adm_1_at_1_col_inv_1.1 <- invasion_run_adm_1(results = adm_1_obs_col_1.1, intro_loc = 'Colombo', scale = 'Province', type = 'Original') 
 
-# Adm 1 Delft introduction, R_0 = 1.1
-adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_del <- do.call(rbind, adm_1_del)
-remove(adm_1_del)
-# Aggregate results
-adm_1_at_1_del_1.1 <- agg_to_adm_1(results = adm_1_obs_del, intro_loc = 'Delft', scale = '1', trans = '1.1') 
-remove(adm_1_obs_del)
+# Adm 1 Sevanagala introduction, R_0 = 1.1
+adm_1_at_1_del_1.1 <- agg_to_adm_1(results = adm_1_obs_del_1.1, intro_loc = 'Sevanagala', scale = '1', trans = '1.1') 
+adm_1_at_1_del_inv_1.1 <- invasion_run_adm_1(results = adm_1_obs_del_1.1, intro_loc = 'Sevanagala', scale = 'Province', type = 'Original') 
 
 #############
 # R_0 = 3.0 #
 #############
 
-# Adm 3 Colombo introduction, R_0 = 3
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_2_col_3 <- agg_to_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '3.0') 
-adm_3_at_1_col_3 <- agg_to_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '3.0') 
-remove(adm_3_obs_col)
+# Adm 3 Colombo introduction, R_0 = 3.0
+adm_3_at_2_col_3.0 <- agg_to_adm_2(results = adm_3_obs_col_3.0, intro_loc = 'Colombo', scale = '3 at 2', trans = '3.0') 
+adm_3_at_2_col_inv_3.0 <- invasion_run_adm_2(results = adm_3_obs_col_3.0, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
+adm_3_at_1_col_3.0 <- agg_to_adm_1(results = adm_3_obs_col_3.0, intro_loc = 'Colombo', scale = '3 at 1', trans = '3.0') 
+adm_3_at_1_col_inv_3.0 <- invasion_run_adm_1(results = adm_3_obs_col_3.0, intro_loc = 'Colombo', scale = 'Division', type = 'Original') 
 
-# Adm 3 Delft introduction, R_0 = 3
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del_3 <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 2', trans = '3.0') 
-adm_3_at_1_del_3 <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 1', trans = '3.0') 
-remove(adm_3_obs_del)
+# Adm 3 Sevanagala introduction, R_0 = 3.0
+adm_3_at_2_del_3.0 <- agg_to_adm_2(results = adm_3_obs_del_3.0, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '3.0') 
+adm_3_at_2_del_inv_3.0 <- invasion_run_adm_2(results = adm_3_obs_del_3.0, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
+adm_3_at_1_del_3.0 <- agg_to_adm_1(results = adm_3_obs_del_3.0, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '3.0') 
+adm_3_at_1_del_inv_3.0 <- invasion_run_adm_1(results = adm_3_obs_del_3.0, intro_loc = 'Sevanagala', scale = 'Division', type = 'Original') 
 
-# Adm 2 Colombo introduction, R_0 = 3
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
-adm_2_at_2_col_3 <- agg_to_adm_2(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2', trans = '3.0') 
-adm_2_at_1_col_3 <- agg_to_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '3.0') 
-remove(adm_2_obs_col)
+# Adm 2 Colombo introduction, R_0 = 3.0
+adm_2_at_2_col_3.0 <- agg_to_adm_2(results = adm_2_obs_col_3.0, intro_loc = 'Colombo', scale = '2', trans = '3.0') 
+adm_2_at_2_col_inv_3.0 <- invasion_run_adm_2(results = adm_2_obs_col_3.0, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
+adm_2_at_1_col_3.0 <- agg_to_adm_1(results = adm_2_obs_col_3.0, intro_loc = 'Colombo', scale = '2 at 1', trans = '3.0') 
+adm_2_at_1_col_inv_3.0 <- invasion_run_adm_1(results = adm_2_obs_col_3.0, intro_loc = 'Colombo', scale = 'District', type = 'Original') 
 
-# Adm 2 Delft introduction, R_0 = 3
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_2_obs_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_2_del_3 <- agg_to_adm_2(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2', trans = '3.0') 
-adm_2_at_1_del_3 <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2 at 1', trans = '3.0') 
-remove(adm_2_obs_del)
+# Adm 2 Sevanagala introduction, R_0 = 3.0
+adm_2_at_2_del_3.0 <- agg_to_adm_2(results = adm_2_obs_del_3.0, intro_loc = 'Sevanagala', scale = '2', trans = '3.0') 
+adm_2_at_2_del_inv_3.0 <- invasion_run_adm_2(results = adm_2_obs_del_3.0, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
+adm_2_at_1_del_3.0 <- agg_to_adm_1(results = adm_2_obs_del_3.0, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '3.0') 
+adm_2_at_1_del_inv_3.0 <- invasion_run_adm_1(results = adm_2_obs_del_3.0, intro_loc = 'Sevanagala', scale = 'District', type = 'Original') 
 
-# Adm 1 Colombo introduction, R_0 = 3
-adm_1_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_col <- do.call(rbind, adm_1_col)
-remove(adm_1_col)
-# Aggregate results
-adm_1_at_1_col_3 <- agg_to_adm_1(results = adm_1_obs_col, intro_loc = 'Colombo', scale = '1', trans = '3.0') 
-remove(adm_1_obs_col)
+# Adm 1 Colombo introduction, R_0 = 3.0
+adm_1_at_1_col_3.0 <- agg_to_adm_1(results = adm_1_obs_col_3.0, intro_loc = 'Colombo', scale = '1', trans = '3.0') 
+adm_1_at_1_col_inv_3.0 <- invasion_run_adm_1(results = adm_1_obs_col_3.0, intro_loc = 'Colombo', scale = 'Province', type = 'Original') 
 
-# Adm 1 Delft introduction, R_0 = 3
-adm_1_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_1_name_vec, adm_level = '1',
-                      pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
-                      max_time = 365, time_step = 1)
-adm_1_obs_del <- do.call(rbind, adm_1_del)
-remove(adm_1_del)
-# Aggregate results
-adm_1_at_1_del_3 <- agg_to_adm_1(results = adm_1_obs_del, intro_loc = 'Delft', scale = '1', trans = '3.0') 
-remove(adm_1_obs_del)
+# Adm 1 Sevanagala introduction, R_0 = 3.0
+adm_1_at_1_del_3.0 <- agg_to_adm_1(results = adm_1_obs_del_3.0, intro_loc = 'Sevanagala', scale = '1', trans = '3.0') 
+adm_1_at_1_del_inv_3.0 <- invasion_run_adm_1(results = adm_1_obs_del_3.0, intro_loc = 'Sevanagala', scale = 'Province', type = 'Original') 
 
 ############################
 # RUN RESCALED SIMULATIONS #
@@ -459,234 +357,84 @@ remove(adm_1_obs_del)
 #############
 
 # Adm 3 at 2 Colombo introduction, R_0 = 1.5
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_sen_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_2_col_sen <- agg_to_adm_2(results = adm_3_sen_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.5') 
-adm_3_at_2_col_sen_inv <- invasion_run_adm_2(results = adm_3_sen_col, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
-remove(adm_3_sen_col)
+adm_3_at_2_col_sen <- agg_to_adm_2(results = adm_3_at_2_sen_col_1.5, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.5') 
+adm_3_at_2_col_sen_inv <- invasion_run_adm_2(results = adm_3_at_2_sen_col_1.5, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 2 Delft introduction, R_0 = 1.5
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_sen_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del_sen <- agg_to_adm_2(results = adm_3_sen_del, intro_loc = 'Delft', scale = '3 at 2', trans = '1.5') 
-adm_3_at_2_del_sen_inv <- invasion_run_adm_2(results = adm_3_sen_del, intro_loc = 'Delft', scale = 'Division', type = 'Rescaled') 
-remove(adm_3_sen_del)
+# Adm 3 at 2 Sevanagala introduction, R_0 = 1.5
+adm_3_at_2_del_sen <- agg_to_adm_2(results = adm_3_at_2_sen_del_1.5, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '1.5') 
+adm_3_at_2_del_sen_inv <- invasion_run_adm_2(results = adm_3_at_2_sen_del_1.5, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 3 at 1 Colombo introduction, R_0 = 1.5
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_sen_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_1_col_sen <- agg_to_adm_1(results = adm_3_sen_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.5')
-adm_3_at_1_col_sen_inv <- invasion_run_adm_1(results = adm_3_sen_col, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
-remove(adm_3_sen_col)
+adm_3_at_1_col_sen <- agg_to_adm_1(results = adm_3_at_1_sen_col_1.5, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.5')
+adm_3_at_1_col_sen_inv <- invasion_run_adm_1(results = adm_3_at_1_sen_col_1.5, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 1 Delft introduction, R_0 = 1.5
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_sen_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_1_del_sen <- agg_to_adm_1(results = adm_3_sen_del, intro_loc = 'Delft', scale = '3 at 1', trans = '1.5') 
-adm_3_at_1_del_sen_inv <- invasion_run_adm_1(results = adm_3_sen_del, intro_loc = 'Delft', scale = 'Division', type = 'Rescaled') 
-remove(adm_3_sen_del)
+# Adm 3 at 1 Sevanagala introduction, R_0 = 1.5
+adm_3_at_1_del_sen <- agg_to_adm_1(results = adm_3_at_1_sen_del_1.5, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '1.5') 
+adm_3_at_1_del_sen_inv <- invasion_run_adm_1(results =  adm_3_at_1_sen_del_1.5, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 2 at 1 Colombo introduction, R_0 = 1.5
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_sen_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
-adm_2_at_1_col_sen <- agg_to_adm_1(results = adm_2_sen_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.5') 
-adm_2_at_1_col_sen_inv <- invasion_run_adm_1(results = adm_2_sen_col, intro_loc = 'Colombo', scale = 'District', type = 'Rescaled') 
-remove(adm_2_sen_col)
+adm_2_at_1_col_sen <- agg_to_adm_1(results = adm_2_sen_col_1.5, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.5') 
+adm_2_at_1_col_sen_inv <- invasion_run_adm_1(results =  adm_2_sen_col_1.5, intro_loc = 'Colombo', scale = 'District', type = 'Rescaled') 
 
-# Adm 2 Delft introduction, R_0 = 1.5
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_sen_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_1_del_sen <- agg_to_adm_1(results = adm_2_sen_del, intro_loc = 'Delft', scale = '2 at 1', trans = '1.5') 
-adm_2_at_1_del_sen_inv <- invasion_run_adm_1(results = adm_2_sen_del, intro_loc = 'Delft', scale = 'District', type = 'Rescaled') 
-remove(adm_2_sen_del)
+# Adm 2 Sevanagala introduction, R_0 = 1.5
+adm_2_at_1_del_sen <- agg_to_adm_1(results = adm_2_sen_del_1.5, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '1.5') 
+adm_2_at_1_del_sen_inv <- invasion_run_adm_1(results = adm_2_sen_del_1.5, intro_loc = 'Sevanagala', scale = 'District', type = 'Rescaled') 
 
 #############
 # R_0 = 1.1 #
 #############
 
 # Adm 3 at 2 Colombo introduction, R_0 = 1.1
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_2_col_sen_1.1 <- agg_to_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.1') 
-remove(adm_3_obs_col)
+adm_3_at_2_col_sen_1.1 <- agg_to_adm_2(results = adm_3_at_2_sen_col_1.1, intro_loc = 'Colombo', scale = '3 at 2', trans = '1.1') 
+adm_3_at_2_col_sen_inv_1.1 <- invasion_run_adm_2(results = adm_3_at_2_sen_col_1.1, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 2 Delft introduction, R_0 = 1.1
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del_sen_1.1 <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 2', trans = '1.1') 
-remove(adm_3_obs_del)
+# Adm 3 at 2 Sevanagala introduction, R_0 = 1.1
+adm_3_at_2_del_sen_1.1 <- agg_to_adm_2(results = adm_3_at_2_sen_del_1.1, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '1.1') 
+adm_3_at_2_del_sen_inv_1.1 <- invasion_run_adm_2(results = adm_3_at_2_sen_del_1.1, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 3 at 1 Colombo introduction, R_0 = 1.1
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_1_col_sen_1.1 <- agg_to_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.1') 
-remove(adm_3_obs_col)
+adm_3_at_1_col_sen_1.1 <- agg_to_adm_1(results = adm_3_at_1_sen_col_1.1, intro_loc = 'Colombo', scale = '3 at 1', trans = '1.1') 
+adm_3_at_1_col_sen_inv_1.1 <- invasion_run_adm_1(results = adm_3_at_1_sen_col_1.1, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 1 Delft introduction, R_0 = 1.1
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_1_del_sen_1.1 <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 1', trans = '1.1') 
-remove(adm_3_obs_del)
+# Adm 3 at 1 Sevanagala introduction, R_0 = 1.1
+adm_3_at_1_del_sen_1.1 <- agg_to_adm_1(results = adm_3_at_1_sen_del_1.1, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '1.1') 
+adm_3_at_1_del_sen_inv_1.1 <- invasion_run_adm_1(results =  adm_3_at_1_sen_del_1.1, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 2 at 1 Colombo introduction, R_0 = 1.1
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
-adm_2_at_1_col_sen_1.1 <- agg_to_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.1') 
-remove(adm_2_obs_col)
+adm_2_at_1_col_sen_1.1 <- agg_to_adm_1(results = adm_2_sen_col_1.1, intro_loc = 'Colombo', scale = '2 at 1', trans = '1.1') 
+adm_2_at_1_col_sen_inv_1.1 <- invasion_run_adm_1(results =  adm_2_sen_col_1.1, intro_loc = 'Colombo', scale = 'District', type = 'Rescaled') 
 
-# Adm 2 Delft introduction, R_0 = 1.1
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.22, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_obs_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_1_del_sen_1.1 <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2 at 1', trans = '1.1') 
-remove(adm_2_obs_del)
+# Adm 2 Sevanagala introduction, R_0 = 1.1
+adm_2_at_1_del_sen_1.1 <- agg_to_adm_1(results = adm_2_sen_del_1.1, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '1.1') 
+adm_2_at_1_del_sen_inv_1.1 <- invasion_run_adm_1(results = adm_2_sen_del_1.1, intro_loc = 'Sevanagala', scale = 'District', type = 'Rescaled') 
 
 #############
 # R_0 = 3.0 #
 #############
 
 # Adm 3 at 2 Colombo introduction, R_0 = 3.0
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_2_col_sen_3 <- agg_to_adm_2(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 2', trans = '3.0') 
-remove(adm_3_obs_col)
+adm_3_at_2_col_sen_3.0 <- agg_to_adm_2(results = adm_3_at_2_sen_col_3.0, intro_loc = 'Colombo', scale = '3 at 2', trans = '3.0') 
+adm_3_at_2_col_sen_inv_3.0 <- invasion_run_adm_2(results = adm_3_at_2_sen_col_3.0, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 2 Delft introduction, R_0 = 3.0
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_2),
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_2_del_sen_3 <- agg_to_adm_2(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 2', trans = '3.0') 
-remove(adm_3_obs_del)
+# Adm 3 at 2 Sevanagala introduction, R_0 = 3.0
+adm_3_at_2_del_sen_3.0 <- agg_to_adm_2(results = adm_3_at_2_sen_del_3.0, intro_loc = 'Sevanagala', scale = '3 at 2', trans = '3.0') 
+adm_3_at_2_del_sen_inv_3.0 <- invasion_run_adm_2(results = adm_3_at_2_sen_del_3.0, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 3 at 1 Colombo introduction, R_0 = 3.0
-adm_3_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 41,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_obs_col <- do.call(rbind, adm_3_col)
-remove(adm_3_col)
-# Aggregate results
-adm_3_at_1_col_sen_3 <- agg_to_adm_1(results = adm_3_obs_col, intro_loc = 'Colombo', scale = '3 at 1', trans = '3.0') 
-remove(adm_3_obs_col)
+adm_3_at_1_col_sen_3.0 <- agg_to_adm_1(results = adm_3_at_1_sen_col_3.0, intro_loc = 'Colombo', scale = '3 at 1', trans = '3.0') 
+adm_3_at_1_col_sen_inv_3.0 <- invasion_run_adm_1(results = adm_3_at_1_sen_col_3.0, intro_loc = 'Colombo', scale = 'Division', type = 'Rescaled') 
 
-# Adm 3 at 1 Delft introduction, R_0 = 3.0
-adm_3_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_3_name_vec, adm_level = '3',
-                      pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = 48,
-                      adm_x_walk = adm_3_x_walk, travel_mat = as.matrix(adm_3_phone_mobility_mat_rescale_adm_1),
-                      max_time = 365, time_step = 1)
-adm_3_obs_del <- do.call(rbind, adm_3_del)
-remove(adm_3_del)
-# Aggregate results
-adm_3_at_1_del_sen_3 <- agg_to_adm_1(results = adm_3_obs_del, intro_loc = 'Delft', scale = '3 at 1', trans = '3.0') 
-remove(adm_3_obs_del)
+# Adm 3 at 1 Sevanagala introduction, R_0 = 3.0
+adm_3_at_1_del_sen_3.0 <- agg_to_adm_1(results = adm_3_at_1_sen_del_3.0, intro_loc = 'Sevanagala', scale = '3 at 1', trans = '3.0') 
+adm_3_at_1_del_sen_inv_3.0 <- invasion_run_adm_1(results =  adm_3_at_1_sen_del_3.0, intro_loc = 'Sevanagala', scale = 'Division', type = 'Rescaled') 
 
 # Adm 2 at 1 Colombo introduction, R_0 = 3.0
-adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_obs_col <- do.call(rbind, adm_2_col)
-remove(adm_2_col)
-# Aggregate results
-adm_2_at_1_col_sen_3 <- agg_to_adm_1(results = adm_2_obs_col, intro_loc = 'Colombo', scale = '2 at 1', trans = '3.0') 
-remove(adm_2_obs_col)
+adm_2_at_1_col_sen_3.0 <- agg_to_adm_1(results = adm_2_sen_col_3.0, intro_loc = 'Colombo', scale = '2 at 1', trans = '3.0') 
+adm_2_at_1_col_sen_inv_3.0 <- invasion_run_adm_1(results =  adm_2_sen_col_3.0, intro_loc = 'Colombo', scale = 'District', type = 'Rescaled') 
 
-# Adm 2 Delft introduction, R_0 = 3.0
-adm_2_del <- mclapply(1:100, run_seir_model, beta = 0.6, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
-                      adm_name_vec = adm_2_name_vec, adm_level = '2',
-                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 9,
-                      adm_x_walk = adm_2_x_walk, travel_mat = as.matrix(adm_2_phone_mobility_mat_rescale),
-                      max_time = 365, time_step = 1)
-adm_2_obs_del <- do.call(rbind, adm_2_del)
-remove(adm_2_del)
-# Aggregate results
-adm_2_at_1_del_sen_3 <- agg_to_adm_1(results = adm_2_obs_del, intro_loc = 'Delft', scale = '2 at 1', trans = '3.0') 
-remove(adm_2_obs_del)
+# Adm 2 Sevanagala introduction, R_0 = 3.0
+adm_2_at_1_del_sen_3.0 <- agg_to_adm_1(results = adm_2_sen_del_3.0, intro_loc = 'Sevanagala', scale = '2 at 1', trans = '3.0') 
+adm_2_at_1_del_sen_inv_3.0 <- invasion_run_adm_1(results = adm_2_sen_del_3.0, intro_loc = 'Sevanagala', scale = 'District', type = 'Rescaled') 
 
 #####################
 # 3. CREATE FIGURES #
@@ -715,16 +463,16 @@ adm_2_at_1_del_1.1 <- adm_2_at_1_del_1.1 |> mutate(`Mobility Data Type` = 'Origi
 adm_1_at_1_col_1.1 <- adm_1_at_1_col_1.1 |> mutate(`Mobility Data Type` = 'Original')
 adm_1_at_1_del_1.1 <- adm_1_at_1_del_1.1 |> mutate(`Mobility Data Type` = 'Original')
 
-adm_3_at_1_col_3 <- adm_3_at_1_col_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_3_at_1_del_3 <- adm_3_at_1_del_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_3_at_2_col_3 <- adm_3_at_2_col_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_3_at_2_del_3 <- adm_3_at_2_del_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_2_at_2_col_3 <- adm_2_at_2_col_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_2_at_2_del_3 <- adm_2_at_2_del_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_2_at_1_col_3 <- adm_2_at_1_col_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_2_at_1_del_3 <- adm_2_at_1_del_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_1_at_1_col_3 <- adm_1_at_1_col_3 |> mutate(`Mobility Data Type` = 'Original')
-adm_1_at_1_del_3 <- adm_1_at_1_del_3 |> mutate(`Mobility Data Type` = 'Original')
+adm_3_at_1_col_3.0 <- adm_3_at_1_col_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_3_at_1_del_3.0 <- adm_3_at_1_del_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_3_at_2_col_3.0 <- adm_3_at_2_col_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_3_at_2_del_3.0 <- adm_3_at_2_del_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_2_at_2_col_3.0 <- adm_2_at_2_col_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_2_at_2_del_3.0 <- adm_2_at_2_del_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_2_at_1_col_3.0 <- adm_2_at_1_col_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_2_at_1_del_3.0 <- adm_2_at_1_del_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_1_at_1_col_3.0 <- adm_1_at_1_col_3.0 |> mutate(`Mobility Data Type` = 'Original')
+adm_1_at_1_del_3.0 <- adm_1_at_1_del_3.0 |> mutate(`Mobility Data Type` = 'Original')
 
 adm_3_at_1_col_sen <- adm_3_at_1_col_sen |> mutate(`Mobility Data Type` = 'Rescaled')
 adm_3_at_1_del_sen <- adm_3_at_1_del_sen |> mutate(`Mobility Data Type` = 'Rescaled')
@@ -740,30 +488,30 @@ adm_3_at_2_del_sen_1.1 <- adm_3_at_2_del_sen_1.1 |> mutate(`Mobility Data Type` 
 adm_2_at_1_col_sen_1.1 <- adm_2_at_1_col_sen_1.1 |> mutate(`Mobility Data Type` = 'Rescaled')
 adm_2_at_1_del_sen_1.1 <- adm_2_at_1_del_sen_1.1 |> mutate(`Mobility Data Type` = 'Rescaled')
 
-adm_3_at_1_col_sen_3 <- adm_3_at_1_col_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
-adm_3_at_1_del_sen_3 <- adm_3_at_1_del_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
-adm_3_at_2_col_sen_3 <- adm_3_at_2_col_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
-adm_3_at_2_del_sen_3 <- adm_3_at_2_del_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
-adm_2_at_1_col_sen_3 <- adm_2_at_1_col_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
-adm_2_at_1_del_sen_3 <- adm_2_at_1_del_sen_3 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_3_at_1_col_sen_3.0 <- adm_3_at_1_col_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_3_at_1_del_sen_3.0 <- adm_3_at_1_del_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_3_at_2_col_sen_3.0 <- adm_3_at_2_col_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_3_at_2_del_sen_3.0 <- adm_3_at_2_del_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_2_at_1_col_sen_3.0 <- adm_2_at_1_col_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
+adm_2_at_1_del_sen_3.0 <- adm_2_at_1_del_sen_3.0 |> mutate(`Mobility Data Type` = 'Rescaled')
 
 # Combine data
-plot_dat_intro <- rbind(adm_1_at_1_col_1.1, adm_1_at_1_col, adm_1_at_1_col_3, 
-                        adm_2_at_1_col_1.1, adm_2_at_1_col, adm_2_at_1_col_3,
-                        adm_2_at_2_col_1.1, adm_2_at_2_col, adm_2_at_2_col_3, 
-                        adm_3_at_1_col_1.1, adm_3_at_1_col, adm_3_at_1_col_3,
-                        adm_3_at_2_col_1.1, adm_3_at_2_col, adm_3_at_2_col_3,
-                        adm_1_at_1_del_1.1, adm_1_at_1_del, adm_1_at_1_del_3, 
-                        adm_2_at_1_del_1.1, adm_2_at_1_del, adm_2_at_1_del_3,
-                        adm_2_at_2_del_1.1, adm_2_at_2_del, adm_2_at_2_del_3, 
-                        adm_3_at_1_del_1.1, adm_3_at_1_del, adm_3_at_1_del_3,
-                        adm_3_at_2_del_1.1, adm_3_at_2_del, adm_3_at_2_del_3,
-                        adm_3_at_1_col_sen_1.1, adm_3_at_1_col_sen, adm_3_at_1_col_sen_3,
-                        adm_3_at_1_del_sen_1.1, adm_3_at_1_del_sen, adm_3_at_1_del_sen_3,
-                        adm_3_at_2_col_sen_1.1, adm_3_at_2_col_sen, adm_3_at_2_col_sen_3,
-                        adm_3_at_2_del_sen_1.1, adm_3_at_2_del_sen, adm_3_at_2_del_sen_3,
-                        adm_2_at_1_col_sen_1.1, adm_2_at_1_col_sen, adm_2_at_1_col_sen_3,
-                        adm_2_at_1_del_sen_1.1, adm_2_at_1_del_sen, adm_2_at_1_del_sen_3)
+plot_dat_intro <- rbind(adm_1_at_1_col_1.1, adm_1_at_1_col, adm_1_at_1_col_3.0, 
+                        adm_2_at_1_col_1.1, adm_2_at_1_col, adm_2_at_1_col_3.0,
+                        adm_2_at_2_col_1.1, adm_2_at_2_col, adm_2_at_2_col_3.0, 
+                        adm_3_at_1_col_1.1, adm_3_at_1_col, adm_3_at_1_col_3.0,
+                        adm_3_at_2_col_1.1, adm_3_at_2_col, adm_3_at_2_col_3.0,
+                        adm_1_at_1_del_1.1, adm_1_at_1_del, adm_1_at_1_del_3.0, 
+                        adm_2_at_1_del_1.1, adm_2_at_1_del, adm_2_at_1_del_3.0,
+                        adm_2_at_2_del_1.1, adm_2_at_2_del, adm_2_at_2_del_3.0, 
+                        adm_3_at_1_del_1.1, adm_3_at_1_del, adm_3_at_1_del_3.0,
+                        adm_3_at_2_del_1.1, adm_3_at_2_del, adm_3_at_2_del_3.0,
+                        adm_3_at_1_col_sen_1.1, adm_3_at_1_col_sen, adm_3_at_1_col_sen_3.0,
+                        adm_3_at_1_del_sen_1.1, adm_3_at_1_del_sen, adm_3_at_1_del_sen_3.0,
+                        adm_3_at_2_col_sen_1.1, adm_3_at_2_col_sen, adm_3_at_2_col_sen_3.0,
+                        adm_3_at_2_del_sen_1.1, adm_3_at_2_del_sen, adm_3_at_2_del_sen_3.0,
+                        adm_2_at_1_col_sen_1.1, adm_2_at_1_col_sen, adm_2_at_1_col_sen_3.0,
+                        adm_2_at_1_del_sen_1.1, adm_2_at_1_del_sen, adm_2_at_1_del_sen_3.0)
 
 # Reorder scale variable
 plot_dat_intro$Scale_order <- ordered(plot_dat_intro$Scale, levels = c("1", "2 at 1", "3 at 1", "2", "3 at 2"))
@@ -781,9 +529,9 @@ intro_trans <- ggplot(plot_dat_intro) +
   xlab('Scale') +
   ylab('\nTime (days)') +
   ggtitle('Disease Arrival Time by Introduction Location & Transmissibility') +
-  scale_y_continuous(limits = c(0, 300),                
+  scale_y_continuous(limits = c(0, 500),                
                      breaks = c(0, 50, 100, 150, 200, 250)) +
-  coord_cartesian(ylim = c(0, 175)) +
+  coord_cartesian(ylim = c(0, 300)) +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
@@ -799,22 +547,27 @@ intro_trans <- ggplot(plot_dat_intro) +
 intro_trans
 
 # Creata magnitude plot
-plot_dat_mag <- rbind(adm_1_at_1_col_1.1, adm_1_at_1_col, adm_1_at_1_col_3, 
-                        adm_2_at_1_col_1.1, adm_2_at_1_col, adm_2_at_1_col_3,
-                        adm_3_at_1_col_1.1, adm_3_at_1_col, adm_3_at_1_col_3,
-                        adm_1_at_1_del_1.1, adm_1_at_1_del, adm_1_at_1_del_3, 
-                        adm_2_at_1_del_1.1, adm_2_at_1_del, adm_2_at_1_del_3,
-                        adm_3_at_1_del_1.1, adm_3_at_1_del, adm_3_at_1_del_3)
+plot_dat_mag <- rbind(adm_1_at_1_col_1.1, adm_1_at_1_col, adm_1_at_1_col_3.0, 
+                        adm_2_at_1_col_1.1, adm_2_at_1_col, adm_2_at_1_col_3.0,
+                        adm_3_at_1_col_1.1, adm_3_at_1_col, adm_3_at_1_col_3.0,
+                        adm_1_at_1_del_1.1, adm_1_at_1_del, adm_1_at_1_del_3.0, 
+                        adm_2_at_1_del_1.1, adm_2_at_1_del, adm_2_at_1_del_3.0,
+                        adm_3_at_1_del_1.1, adm_3_at_1_del, adm_3_at_1_del_3.0)
 
-plot_dat_mag$Scale <- ifelse(plot_dat_mag$Scale == '2 at 1', '2', plot_dat_mag$Scale)
-plot_dat_mag$Scale <- ifelse(plot_dat_mag$Scale == '3 at 1', '3', plot_dat_mag$Scale)
+plot_dat_mag$Scale <- ifelse(plot_dat_mag$Scale == '2 at 1', 'District', plot_dat_mag$Scale)
+plot_dat_mag$Scale <- ifelse(plot_dat_mag$Scale == '3 at 1', 'Division', plot_dat_mag$Scale)
+plot_dat_mag$Scale <- ifelse(plot_dat_mag$Scale == '1', 'Province', plot_dat_mag$Scale)
+
+plot_dat_mag <- plot_dat_mag |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
 
 mag_trans <- ggplot(plot_dat_mag) + geom_boxplot(aes(x = Scale, y = magnitude / sum(adm_1_pop_vec), 
                                                      fill = Scale, color = Scale), 
                                     outliers = F, width = 0.6, size = 1) +
   facet_wrap(vars(intro_loc, Trans)) +
-  scale_fill_manual(values = c('2'="#9e9ac8",'1'= "#4292C6", '3' = '#41AE76')) +
-  scale_color_manual(values = c('2'="#9e9ac8",'1'= "#4292C6", '3' = '#41AE76')) +
+  scale_fill_manual(values = c('District'="#9e9ac8",'Province'= "#4292C6", 'Division' = '#41AE76')) +
+  scale_color_manual(values = c('District'="#9e9ac8",'Province'= "#4292C6", 'Division' = '#41AE76')) +
   theme_bw() + 
   xlab('Scale') +
   ylab('\nProportion Infected') +
@@ -824,7 +577,7 @@ mag_trans <- ggplot(plot_dat_mag) + geom_boxplot(aes(x = Scale, y = magnitude / 
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
@@ -841,7 +594,7 @@ plot <- cowplot::plot_grid(intro_trans,
                            labels = c('(a)', '', '(b)'),
                            rel_heights = c(1, 0.05, 0.9))
 
-ggsave('./figs/figure_5_spectrum_new.jpg', plot = plot , height = 25, width = 25)
+ggsave('./figs/figure_S.7.jpg', plot = mag_trans , height = 14, width = 25)
 
 
 int_del_obs_all <- rbind(adm_3_at_2_del_inv, adm_2_at_2_del_inv, adm_3_at_2_del_sen_inv)
@@ -915,8 +668,6 @@ line_plot_mad_obs <- ggplot(int_mad_obs_all, aes(x = time, y = fct_reorder(adm_2
         legend.title = element_text(size = 30)) 
 line_plot_mad_obs
 
-
-
 int_del_obs_all_1 <- rbind(adm_3_at_1_del_inv, adm_2_at_1_del_inv, adm_1_at_1_del_inv, adm_3_at_1_del_sen_inv, adm_2_at_1_del_sen_inv)
 
 int_col_obs_all_1 <- rbind(adm_3_at_1_col_inv, adm_2_at_1_col_inv, adm_1_at_1_col_inv, adm_3_at_1_col_sen_inv, adm_2_at_1_col_sen_inv)
@@ -937,6 +688,165 @@ adm_1_order_col <- adm_1_at_1_col_inv |>
   arrange(median) |>
   mutate(Order = row_number())
 
+del_1.5 <- int_del_obs_all_1 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+del_1.5_prov <- del_1.5 |> filter(Scale == 'Province')
+
+del_1.5 <- left_join(del_1.5, del_1.5_prov[,c(1, 4)], by = 'adm_1')
+
+del_1.5_med <- del_1.5 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '1.5')
+
+col_1.5 <- int_col_obs_all_1 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+col_1.5_prov <- col_1.5 |> filter(Scale == 'Province')
+
+col_1.5 <- left_join(col_1.5, col_1.5_prov[,c(1, 4)], by = 'adm_1')
+
+col_1.5_med <- col_1.5 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '1.5')
+
+
+
+
+int_del_obs_all_1.1 <- rbind(adm_3_at_1_del_inv_1.1, adm_2_at_1_del_inv_1.1, 
+                             adm_1_at_1_del_inv_1.1, adm_3_at_1_del_sen_inv_1.1, 
+                             adm_2_at_1_del_sen_inv_1.1)
+
+int_col_obs_all_1.1 <- rbind(adm_3_at_1_col_inv_1.1, adm_2_at_1_col_inv_1.1, 
+                             adm_1_at_1_col_inv_1.1, adm_3_at_1_col_sen_inv_1.1, 
+                             adm_2_at_1_col_sen_inv_1.1)
+
+del_1.1 <- int_del_obs_all_1.1 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+del_1.1_prov <- del_1.1 |> filter(Scale == 'Province')
+
+del_1.1 <- left_join(del_1.1, del_1.1_prov[,c(1, 4)], by = 'adm_1')
+
+del_1.1_med <- del_1.1 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '1.1')
+
+col_1.1 <- int_col_obs_all_1.1 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+col_1.1_prov <- col_1.1 |> filter(Scale == 'Province')
+
+col_1.1 <- left_join(col_1.1, col_1.1_prov[,c(1, 4)], by = 'adm_1')
+
+col_1.1_med <- col_1.1 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '1.1')
+
+
+
+
+int_del_obs_all_3.0 <- rbind(adm_3_at_1_del_inv_3.0, adm_2_at_1_del_inv_3.0, 
+                             adm_1_at_1_del_inv_3.0, adm_3_at_1_del_sen_inv_3.0, 
+                             adm_2_at_1_del_sen_inv_3.0)
+
+int_col_obs_all_3.0 <- rbind(adm_3_at_1_col_inv_3.0, adm_2_at_1_col_inv_3.0, 
+                             adm_1_at_1_col_inv_3.0, adm_3_at_1_col_sen_inv_3.0, 
+                             adm_2_at_1_col_sen_inv_3.0)
+
+del_3.0 <- int_del_obs_all_3.0 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+del_3.0_prov <- del_3.0 |> filter(Scale == 'Province')
+
+del_3.0 <- left_join(del_3.0, del_3.0_prov[,c(1, 4)], by = 'adm_1')
+
+del_3.0_med <- del_3.0 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '3.0')
+
+col_3.0 <- int_col_obs_all_3.0 |>
+  group_by(adm_1, Scale, `Mobility Data Type`) |>
+  mutate(median = median(time)) |>
+  distinct(adm_1, Scale, `Mobility Data Type`, median)
+
+col_3.0_prov <- col_3.0 |> filter(Scale == 'Province')
+
+col_3.0 <- left_join(col_3.0, col_3.0_prov[,c(1, 4)], by = 'adm_1')
+
+col_3.0_med <- col_3.0 |> group_by(Scale, `Mobility Data Type`) |>
+  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
+  distinct(Scale, `Mobility Data Type`, rmse) |>
+  mutate(trans = '3.0')
+
+
+
+rmse_col <- rbind(col_1.5_med, col_1.1_med, col_3.0_med)
+rmse_col <- rmse_col |> dplyr::filter(Scale != 'Province')
+rmse_col <- rmse_col |> ungroup() |>
+  mutate(`Mobility Data Type` = factor(`Mobility Data Type`, levels=c( "Rescaled", "Original"))) |>
+  mutate(trans = factor(trans, levels=c('3.0', '1.5', '1.1'))) |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+  
+
+rmse_plot_col_obs_1 <- ggplot(rmse_col) +
+  geom_bar_pattern(aes(x = trans, y = rmse, fill = Scale, pattern = `Mobility Data Type`), 
+                   color = 'black', stat = "identity", position = "dodge", linewidth = 1) +
+  labs(x = expression(~ R[0]), y = "RMSE (days)", fill = "Scale") +
+  theme_minimal() +  coord_flip() + scale_y_continuous(limits = c(0, 45), breaks = c(0, 10, 20, 30, 40)) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  guides(linetype = guide_legend(override.aes = list(fill = "white"))) + ggtitle('\nDifference from Province Model') +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30)) 
+  
+    
+library(ggpattern)
+rmse_del <- rbind(del_1.5_med, del_1.1_med, del_3.0_med)
+rmse_del <- rmse_del |> dplyr::filter(Scale != 'Province')
+rmse_del <- rmse_del |> ungroup() |>
+  mutate(`Mobility Data Type` = factor(`Mobility Data Type`, levels=c( "Rescaled", "Original"))) |>
+  mutate(trans = factor(trans, levels=c('3.0', '1.5', '1.1'))) |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+
+rmse_plot_mad_obs_1 <- ggplot(rmse_del) +
+  geom_bar_pattern(aes(x = trans, y = rmse, fill = Scale, pattern = `Mobility Data Type`), 
+           color = 'black', stat = "identity", position = "dodge", linewidth = 1) +
+  labs(x = expression(~ R[0]), y = "RMSE (days)", fill = "Scale") +
+  theme_minimal() +  coord_flip() + scale_y_continuous(limits = c(0, 45), breaks = c(0, 10, 20, 30, 40)) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  guides(linetype = guide_legend(override.aes = list(fill = "white")))  + ggtitle('\nDifference from Province Model') +
+  theme(plot.title = element_text(size=34, hjust = 0.5),
+        axis.title = element_text(size=34),
+        axis.text = element_text(size=30),
+        panel.grid.minor = element_blank(),
+        legend.position = 'none',
+        legend.text = element_text(size = 30),
+        legend.title = element_text(size = 30)) 
+
+  
 # dist_mad <- as.data.frame(1 - log(adm_1_phone_mobility_mat[5,]))
 # dist_mad$name <- rownames(dist_mad)
 # names(dist_mad)[1] <- "dist"
@@ -948,81 +858,96 @@ adm_1_order_col <- adm_1_at_1_col_inv |>
 int_mad_obs_all_1 <- left_join(int_del_obs_all_1, adm_1_order_del, by = c('adm_1' = 'adm_1'))
 int_col_obs_all_1 <- left_join(int_col_obs_all_1, adm_1_order_col, by = c('adm_1' = 'adm_1'))
 
-line_plot_col_obs_1 <- ggplot(int_col_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, linetype = `Mobility Data Type`)) +
+int_col_obs_all_1 <- int_col_obs_all_1 |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+
+line_plot_col_obs_1 <- ggplot(int_col_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
-  geom_boxplot(position = position_dodge(width = 0.65), width=0.5, color = 'black', outlier.shape = NA, coef = 0) +
+  geom_boxplot_pattern(position = position_dodge(width = 0.75), width=0.5, color = 'black', outlier.shape = NA, coef = 0, linewidth = 1) +
   theme_minimal() + coord_cartesian(xlim = c(0, 110)) +
-  scale_fill_manual(values = c('District'="#41AE76", 'Division'="#9e9ac8",'Province'= "#4292C6")) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
   theme(legend.position = 'none') +
   ylab('Province') +
   xlab('Time (days)') +
-  ggtitle('Provinces Infected') +
+  ggtitle('Province Infection Time') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) 
 line_plot_col_obs_1
 
-line_plot_mad_obs_1 <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, linetype = `Mobility Data Type`)) +
+int_mad_obs_all_1 <- int_mad_obs_all_1 |> ungroup() |>
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
+
+
+line_plot_mad_obs_1 <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
-  geom_boxplot(position = position_dodge(width = 0.65), width=0.5, color = 'black', outlier.shape = NA, coef = 0) +
+  geom_boxplot_pattern(position = position_dodge(width = 0.75), width=0.5, color = 'black', outlier.shape = NA, coef = 0, linewidth = 1) +
   theme_minimal() + coord_cartesian(xlim = c(0, 110)) +
-  scale_fill_manual(values = c('District (2)'="#41AE76", 'Division (3)'="#9e9ac8",'Province (1)'= "#4292C6")) +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
   ylab('Province') +
   xlab('Time (days)') +
-  ggtitle('Delft: Disease Arrival Time by Province') +
+  ggtitle('Province Infection Time') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'none',
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) 
 line_plot_mad_obs_1
 
-int_mad_obs_all_1$Scale <- ifelse(int_mad_obs_all_1$Scale == 'District', 'District (2)', int_mad_obs_all_1$Scale)
-int_mad_obs_all_1$Scale <- ifelse(int_mad_obs_all_1$Scale == 'Division', 'Division (3)', int_mad_obs_all_1$Scale)
-int_mad_obs_all_1$Scale <- ifelse(int_mad_obs_all_1$Scale == 'Province', 'Province (1)', int_mad_obs_all_1$Scale)
 
-legend <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, linetype = `Mobility Data Type`)) +
+legend <- ggplot(int_mad_obs_all_1, aes(x = mean(time), y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
-  geom_boxplot(position = position_dodge(width = 0.65), width=0.5, color = 'black', outlier.shape = NA, coef = 0) +
+  geom_bar_pattern(aes(fill = Scale, pattern = `Mobility Data Type`), 
+                   color = 'black', stat = "identity", position = "dodge", linewidth = 1,
+                   pattern_density = 0.1,
+                   pattern_spacing = 0.5,
+                   pattern_key_scale_factor = 0.6,
+                   pattern_fill = "black",
+                   pattern_angle = 45) +
   theme_minimal() + coord_cartesian(xlim = c(0, 110)) +
-  scale_fill_manual(values = c('District (2)'="#41AE76", 'Division (3)'="#9e9ac8",'Province (1)'= "#4292C6")) +
-  ylab('Province') +
+  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
+  ylab('Province') + 
   xlab('Time (days)') +
-  ggtitle('Delft: Disease Arrival Time by Province') +
+  ggtitle('Province Infection Time') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
         axis.title = element_text(size=34),
         axis.text = element_text(size=30),
-        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = 'bottom',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 34)) 
+        legend.text = element_text(size = 38),
+        legend.title = element_text(size = 44),
+        legend.key.width = unit(2, "cm")) +
+  guides(pattern = guide_legend(override.aes = list(fill = "white")),
+         fill = guide_legend(override.aes = list(pattern = "none")))
+
 
 legend_get <- get_legend(legend)
 
-row_1_1 <- cowplot::plot_grid(intro_trans,
-                              nrow = 1, labels = c('(a)'),
-                              label_size = 34)
-row_1_2 <- cowplot::plot_grid(line_plot_mad_obs_1, line_plot_mad_obs,
-                              nrow = 1, labels = c('(b)', '(c)'),
-                              label_size = 34)
+row_1_1 <- cowplot::plot_grid(ggplot() + theme_void(), ggplot() + theme_void(),
+                              line_plot_col_obs_1, line_plot_mad_obs_1, 
+                              rmse_plot_col_obs_1, rmse_plot_mad_obs_1,
+                              nrow = 3, labels = c('Colombo Introduction Event', 'Sevanagala Introduction Event',
+                                                   '(a)', '(b)', '', ''),
+                              label_size = 34,
+                              rel_heights = c(0.05, 1, 0.45))
 
-plot <- cowplot::plot_grid(row_1_1,
-                           row_1_2, legend_get,
-                           nrow = 3,
-                           label_size = 34, hjust = 0,
-                           rel_heights = c(1, 1, 0.1))
 
-ggsave('./figs/figure_5_spectrum_new.jpg', plot = plot , height = 25, width = 25)
+plot <- cowplot::plot_grid(row_1_1, legend_get,
+                           nrow = 2, rel_heights = c(1, 0.1),
+                           label_size = 34, hjust = 0)
+
+ggsave('./figs/figure_5_spectrum_new.jpg', plot = plot, height = 25, width = 25)
 

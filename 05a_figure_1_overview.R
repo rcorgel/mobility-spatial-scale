@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05b_figure_1_overview                                             #
+# File Name: 05a_figure_1                                                      #
 #                                                                              #
 # Purpose:   Create figure 1 for the manuscript.                               #
 # Steps:                                                                       # 
@@ -29,6 +29,8 @@ library(scales)
 library(reshape2)
 library(ggpubr)
 library(osmdata)
+library(curl)
+library(parallel)
 
 # Set the seed
 set.seed(12345)
@@ -227,29 +229,19 @@ ggsave('./figs/subnational_level_full.jpg', plot = map, height = 16, width = 13)
 #################################################
 
 # First, load metapopulation model data at Admin 2 level
-load('./tmp/adm_2_metapop_dat.RData')
+adm_2_phone_mobility_mat <- readRDS('./out/adm_2_phone_mobility_mat.rds')
+adm_2_name_vec <- readRDS('./out/adm_2_name_vec.rds')
+adm_2_pop_vec <- readRDS('./out/adm_2_pop_vec.rds')
+adm_2_x_walk <- readRDS('./out/adm_2_x_walk.rds')
 
 # Simulate an epidemic for display purposes only
-adm_2_obs_col <- run_seir_model_multi(n = 50, density_dep = FALSE, method = 'append',
-                                      R_0 = 1.85, gamma = 1/7, sigma = 1/2, 
-                                      prop_s = 0.90, adm_name_vec = adm_2_name_vec, 
-                                      adm_level = '2', pop_vec = adm_2_pop_vec, 
-                                      intro_adm = 'Colombo', intro_num = 1,
-                                      adm_x_walk = adm_2_x_walk, 
-                                      travel_mat = adm_2_phone_mobility_mat, 
-                                      max_time = 365, time_step = 1, mobility = TRUE)
-
-
-ggplot(adm_2_obs_col[adm_2_obs_col$adm_2 == 'Kandy',]) +
-  geom_line(aes(x = time, y = incid_I, group = run_num), 
-            color = '#607AE0', linewidth = 1, alpha = 0.5) + 
-  theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        axis.ticks = element_blank(), panel.background = element_blank(),
-        axis.text = element_blank(), axis.title=element_text(size=26)) + 
-  xlab("Time") + ylab("Cases")
-
-
+adm_2_col <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
+                      adm_name_vec = adm_2_name_vec, adm_level = '2',
+                      pop_vec = adm_2_pop_vec, intro_adm = 'All', intro_num = 5,
+                      adm_x_walk = adm_2_x_walk, travel_mat = adm_2_phone_mobility_mat,
+                      max_time = 365, time_step = 1)
+adm_2_obs_col <- do.call(rbind, adm_2_col)
+remove(adm_2_col)
 
 # Average at the Admin 2 level
 adm_2_at_2_obs_col <- adm_2_obs_col %>%
@@ -269,7 +261,7 @@ adm_2_at_0_obs_col <- adm_2_at_2_obs_col %>%
 # Graph an epidemic curve at the national level
 line <- ggplot() +
   geom_line(data = adm_2_at_0_obs_col, aes(x = time, y = avg_incid_I_adm_2), 
-            color = '#347DC1', linewidth = 3, alpha = 1) + 
+            color = '#DDBAA4', linewidth = 3, alpha = 1) + 
   theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         axis.ticks = element_blank(), panel.background = element_blank(),
@@ -303,6 +295,7 @@ adm_2_at_2_obs_col_filt[adm_2_at_2_obs_col_filt$adm_2 == 'Kandy',]$time <-
   adm_2_at_2_obs_col_filt[adm_2_at_2_obs_col_filt$adm_2 == 'Kandy',]$time - rep(65, 365)
 adm_2_at_2_obs_col_filt[adm_2_at_2_obs_col_filt$adm_2 == 'Nuwara Eliya',]$time <- 
   adm_2_at_2_obs_col_filt[adm_2_at_2_obs_col_filt$adm_2 == 'Nuwara Eliya',]$time + rep(40, 365)
+
 # Graph an epidemic curve at the subnational level
 line <- ggplot() +
   geom_line(data = adm_2_at_2_obs_col_filt, aes(x = time, y = avg_incid_I_adm_2, color = adm_2), 
@@ -312,26 +305,12 @@ line <- ggplot() +
         axis.ticks = element_blank(), panel.background = element_blank(),
         axis.text = element_blank(), axis.title=element_text(size=26),
         legend.position = 'none') + ylim(0, 5000) +
-  xlab("Time") + ylab("Cases") + scale_color_manual(values = c('#9B59B6', '#d7642c', '#3cbb75ff'))
-
-line <- ggplot() +
-  geom_line(data = adm_2_at_2_obs_col_filt, aes(x = time, y = avg_incid_I_adm_2, color = adm_2), 
-            linewidth = 4, alpha = 1) + 
-  theme(panel.border = element_blank(), axis.line = element_line(linewidth = 1.5),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        axis.ticks = element_blank(), panel.background = element_blank(),
-        axis.text = element_blank(), axis.title=element_text(size=26),
-        axis.line.y = element_blank(), axis.line.x = element_blank(),
-        legend.position = 'none') + ylim(0, 5000) +
-  xlab("") + ylab("") + scale_color_manual(values = c('#9B59B6', '#d7642c', '#3cbb75ff'))
-line
-
-line
-#"#ABDDA4", "#A4C7DD","#D6A4DD"
-
+  xlab("Time") + ylab("Cases") + scale_color_manual(values = c("#ABDDA4", "#A4C7DD","#D6A4DD"))
 
 # Save
 ggsave('./figs/subnational_level_curve.jpg', plot = line, height = 4, width = 6)
+
+# All graphs are combined in Power Point to create the final Figure 1
 
 ################################################################################
 ################################################################################

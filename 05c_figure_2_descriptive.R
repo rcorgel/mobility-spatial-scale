@@ -47,7 +47,7 @@ make_simple_map <- function(data, color, coord_data) {
   map <- ggplot(data = data) +
     geom_sf(aes(fill = population), color= 'black', linewidth = 0.20) +
     scale_fill_distiller(palette = color, direction = 1, name = 'Population', labels = comma) +
-    theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.90),
+    theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.85),
                                         plot.title = element_text(size = 30, hjust = 0.5),
                                         legend.text = element_text(size = 22),
                                         legend.title = element_text(size = 24)) +
@@ -131,19 +131,19 @@ make_matrix_plot <- function(data, color) {
 # Add coordinates of highlight cities/units
 # Administrative level 3
 coordinate_cities_3 <- data.frame(
-  city = c("Colombo", "Delft"),
-  lat = c(6.927632561772342, 9.516667),
-  long = c(79.85843709788357, 79.6833))   
+  city = c("Colombo", "Sevanagala"),
+  lat = c(6.927632561772342, 6.386667),
+  long = c(79.85843709788357, 80.909167))   
 # Administrative level 2
 coordinate_cities_2 <- data.frame(
-  city = c("Colombo", "Jaffna"),
-  lat = c(6.866667, 9.2),
-  long = c(80.016667, 80.416667))   
+  city = c("Colombo", "Monaragala"),
+  lat = c(6.866667, 6.8167),
+  long = c(80.016667, 81.4333))   
 # Administrative level 1
 coordinate_cities_1 <- data.frame(
-  city = c("Western", "Northern"),
-  lat = c(6.833333, 9.2),
-  long = c(80.083333, 80.416667))   
+  city = c("Western", "Uva"),
+  lat = c(6.833333, 6.9350),
+  long = c(80.083333, 81.2800))   
 
 # Load the shape files
 # From: https://data.humdata.org/dataset/cod-ab-mdg
@@ -155,7 +155,9 @@ choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/',
                         layer = 'lka_admbnda_adm3_slsd_20220816')
 
 # Load population data
-load('./tmp/adm_population_dat.RData')
+adm_3_population_dat <- readRDS('./out/adm_3_population_dat.rds')
+adm_2_population_dat <- readRDS('./out/adm_2_population_dat.rds')
+adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
 
 # Load mobility to shape cross walk
 # The mobility data combines multiple admin 3 units, changing the total from 339 to 330
@@ -176,9 +178,8 @@ choropleth_1 <- choropleth_1 |> dplyr::rename('population' = 'population_2020_ad
 adm_1_map <- make_simple_map(data = choropleth_1, color = "Blues", coord_data = coordinate_cities_1) +
   geom_label(data = coordinate_cities_1, aes(x = long, y = lat + c(0.62, 0.77) , label = city), 
              fill = 'white', size = 8, fontface = 'bold', alpha = 0.85) +
-  geom_sf(data = choropleth_1[c(5),], aes(), fill = '#00000000', color= 'black', linewidth = 1.7) +
+  geom_sf(data = choropleth_1[c(8),], aes(), fill = '#00000000', color= 'black', linewidth = 1.7) +
   geom_sf(data = choropleth_1[c(9),], aes(), fill = '#00000000', color= 'black', linewidth = 1.7)
-
 
 # Administrative level 2
 choropleth_2 <- left_join(choropleth_2, adm_2_population_dat, by = c('ADM2_EN' = 'adm_2'))
@@ -186,7 +187,7 @@ choropleth_2 <- choropleth_2 |> dplyr::rename('population' = 'population_2020_ad
 adm_2_map <- make_simple_map(data = choropleth_2, color = "Purples", coord_data = coordinate_cities_2) +
   geom_label(data = coordinate_cities_2, aes(x = long, y = lat  + c(0.24, 0.77), label = city), 
              fill = 'white', size = 8, fontface = 'bold', alpha = 0.85) +
-  geom_sf(data = choropleth_2[c(1, 10),], aes(), fill = '#00000000', color= 'black', linewidth = 1.7)
+  geom_sf(data = choropleth_2[c(1, 23),], aes(), fill = '#00000000', color= 'black', linewidth = 1.7)
 
 # Administrative level 3
 choropleth_3_mobility <- left_join(choropleth_3_mobility, adm_3_population_dat, 
@@ -203,13 +204,19 @@ adm_3_map <- make_simple_map(data = choropleth_3_mobility, color = "BuGn", coord
 ################################
 
 # Load simulated trip count data
-load('./tmp/adm_sim_mobility_dat.RData')
+adm_3_phone_mobility_dat <- readRDS('./out/adm_3_phone_mobility_dat.rds')
+adm_2_phone_mobility_dat <- readRDS('./out/adm_2_phone_mobility_dat.rds')
+adm_1_phone_mobility_dat <- readRDS('./out/adm_1_phone_mobility_dat.rds')
 
 # Load distance data
-load('./tmp/adm_dist_mat.RData')
+adm_1_dist <- readRDS('./out/adm_1_dist.rds')
+adm_2_dist <- readRDS('./out/adm_2_dist.rds')
+adm_3_dist <- readRDS('./out/adm_3_dist.rds')
 
 # Load observed trip count data
-load('./tmp/adm_phone_mobility_dat.RData')
+adm_3_sim_mobility_dat <- readRDS('./out/adm_3_sim_mobility_dat.rds')
+adm_2_sim_mobility_dat <- readRDS('./out/adm_2_sim_mobility_dat.rds')
+adm_1_sim_mobility_dat <- readRDS('./out/adm_1_sim_mobility_dat.rds')
 
 # Merge simulated and observed trip count data in addition to distance
 # Administrative Level 1
@@ -249,27 +256,28 @@ obs$Cat <- 'Observed'
 obs <- obs |> dplyr::rename('value' = 'trips_avg')
 all <- rbind(sim, obs)
 
-plot_1 <- ggplot(data = all[all$adm_3_destination == 'Delft',]) +
+plot_1 <- ggplot(data = all[all$adm_3_destination == 'Sevanagala',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.10, size = 6, shape = 21) + theme_classic() +
   xlab('Distance (km)') + 
   scale_y_log10("Trip Counts",
-                breaks = c(10^-8, 10^-4, 10^0, 10^4, 10^8),
+                breaks = c(10^-12, 10^-8, 10^-4, 10^0, 10^4, 10^8),
                 labels = trans_format("log10", math_format(10^.x)),
                 n.breaks = 12,
-                limits = c(10^-8, 10^8)) + ggtitle('\n\nDelft Division\n(Rural)') +
+                limits = c(10^-13, 10^8)) + 
+  ggtitle('\n\nSevanagala Division\n(Rural)') +
   scale_fill_manual('', values = c('#41AE76', 'grey70')) +
   scatter_theme + theme(plot.title = element_text(hjust = 0.5),
                         legend.position = 'none')
-cor(all[all$adm_3_destination == 'Delft',]$distance, all[all$adm_3_destination == 'Delft',]$value, use = 'pairwise.complete.obs')
+cor(all[all$adm_3_destination == 'Sevanagala',]$distance, all[all$adm_3_destination == 'Sevanagala',]$value, use = 'pairwise.complete.obs')
 
 plot_2 <- ggplot(data = all[all$adm_3_destination == 'Colombo',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.10, size = 6, shape = 21) + theme_classic() +
   xlab('Distance (km)') + 
   scale_y_log10("Trip Counts",
-                breaks = c(10^-8, 10^-4, 10^0, 10^4, 10^8),
+                breaks = c(10^-12, 10^-8, 10^-4, 10^0, 10^4, 10^8),
                 labels = trans_format("log10", math_format(10^.x)),
                 n.breaks = 12,
-                limits = c(10^-8, 10^8)) + ggtitle('\n\nColombo Division\n(Urban)') +
+                limits = c(10^-13, 10^8)) + ggtitle('\n\nColombo Division\n(Urban)') +
   scale_fill_manual('', values = c('#41AE76', 'grey70')) +
   scatter_theme + theme(plot.title = element_text(hjust = 0.5),
                         legend.position = 'none')
@@ -289,18 +297,18 @@ obs$Cat <- 'Observed'
 obs <- obs |> dplyr::rename('value' = 'trips_avg')
 all <- rbind(sim, obs)
 
-plot_3 <- ggplot(data = all[all$adm_2_destination == 'Jaffna',]) +
+plot_3 <- ggplot(data = all[all$adm_2_destination == 'Monaragala',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.65, size = 6, shape = 21) + theme_classic() +
   xlab('Distance (km)') + 
   scale_y_log10("Trip Counts",
                 breaks = c(10^-8, 10^-4, 10^0, 10^4, 10^8),
                 labels = trans_format("log10", math_format(10^.x)),
                 n.breaks = 12,
-                limits = c(10^-8, 10^8)) + ggtitle('\n\nJaffna District\n(Rural)') +
+                limits = c(10^-8, 10^8)) + ggtitle('\n\nMonaragala District\n(Rural)') +
   scale_fill_manual('', values = c('#807DBA', 'grey70')) +
   scatter_theme + theme(plot.title = element_text(hjust = 0.5),
                         legend.position = 'none')
-cor(all[all$adm_2_destination == 'Jaffna',]$distance, all[all$adm_2_destination == 'Jaffna',]$value)
+cor(all[all$adm_2_destination == 'Monaragala',]$distance, all[all$adm_2_destination == 'Monaragala',]$value)
 
 plot_4 <- ggplot(data = all[all$adm_2_destination == 'Colombo',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.65, size = 6, shape = 21) + theme_classic() +
@@ -329,18 +337,18 @@ obs$Cat <- 'Observed'
 obs <- obs |> dplyr::rename('value' = 'trips_avg')
 all <- rbind(sim, obs)
 
-plot_5 <- ggplot(data = all[all$adm_1_destination == 'Northern',]) +
+plot_5 <- ggplot(data = all[all$adm_1_destination == 'Uva',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.65, size = 6, shape = 21) + theme_classic() +
   xlab('Distance (km)') + 
   scale_y_log10("Trip Counts",
                 breaks = c(10^-8, 10^-4, 10^0, 10^4, 10^8),
                 labels = trans_format("log10", math_format(10^.x)),
                 n.breaks = 12,
-                limits = c(10^-8, 10^8)) + ggtitle('\n\nNorthern Province\n(Rural)') +
+                limits = c(10^-8, 10^8)) + ggtitle('\n\nUva Province\n(Rural)') +
   scale_fill_manual('', values = c('#4292C6', 'grey70')) +
   scatter_theme + theme(plot.title = element_text(hjust = 0.5),
                         legend.position = 'none')
-cor(all[all$adm_1_destination == 'Northern',]$distance, all[all$adm_1_destination == 'Northern',]$value)
+cor(all[all$adm_1_destination == 'Uva',]$distance, all[all$adm_1_destination == 'Uva',]$value)
 
 plot_6 <- ggplot(data = all[all$adm_1_destination == 'Western',]) +
   geom_point(aes(x = distance, y = value, fill = Cat), color = '#565656', alpha = 0.65, size = 6, shape = 21) + theme_classic() +
@@ -383,17 +391,19 @@ sub_3 <- plot_grid(plot_5, plot_6, legend_1,
 #####################
 
 # Load phone mobility data
-load('./tmp/fmt_adm_3_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_2_phone_mobility_dat.RData')
-load('./tmp/fmt_adm_1_phone_mobility_dat.RData')
+adm_3_phone_mobility_long_code <- readRDS('./out/adm_3_phone_mobility_long_code.rds')
+adm_2_phone_mobility_long_code <- readRDS('./out/adm_2_phone_mobility_long_code.rds')
+adm_1_phone_mobility_long_code <- readRDS('./out/adm_1_phone_mobility_long_code.rds')
 
 # Load simulated mobility data
-load('./tmp/fmt_adm_3_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_2_sim_mobility_dat.RData')
-load('./tmp/fmt_adm_1_sim_mobility_dat.RData')
+adm_3_sim_mobility_long_code <- readRDS('./out/adm_3_sim_mobility_long_code.rds')
+adm_2_sim_mobility_long_code <- readRDS('./out/adm_2_sim_mobility_long_code.rds')
+adm_1_sim_mobility_long_code <- readRDS('./out/adm_1_sim_mobility_long_code.rds')
 
 # Administrative Unit 3
 # Make category variable
+adm_3_phone_mobility_long_code$value <- ifelse(adm_3_phone_mobility_long_code$value == 0, NA, 
+                                               adm_3_phone_mobility_long_code$value)
 adm_3_phone_mobility_long_code$value_cat <- cut(adm_3_phone_mobility_long_code$value,
                                                 breaks = c(-Inf, 0.001, 0.01, 0.1, Inf),
                                                 labels = c("< 0.1%", "0.1 - 1%", 
@@ -431,6 +441,7 @@ adm_3_sim_mobility_long_code$value_cat <- cut(adm_3_sim_mobility_long_code$value
                                               breaks = c(-Inf, 0.001, 0.01, 0.1, Inf),
                                               labels = c("< 0.1%", "0.1 - 1%", 
                                                          "1% - 10%", "10% - 100%"))
+
 # Create plot
 adm_3_phone_plot_sim <- make_matrix_plot(data = adm_3_sim_mobility_long_code, color = 'BuGn')
 
@@ -440,6 +451,7 @@ adm_2_sim_mobility_long_code$value_cat <- cut(adm_2_sim_mobility_long_code$value
                                               breaks = c(-Inf, 0.001, 0.01, 0.1, Inf),
                                               labels = c("< 0.1%", "0.1 - 1%", 
                                                          "1% - 10%", "10% - 100%"))
+
 # Create plot
 adm_2_phone_plot_sim <- make_matrix_plot(data = adm_2_sim_mobility_long_code, color = 'Purples')
 
@@ -509,7 +521,7 @@ figure_2 <- plot_grid(ggplot() + theme_void(),
                       mat__3,
                       nrow = 6,
                       rel_heights = c(0.06, 1, 0.06, 1, 0.06, 1),
-                      rel_widths = c(0.6, 0.4, 1),
+                      rel_widths = c(0.5, 0.5, 1),
                       labels = c('Provinces','', '', '(a)', '(b)', '(c)', 'Districts', '', '', '(d)', '(e)', '(f)',
                                  'Divisions', '', '', '(g)', '(h)', '(i)'),
                       label_size = 34, hjust = 0)

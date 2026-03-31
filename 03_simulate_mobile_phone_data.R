@@ -39,7 +39,12 @@ source('./mobility-spatial-scale/02_format_functions.R')
 #################################
 
 # Distance data
-load('./tmp/adm_dist_mat.RData')
+adm_1_dist <- readRDS('./out/adm_1_dist.rds')
+adm_1_dist_mat <- readRDS('./out/adm_1_dist_mat.rds')
+adm_2_dist <- readRDS('./out/adm_2_dist.rds')
+adm_2_dist_mat <- readRDS('./out/adm_2_dist_mat.rds')
+adm_3_dist <- readRDS('./out/adm_3_dist.rds')
+adm_3_dist_mat <- readRDS('./out/adm_3_dist_mat.rds')
 
 # Population data
 adm_1_population_dat <- readRDS('./out/adm_1_population_dat.rds')
@@ -144,6 +149,24 @@ model_3 <- mobility(data=adm_3,
                     n_thin=2,
                     DIC=TRUE)
 
+model_3_power <- mobility(data=adm_3,
+                    model='gravity',
+                    type='power',
+                    n_chain=2,
+                    n_burn=1000,
+                    n_samp=1000,
+                    n_thin=2,
+                    DIC=TRUE)
+
+model_3_basic <- mobility(data=adm_3,
+                    model='gravity',
+                    type='basic',
+                    n_chain=2,
+                    n_burn=1000,
+                    n_samp=1000,
+                    n_thin=2,
+                    DIC=TRUE)
+
 # Administrative Level 2
 model_2 <- mobility(data=adm_2,
                     model='gravity',
@@ -153,6 +176,24 @@ model_2 <- mobility(data=adm_2,
                     n_samp=1000,
                     n_thin=2,
                     DIC=TRUE)
+
+model_2_power <- mobility(data=adm_2,
+                          model='gravity',
+                          type='power',
+                          n_chain=2,
+                          n_burn=1000,
+                          n_samp=1000,
+                          n_thin=2,
+                          DIC=TRUE)
+
+model_2_basic <- mobility(data=adm_2,
+                        model='gravity',
+                        type='basic',
+                        n_chain=2,
+                        n_burn=1000,
+                        n_samp=1000,
+                        n_thin=2,
+                        DIC=TRUE)
 
 # Administrative Level 1
 model_1 <- mobility(data=adm_1,
@@ -164,15 +205,33 @@ model_1 <- mobility(data=adm_1,
                     n_thin=2,
                     DIC=TRUE)
 
+model_1_power <- mobility(data=adm_1,
+                          model='gravity',
+                          type='power',
+                          n_chain=2,
+                          n_burn=1000,
+                          n_samp=1000,
+                          n_thin=2,
+                          DIC=TRUE)
+
+model_1_basic <- mobility(data=adm_1,
+                        model='gravity',
+                        type='basic',
+                        n_chain=2,
+                        n_burn=1000,
+                        n_samp=1000,
+                        n_thin=2,
+                        DIC=TRUE)
+
 # Predict for Admin 1, Admin 2, Admin 3 and average across iterations
 phone_mobility_adm_1_pred <- predict(model_1, nsim = 100)
-phone_mobility_adm_1_pred[phone_mobility_adm_1_pred < 1] <- 0 # censor trips < 1
+#phone_mobility_adm_1_pred[phone_mobility_adm_1_pred < 1] <- 0 # censor trips < 1
 phone_mobility_adm_1_pred <- apply(phone_mobility_adm_1_pred, 1:2, mean)
-phone_mobility_adm_2_pred <- predict(model_2, nsim = 100)
-phone_mobility_adm_2_pred[phone_mobility_adm_2_pred < 1] <- 0 # censor trips < 1
+phone_mobility_adm_2_pred <- predict(model_2_power, nsim = 100)
+#phone_mobility_adm_2_pred[phone_mobility_adm_2_pred < 1] <- 0 # censor trips < 1
 phone_mobility_adm_2_pred <- apply(phone_mobility_adm_2_pred, 1:2, mean)
 phone_mobility_adm_3_pred <- predict(model_3, nsim = 100)
-phone_mobility_adm_3_pred[phone_mobility_adm_3_pred < 1] <- 0 # censor trips < 1
+#phone_mobility_adm_3_pred[phone_mobility_adm_3_pred < 1] <- 0 # censor trips < 1
 phone_mobility_adm_3_pred <- apply(phone_mobility_adm_3_pred, 1:2, mean)
 
 # Model checks
@@ -187,14 +246,19 @@ adm_3_phone_pred_mobility_mat <- phone_mobility_adm_3_pred / rowSums(phone_mobil
 
 # Save predicted count, proportion data, and model fits
 saveRDS(phone_mobility_adm_3_pred, './mobility-spatial-scale/simulated data/adm_3_predictions_count.rds')
-saveRDS(adm_3_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_3_predictions_proportion.rds')
 saveRDS(model_3, './mobility-spatial-scale/simulated data/adm_3_model_fit.rds')
+saveRDS(model_3_power, './mobility-spatial-scale/simulated data/adm_3_model_fit_pwr.rds')
+saveRDS(model_3_basic, './mobility-spatial-scale/simulated data/adm_3_model_fit_bac.rds')
+
 saveRDS(phone_mobility_adm_2_pred, './mobility-spatial-scale/simulated data/adm_2_predictions_count.rds')
-saveRDS(adm_2_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_2_predictions_proportion.rds')
 saveRDS(model_2, './mobility-spatial-scale/simulated data/adm_2_model_fit.rds')
+saveRDS(model_2_power, './mobility-spatial-scale/simulated data/adm_2_model_fit_pwr.rds')
+saveRDS(model_2_basic, './mobility-spatial-scale/simulated data/adm_2_model_fit_bac.rds')
+
 saveRDS(phone_mobility_adm_1_pred, './mobility-spatial-scale/simulated data/adm_1_predictions_count.rds')
-saveRDS(adm_1_phone_pred_mobility_mat, './mobility-spatial-scale/simulated data/adm_1_predictions_proportion.rds')
 saveRDS(model_1, './mobility-spatial-scale/simulated data/adm_1_model_fit.rds')
+saveRDS(model_1_power, './mobility-spatial-scale/simulated data/adm_1_model_fit_pwr.rds')
+saveRDS(model_1_basic, './mobility-spatial-scale/simulated data/adm_1_model_fit_bac.rds')
 
 ################################################################################
 ################################################################################
