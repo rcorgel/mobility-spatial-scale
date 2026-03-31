@@ -8,7 +8,7 @@ Data availability:
 The repository structure is as follows: 
 - 01: importation of data and creation of crosswalks
 - 02: formatting data for analyses
-- 03: data simulation with gravity model
+- 03: data simulation with gravity models
 - 04: infectious disease modeling
 - 05: analysis and figure creation
 
