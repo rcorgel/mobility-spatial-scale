@@ -323,6 +323,7 @@ remove(adm_1_obs_del)
 # Adm 3
 # Randomly sample 50 introduction locations
 intro_nums <- sample(1:330, 50, replace = FALSE)
+saveRDS(intro_nums, file = './out/intro_nums_adm_3.rds')
 
 # Create an empty list to fill
 adm_3_random <- NULL
