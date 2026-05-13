@@ -4,11 +4,12 @@
 # Purpose:   Simulate disease dynamics with the observed mobility data.        #
 #            Two introduction scenarios (Colombo & Delft) and three            #
 #            transmissibility scenarios (R_0 = 1.1, 1.5, 3) are modeled.       #
+#            Finally, 50 random introduction scenarios are modeled.            #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Simulate epidemics                                             #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -314,6 +315,64 @@ remove(adm_1_del)
 # Save
 saveRDS(adm_1_obs_del, file = './out/adm_1_obs_del_3.0.rds')
 remove(adm_1_obs_del)
+
+##################################
+# 50 RANDOM SCENARIOS @ R0 = 1.5 #
+##################################
+
+# Adm 3
+# Randomly sample 50 introduction locations
+intro_nums <- sample(1:330, 50, replace = FALSE)
+
+# Create an empty list to fill
+adm_3_random <- NULL
+
+# Loop through each location
+count <- 1
+for (i in intro_nums) {
+  print(i)
+  adm_3 <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
+                        adm_name_vec = adm_3_name_vec, adm_level = '3',
+                        pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = i,
+                        adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
+                        max_time = 365, time_step = 1)
+  adm_3_obs <- do.call(rbind, adm_3)
+  adm_3_obs$intro_num <- i
+  adm_3_random[[count]] <- adm_3_obs
+  remove(adm_3, adm_3_obs)
+  count <- count + 1
+}
+
+# Save
+saveRDS(adm_3_random, file = './out/adm_3_random.rds')
+remove(adm_3_random)
+
+# Adm 1
+# Just do all 9
+intro_nums <- seq(1, 9, 1)
+
+# Create an empty list to fill
+adm_1_random <- NULL
+
+# Loop through each location
+count <- 1
+for (i in intro_nums) {
+  print(i)
+  adm_1 <- mclapply(1:100, run_seir_model, beta = 0.3, gamma = 1/5, sigma = 1/2, prop_s = 0.90,
+                        adm_name_vec = adm_1_name_vec, adm_level = '1',
+                        pop_vec = adm_1_pop_vec, intro_adm = 'All', intro_num = i,
+                        adm_x_walk = adm_2_x_walk, travel_mat = adm_1_phone_mobility_mat,
+                        max_time = 365, time_step = 1)
+  adm_1_obs <- do.call(rbind, adm_1)
+  adm_1_obs <- do.call(rbind, adm_1)
+  adm_1_random[[count]] <- adm_1_obs
+  remove(adm_1, adm_1_obs)
+  count <- count + 1
+}
+
+# Save
+saveRDS(adm_1_random, file = './out/adm_1_random.rds')
+remove(adm_1_random)
 
 ################################################################################
 ################################################################################
