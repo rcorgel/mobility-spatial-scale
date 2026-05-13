@@ -9,7 +9,7 @@
 #            4. Add in missing days and routes                                 #
 #            5. Aggregate data to administrative levels 1, 2, 3                #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

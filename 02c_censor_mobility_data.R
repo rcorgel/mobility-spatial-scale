@@ -6,7 +6,7 @@
 #            1. Set-up script                                                  #
 #            2. Censor data and save                                           #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -95,9 +95,9 @@ adm_1_mat <- as.matrix(adm_1_mat)
 names(dimnames(adm_1_mat)) <- c('origin', 'destination')
 
 # Save
-saveRDS(adm_3_mat, './mobility-spatial-scale/observed data/adm_3_observed_count.rds')
-saveRDS(adm_2_mat, './mobility-spatial-scale/observed data/adm_2_observed_count.rds')
-saveRDS(adm_1_mat, './mobility-spatial-scale/observed data/adm_1_observed_count.rds')
+saveRDS(adm_3_mat, './mobility-spatial-scale/observed data/adm_3_censored_count.rds')
+saveRDS(adm_2_mat, './mobility-spatial-scale/observed data/adm_2_censored_count.rds')
+saveRDS(adm_1_mat, './mobility-spatial-scale/observed data/adm_1_censored_count.rds')
 
 ################################################################################
 ################################################################################

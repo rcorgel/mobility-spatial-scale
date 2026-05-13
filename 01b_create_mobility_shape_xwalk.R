@@ -10,7 +10,7 @@
 #            3. Merge mobility and spatial data                                #
 #            4. Create crosswalk                                               #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

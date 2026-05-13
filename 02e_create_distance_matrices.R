@@ -1,12 +1,12 @@
 ################################################################################
-# File Name: 02c_create_distance_matrices                                      #
+# File Name: 02e_create_distance_matrices                                      #
 # Purpose:   Create distance matrices.                                         #                                                  
 # Steps:                                                                       #
 #         1. Set-up the script                                                 #
 #         2. Load coordinate data and create distance matrices                 #
 #         3. Save data                                                         #
 #                                                                              #
-# Project: Sri Lanka Spatial Aggregation                                       #
+# Project: Mobility Spatial Scale                                              #
 # Author: Ronan Corgel                                                         #
 ################################################################################
 

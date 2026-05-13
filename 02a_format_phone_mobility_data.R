@@ -5,7 +5,7 @@
 #         1. Set-up the script                                                 #
 #         2. Format phone mobility data                                        #
 #                                                                              #
-# Project: Sri Lanka Spatial Aggregation                                       #
+# Project: Mobility Spatial Scale                                              #
 # Author: Ronan Corgel                                                         #
 ################################################################################
 

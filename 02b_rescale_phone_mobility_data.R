@@ -8,7 +8,7 @@
 #         2. Load phone mobility data                                          #
 #         3. Rescale phone mobility data                                       #
 #                                                                              #
-# Project: Sri Lanka Spatial Aggregation                                       #
+# Project: Mobility Spatial Scale                                              #
 # Author: Ronan Corgel                                                         #
 ################################################################################
 

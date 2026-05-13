@@ -9,7 +9,7 @@
 #            4. Load UN data and apply scaling factor                          #
 #            5. Aggregate data and merge on crosswalk                          #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

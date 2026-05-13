@@ -7,7 +7,7 @@
 #            1. Set-up script                                                  #
 #            2. Load mobility data and create crosswalk                        #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

@@ -5,7 +5,7 @@
 #         1. Set-up the script                                                 #
 #         2. Create formatting functions                                       #
 #                                                                              #
-# Project: Sri Lanka Spatial Aggregation                                       #
+# Project: Mobility Spatial Scale                                              #
 # Author: Ronan Corgel                                                         #
 ################################################################################
 
