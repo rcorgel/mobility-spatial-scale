@@ -7,7 +7,7 @@
 #            1. Set-up script                                                  #
 #            2. Simulate mobile phone data                                     #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
