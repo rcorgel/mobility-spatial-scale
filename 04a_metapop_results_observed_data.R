@@ -4,7 +4,7 @@
 # Purpose:   Simulate disease dynamics with the observed mobility data.        #
 #            Two introduction scenarios (Colombo & Delft) and three            #
 #            transmissibility scenarios (R_0 = 1.1, 1.5, 3) are modeled.       #
-#            Finally, 50 random introduction scenarios are modeled.            #
+#            Finally, 25 random introduction scenarios are modeled.            #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Simulate epidemics                                             #
@@ -317,12 +317,12 @@ saveRDS(adm_1_obs_del, file = './out/adm_1_obs_del_3.0.rds')
 remove(adm_1_obs_del)
 
 ##################################
-# 50 RANDOM SCENARIOS @ R0 = 1.5 #
+# 25 RANDOM SCENARIOS @ R0 = 1.5 #
 ##################################
 
 # Adm 3
-# Randomly sample 50 introduction locations
-intro_nums <- sample(1:330, 50, replace = FALSE)
+# Randomly sample 25 introduction locations
+intro_nums <- sample(1:330, 25, replace = FALSE)
 saveRDS(intro_nums, file = './out/intro_nums_adm_3.rds')
 
 # Create an empty list to fill
@@ -337,7 +337,7 @@ for (i in intro_nums) {
                         pop_vec = adm_3_pop_vec, intro_adm = 'All', intro_num = i,
                         adm_x_walk = adm_3_x_walk, travel_mat = adm_3_phone_mobility_mat,
                         max_time = 365, time_step = 1)
-  adm_3_obs <- do.call(rbind, adm_3)
+  adm_3_obs <- as.data.frame(do.call(rbind, adm_3))
   adm_3_obs$intro_num <- i
   adm_3_random[[count]] <- adm_3_obs
   remove(adm_3, adm_3_obs)

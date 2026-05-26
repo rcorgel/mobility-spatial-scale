@@ -56,7 +56,7 @@ adm_1_name_vec <- readRDS('./out/adm_1_name_vec_new.rds')
 adm_1_pop_vec <- readRDS('./out/adm_1_pop_vec_new.rds')
 
 ###################################################
-# 50 RANDOM SCENARIOS @ R0 = 1.5 W/ OBSERVED DATA #
+# 25 RANDOM SCENARIOS @ R0 = 1.5 W/ OBSERVED DATA #
 ###################################################
 
 # Adm 3
@@ -90,14 +90,14 @@ saveRDS(adm_1_random, file = './out/adm_1_random_new.rds')
 remove(adm_1_random)
 
 ###################################################
-# 50 RANDOM SCENARIOS @ R0 = 1.5 W/ RESCALED DATA #
+# 25 RANDOM SCENARIOS @ R0 = 1.5 W/ RESCALED DATA #
 ###################################################
 
 # Load rescaled data (NEW)
 adm_3_phone_mobility_mat_rescale_adm_1 <- readRDS('./out/adm_3_phone_mobility_mat_rescale_adm_1_new.rds')
 
 # Adm 3
-# Randomly sample 50 introduction locations
+# Randomly sample 25 introduction locations
 intro_nums <- readRDS(file = './out/intro_nums_adm_3.rds')
 
 # Create an empty list to fill

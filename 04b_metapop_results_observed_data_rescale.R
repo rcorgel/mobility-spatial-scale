@@ -4,7 +4,7 @@
 # Purpose:   Simulate disease dynamics with the obs. rescaled mobility data.   #
 #            Two introduction scenarios (Colombo & Delft) and three            #
 #            transmissibility scenarios (R_0 = 1.1, 1.5, 3) are modeled.       #
-#            Finally, 50 random introduction scenarios are modeled.            #
+#            Finally, 25 random introduction scenarios are modeled.            #
 #                                                                              #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
@@ -303,11 +303,11 @@ saveRDS(adm_2_sen_del, file = './out/adm_2_sen_del_3.0.rds')
 remove(adm_2_sen_del)
 
 ##################################
-# 50 RANDOM SCENARIOS @ R0 = 1.5 #
+# 25 RANDOM SCENARIOS @ R0 = 1.5 #
 ##################################
 
 # Adm 3
-# Randomly sample 50 introduction locations
+# Randomly sample 25 introduction locations
 intro_nums <- readRDS(file = './out/intro_nums_adm_3.rds')
 
 # Create an empty list to fill
