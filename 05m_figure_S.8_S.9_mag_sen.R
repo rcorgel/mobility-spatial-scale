@@ -607,6 +607,7 @@ ggsave('./figs/figure_S.7.jpg', plot = mag_trans , height = 14, width = 25)
 
 
 
+
 int_del_obs_all <- rbind(adm_3_at_2_del_inv, adm_2_at_2_del_inv, adm_3_at_2_del_sen_inv)
 
 int_col_obs_all <- rbind(adm_3_at_2_col_inv, adm_2_at_2_col_inv, adm_3_at_2_col_sen_inv)
