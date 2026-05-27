@@ -1,14 +1,14 @@
 ################################################################################
-# File Name: 05i_figure_4_example                                              #
+# File Name: 05k_figure_S.6_example_sim                                        #
 #                                                                              #
-# Purpose:   Create figure 4 for the manuscript.                               #
+# Purpose:   Create figure S.6 for the manuscript.                             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
-#            2. Simulate example epidemics                                     #
+#            2. Load Simulated epidemics                                       #
 #            3. Create subfigures                                              #
 #            4. Create final figure                                            #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -35,9 +35,9 @@ set.seed(123456)
 # Set the directory
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
-#################################
-# 2. SIMULATE EXAMPLE EPIDEMICS #
-#################################
+###############################
+# 2. LOAD SIMULATED EPIDEMICS #
+###############################
 
 adm_3_obs_col <- readRDS('./out/adm_3_sim_col_1.5.rds')
 adm_2_obs_col <- readRDS('./out/adm_2_sim_col_1.5.rds')
@@ -47,89 +47,13 @@ adm_3_obs_mad <- readRDS('./out/adm_3_sim_del_1.5.rds')
 adm_2_obs_mad <- readRDS('./out/adm_2_sim_del_1.5.rds')
 adm_1_obs_mad <- readRDS('./out/adm_1_sim_del_1.5.rds')
 
-##########################
-# Administrative Level 3 #
-##########################
-
-# Create object for mobility data
-#mobility_dat_adm_3 <- list(as.matrix(adm_3_phone_mobility_mat_rescale_adm_1), adm_3_phone_pred_mobility_mat)
-# 
-# adm_3_at_1_obs_col_int <- adm_3_obs_col |>
-#   # Restrict to simulations that took off
-#   group_by(run_num) |>
-#   dplyr::filter(sum(incid_I) > 100) |>
-#   ungroup() |>
-#   # Sum to relevant spatial scale
-#   group_by(run_num, time, adm_3) |> 
-#   mutate(sum_incid_I = sum(incid_I)) |>
-#   distinct(run_num, time, adm_3, sum_incid_I) |> 
-#   ungroup() |>
-#   group_by(run_num, adm_3) |> 
-#   # Calculate cumulative cases at the spatial scale
-#   mutate(cum_sum_I = cumsum(sum_incid_I),
-#          intro = ifelse(cum_sum_I > 1, 1, 0)) |>
-#   # Indicate the first instance when cumulative > 1
-#   mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
-#   # Filter to first instance for all admin
-#   dplyr::filter(intro_first == TRUE) |>
-#   ungroup() |>
-#   arrange(run_num, time) |>
-#   group_by(run_num) |>
-#   arrange(time) |>
-#   mutate(intro_loc = 'Col',
-#          Scale = 'Division',
-#          Count = row_number()) |>
-#   dplyr::select(run_num, time, adm_3, time, Count, Scale) 
-# 
-# 
-# (unique(adm_3_at_1_obs_col_int$run_num))
-# 
-# test <- adm_3_at_1_obs_col_int |> dplyr::filter(Count < 18) |>
-#   mutate(count = 1) |>
-#   group_by(adm_3) |>
-#   mutate(unit_count = sum(count),
-#          unit_prop = unit_count / 47) |>
-#   distinct(adm_3, unit_count, unit_prop) 
-# 
-# choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/', 
-#                         layer = 'lka_admbnda_adm3_slsd_20220816')
-# 
-# library(sf)
-# # Load population data
-# load('./tmp/adm_population_dat.RData')
-# 
-# # Load mobility to shape cross walk
-# # The mobility data combines multiple admin 3 units, changing the total from 339 to 330
-# mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
-# 
-# # Merge on the cross walk
-# choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
-# 
-# # Join polygons to create 330 mobility admin 3 units
-# choropleth_3_mobility <- choropleth_3 |> 
-#   group_by(adm_3_mobility) |>
-#   summarise(geometry = sf::st_union(geometry)) |>
-#   ungroup()
-# 
-# choropleth_3_mobility <- left_join(choropleth_3_mobility, test, by = c('adm_3_mobility' = 'adm_3'))
-# 
-# 
-# ggplot(data = choropleth_3_mobility) +
-#   geom_sf(aes(fill = unit_prop), color= 'black', linewidth = 0.20) +
-#   scale_fill_distiller(palette = 'Blues', direction = 1, name = 'invasion') +
-#   theme_void() + ggtitle(' ') + theme(legend.position = 'inside', legend.position.inside = c(0.85, 0.90),
-#                                       plot.title = element_text(size = 30, hjust = 0.5),
-#                                       legend.text = element_text(size = 22),
-#                                       legend.title = element_text(size = 24)) +
-#   coord_sf()
-
 ########################
 # 3. CREATE SUBFIGURES #
 ########################
 
-#######################
-# Make disease curves #
-#######################
+########################
+# EPIDEMIC PROBABILITY #
+########################
 
 take_off_3 <- adm_3_obs_col |> group_by(run_num) |>
   mutate(sum = sum(incid_I)) |> 
@@ -189,9 +113,9 @@ take_off_1_mad <- adm_1_obs_mad |> group_by(run_num) |>
 
 take_off_mad <- rbind(take_off_1_mad, take_off_2_mad, take_off_3_mad)
 
-############
-# Observed #
-############
+###################
+# EPIDEMIC CURVES #
+###################
 
 adm_3_obs_col_avg <- adm_3_obs_col |>
   group_by(run_num) |>
@@ -311,13 +235,9 @@ adm_1_obs_mad_avg <- adm_1_obs_mad |>
 
 line_mad_obs_all <- rbind(adm_3_obs_mad_avg, adm_2_obs_mad_avg, adm_1_obs_mad_avg)
 
-######################
-# Introduction count #
-######################
-
-############
-# Observed #
-############
+#######################
+# INTRODUCTION TIMING #
+#######################
 
 adm_3_at_1_obs_col_int <- adm_3_obs_col |>
   # Restrict to simulations that took off
@@ -520,6 +440,10 @@ adm_1_order_col <- adm_1_obs_col_int |>
 int_mad_obs_all <- left_join(int_mad_obs_all, adm_1_order_mad, by = c('adm_1' = 'adm_1'))
 int_col_obs_all <- left_join(int_col_obs_all, adm_1_order_col, by = c('adm_1' = 'adm_1'))
 
+########
+# PLOT #
+########
+
 line_plot_col_obs <- ggplot(int_col_obs_all, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
@@ -642,6 +566,10 @@ legend <- ggplot(data = line_mad_obs_all) + geom_line(aes(x = time, y = perc_50,
 
 legend_get <- get_legend(legend)
 
+##########################
+# 4. CREATE FINAL FIGURE #
+##########################
+
 row_1_1 <- cowplot::plot_grid(take_off_col_plot,
                               line_plot_col_obs, dis_plot_col_obs, 
                               nrow = 1, labels = c('(a)', '(b)', '(c)'),
@@ -669,8 +597,8 @@ test <- int_mad_obs_all |> group_by(adm_1, Scale) |> mutate(med = median(time)) 
 max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Uva' & line_mad_obs_all$Scale == 'Division',]$perc_50)
 max(line_mad_obs_all[line_mad_obs_all$adm_1 == 'Uva' & line_mad_obs_all$Scale == 'District',]$perc_50)
 
-
-ggsave('./figs/figure_4_example_sim.jpg', plot = plot , height = 17, width = 25)
+# Save
+ggsave('./figs/figure_S.6_example_sim.jpg', plot = plot , height = 17, width = 25)
 
 ################################################################################
 ################################################################################
