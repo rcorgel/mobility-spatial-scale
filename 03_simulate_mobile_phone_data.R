@@ -240,6 +240,11 @@ check(model_1)
 check(model_2)
 check(model_3)
 
+# Summarize models for Table S.4
+summary(model_1)
+summary(model_2)
+summary(model_3)
+
 # Convert to trip proportion
 adm_1_phone_pred_mobility_mat <- phone_mobility_adm_1_pred / rowSums(phone_mobility_adm_1_pred)
 adm_2_phone_pred_mobility_mat <- phone_mobility_adm_2_pred / rowSums(phone_mobility_adm_2_pred)
