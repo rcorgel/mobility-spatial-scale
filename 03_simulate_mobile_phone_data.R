@@ -2,7 +2,8 @@
 # File Name: 03_simulate_mobile_phone_data                                     #
 #                                                                              #
 # Purpose:   Simulate mobile phone data OD matrices using mobility models      #
-#            from observed data.                                               #
+#            from observed data. DIC and fitted values from this file are      #
+#            used in Tables S.3 and S.4.                                       #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Simulate mobile phone data                                     #
@@ -227,7 +228,7 @@ model_1_basic <- mobility(data=adm_1,
 phone_mobility_adm_1_pred <- predict(model_1, nsim = 100)
 #phone_mobility_adm_1_pred[phone_mobility_adm_1_pred < 1] <- 0 # censor trips < 1
 phone_mobility_adm_1_pred <- apply(phone_mobility_adm_1_pred, 1:2, mean)
-phone_mobility_adm_2_pred <- predict(model_2_power, nsim = 100)
+phone_mobility_adm_2_pred <- predict(model_2, nsim = 100)
 #phone_mobility_adm_2_pred[phone_mobility_adm_2_pred < 1] <- 0 # censor trips < 1
 phone_mobility_adm_2_pred <- apply(phone_mobility_adm_2_pred, 1:2, mean)
 phone_mobility_adm_3_pred <- predict(model_3, nsim = 100)
