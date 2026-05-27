@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05a_figure_1                                                      #
+# File Name: 05a_figure_1_overview                                             #
 #                                                                              #
 # Purpose:   Create figure 1 for the manuscript.                               #
 # Steps:                                                                       # 
@@ -9,7 +9,7 @@
 #            4. Create national level map                                      #
 #            5. Create epidemic curves at different scales                     #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

@@ -1,7 +1,7 @@
 ################################################################################
 # File Name: 05d_table_figure_S.2_corr_comp                                    #
 #                                                                              #
-# Purpose:   This file contains code for table S.2, figure S.2 as well as      #
+# Purpose:   This file contains code for table S.2, figure S.1 as well as      #
 #            text call outs.                                                   #
 #                                                                              #
 # Steps:                                                                       # 
@@ -11,7 +11,7 @@
 #            4. Combine subfigures                                             #
 #            5. Text callouts                                                  #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -216,7 +216,7 @@ adm_3_phone_mobility_long <- left_join(adm_3_phone_mobility_long,
                                                  'destination' = 'destination'))
 # Plot
 sim_comp_3_prop <- ggplot(data = adm_3_phone_mobility_long) + 
-  geom_point(aes(x = value.y, y = value.x), size = 10, color = '#807DBA', alpha = 0.2) +
+  geom_point(aes(x = value.x, y = value.y), size = 10, color = '#807DBA', alpha = 0.2) +
   geom_abline(intercept = 0, slope = 1, linetype = 'dashed') + theme_minimal() +
   ylim(0, 1) + xlim(0, 1) + theme(legend.position = 'none',
                                   axis.text = element_text(size=20),
@@ -235,7 +235,7 @@ adm_2_phone_mobility_long <- left_join(adm_2_phone_mobility_long,
                                               'destination' = 'destination'))
 # Plot
 sim_comp_2_prop <- ggplot(data = adm_2_phone_mobility_long) + 
-  geom_point(aes(x = value.y, y = value.x), size = 10, color = '#41AE76', alpha = 0.2) +
+  geom_point(aes(x = value.x, y = value.y), size = 10, color = '#41AE76', alpha = 0.2) +
   geom_abline(intercept = 0, slope = 1, linetype = 'dashed') + theme_minimal() +
   ylim(0, 1) + xlim(0, 1) + theme(legend.position = 'none',
                                   axis.text = element_text(size=20),
@@ -254,7 +254,7 @@ adm_1_phone_mobility_long <- left_join(adm_1_phone_mobility_long,
                                               'destination' = 'destination'))
 # Plot
 sim_comp_1_prop <- ggplot(data = adm_1_phone_mobility_long) + 
-  geom_point(aes(x = value.y, y = value.x), size = 10, color = '#4292C6', alpha = 0.2) +
+  geom_point(aes(x = value.x, y = value.y), size = 10, color = '#4292C6', alpha = 0.2) +
   geom_abline(intercept = 0, slope = 1, linetype = 'dashed') + theme_minimal() +
   ylim(0, 1) + xlim(0, 1) + theme(legend.position = 'none',
                                   axis.text = element_text(size=20),

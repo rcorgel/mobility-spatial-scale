@@ -1,7 +1,7 @@
 ################################################################################
-# File Name: 05f_figure_S.1_internal                                           #
+# File Name: 05e_figure_S.2_internal                                           #
 #                                                                              #
-# Purpose:   Create figure S.1 for the manuscript.                             #
+# Purpose:   Create figure S.2 for the manuscript.                             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Create figure functions                                        #
@@ -9,7 +9,7 @@
 #            4. Combine sub figures                                            #
 #            5. Text callouts                                                  #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

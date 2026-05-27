@@ -1,14 +1,14 @@
 ################################################################################
-# File Name: 05e_figure_3_nested_sim                                           #
+# File Name: 05h_figure_S.4_nested_sim                                         #
 #                                                                              #
-# Purpose:   Create figure 3 for the manuscript.                               #
+# Purpose:   Create figure S.4 for the manuscript.                             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Create figure functions                                        #
-#            4. Create subfigures                                              #
-#            5. Create final figure                                            #
+#            3. Create subfigures                                              #
+#            4. Create final figure                                            #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -383,25 +383,7 @@ figure_3 <- cowplot::plot_grid(col_1, ggplot() + theme_void(),
                                labels = c('', '', ''),
                                label_size = 26, hjust = 0)                            
 # Save plot
-ggsave('./figs/figure_3_nested_new_sim.jpg', plot = figure_3, height = 25, width = 25)
+ggsave('./figs/figure_S.4_nested_new_sim.jpg', plot = figure_3, height = 25, width = 25)
 
 ################################################################################
 ################################################################################
-
-# At the province level, the probability of remaining in the Western province was 93%. 
-network_even[network_even$origin == 'Western' & network_even$destination == 'Western',]$value_sum
-
-# Meanwhile, the probability of remaining in the Western province when originating 
-# the Colombo division (nested within the Western province) was also 93%
-network_even[network_even$origin == 'Colombo' & network_even$destination == 'Western',]$value_sum
-
-# In the Sevanagala division nested within the Uva province, there was a much lower probability 
-# of remaining within the Uva province than for someone in Uva province on average (45% vs. 96%)
-network_odd[network_odd$origin == 'Sevanagala' & network_odd$destination == 'Uva',]$value_sum
-network_odd[network_odd$origin == 'Uva' & network_odd$destination == 'Uva',]$value_sum
-
-# After comparing this difference across all nested province-division pairs, we found that 
-# divisions on average were more likely to have a higher travel probability (6%, ranging from -16% to 64%)
-mean(adm_3_adm_1_phone_leave$difference)
-min(adm_3_adm_1_phone_leave$difference)
-max(adm_3_adm_1_phone_leave$difference)

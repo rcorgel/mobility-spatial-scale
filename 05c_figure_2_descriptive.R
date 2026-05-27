@@ -11,7 +11,7 @@
 #            5. Create matrix subfigures                                       #
 #            6. Combine subfigures                                             #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -382,9 +382,9 @@ legend_1 <- get_legend(legend_adm_1)
 sub_3 <- plot_grid(plot_5, plot_6, legend_1,
           nrow = 3, rel_heights = c(1, 1, 0.2))
 
-##################################################
-# 6. CREATE MATRIX SUBFIGURES AND S.2 SUBFIGURES #
-##################################################
+###############################
+# 5. CREATE MATRIX SUBFIGURES #
+###############################
 
 #####################
 # MOBILE PHONE DATA #
@@ -491,7 +491,7 @@ mat__3 <- plot_grid(mat_3, title, legend_3,
                     nrow = 3, rel_heights = c(1, 0.05, 0.2))
 
 #########################
-# 7. COMBINE SUBFIGURES #
+# 6. COMBINE SUBFIGURES #
 #########################
 
 # CREATE FIGURE 2

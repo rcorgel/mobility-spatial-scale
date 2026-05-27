@@ -9,7 +9,7 @@
 #            4. Perform logistic regression                                    #
 #            5. Text callout                                                   #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

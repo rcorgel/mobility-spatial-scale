@@ -1,7 +1,7 @@
 ################################################################################
-# File Name: 05g_figure_S.3_cluster                                            #
+# File Name: 05i_figure_S.5_cluster                                            #
 #                                                                              #
-# Purpose:   Create figure S.3 for the manuscript.                             #
+# Purpose:   Create figure S.5 for the manuscript.                             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Cluster of divisions in districts                              #
@@ -9,7 +9,7 @@
 #            4. Cluster of districts in provinces                              #
 #            5. Create final figure                                            #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

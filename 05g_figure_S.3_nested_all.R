@@ -1,14 +1,13 @@
 ################################################################################
-# File Name: 05e_figure_3_nested                                               #
+# File Name: 05g_figure_S.3_nested_all                                         #
 #                                                                              #
-# Purpose:   Create figure 3 for the manuscript.                               #
+# Purpose:   Create figure S.3 for the manuscript.                             #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
-#            2. Create figure functions                                        #
-#            4. Create subfigures                                              #
-#            5. Create final figure                                            #
+#            2. Create subfigures                                              #
+#            3. Create final figure                                            #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
@@ -36,7 +35,7 @@ set.seed(12345)
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
 ########################
-# 3. CREATE SUBFIGURES #
+# 2. CREATE SUBFIGURES #
 ########################
 
 # Load the shape files
@@ -379,8 +378,6 @@ mean(adm_2_adm_1_phone_leave$difference)
 min(adm_2_adm_1_phone_leave$difference)
 max(adm_2_adm_1_phone_leave$difference)
 
-
-
 ##################
 # SIMULATED DATA #
 ##################
@@ -674,12 +671,8 @@ plot_2_1_map_sim <- ggplot() +
                          low = '#42AE76', mid = "white", high = '#4292C6',
                          midpoint = 0, aesthetics = 'fill', limits=c(-0.36, 0.60))
 
-
-
-
-
 ##########################
-# 5. CREATE FINAL FIGURE #
+# 3. CREATE FINAL FIGURE #
 ##########################
 
 col_1 <- cowplot::plot_grid(plot_3_2_scatter,
@@ -739,11 +732,9 @@ figure_3 <- cowplot::plot_grid(ggplot() + theme_void(), ggplot() + theme_void(),
                                           'Observed Data: District - Province', 'Simulated Data: District - Province', '', ''),
                                label_size = 30, hjust = 0)                            
 # Save plot
-ggsave('./figs/figure_3_supp_new.jpg', plot = figure_3, height = 25, width = 35)
+ggsave('./figs/figure_S.3_supp_nested.jpg', plot = figure_3, height = 25, width = 35)
 
-
-# TEXT CALL OUTS
-
+## TEXT CALL OUTS ##
 mean(adm_3_adm_1_phone_leave$difference)
 min(adm_3_adm_1_phone_leave$difference)
 max(adm_3_adm_1_phone_leave$difference)
@@ -756,8 +747,6 @@ max(adm_3_adm_2_phone_leave$difference)
 mean(adm_2_adm_1_phone_leave$difference)
 min(adm_2_adm_1_phone_leave$difference)
 max(adm_2_adm_1_phone_leave$difference)
-
-
 
 ################################################################################
 ################################################################################
