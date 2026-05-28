@@ -751,10 +751,62 @@ all_rescale_new_3_1.5 <- left_join(all_rescale_new_3_1.5, adm_3_names, by = 'int
 
 all_rescale_new_3_1.5 <- left_join(all_rescale_new_3_1.5, adm_3_x_walk_new, by = c('adm_3_name_vec' = 'adm_3'))
 
+#############
+# ADM 1 OBS #
+#############
+
+## LOAD 25 RANDOM LOCATION RESULTS ##
+adm_1_random <- readRDS('./out/adm_1_random.rds')
+
+# Create empty list
+inv_list <- NULL
+
+# Loop through introduction scenarios
+for (i in 1:25) {
+  print(i)
+  inv_dat <- adm_1_random[[i]]
+  inv_dat <- inv_dat |>
+    # Restrict to simulations that took off
+    group_by(run_num) |>
+    dplyr::filter(sum(incid_I) > 100) |>
+    ungroup() |>
+    # Sum to relevant spatial scale
+    group_by(run_num, time, adm_1) |> 
+    mutate(sum_incid_I = sum(incid_I)) |>
+    distinct(run_num, intro_num, time, adm_1, sum_incid_I) |> 
+    ungroup() |>
+    group_by(run_num, adm_1) |> 
+    # Calculate cumulative cases at the spatial scale
+    mutate(cum_sum_I = cumsum(sum_incid_I),
+           intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+    # Indicate the first instance when cumulative > 1
+    mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+    # Filter to first instance for all admin
+    dplyr::filter(intro_first == TRUE) |>
+    ungroup() |>
+    arrange(run_num, time) |>
+    group_by(run_num) |>
+    arrange(time) |>
+    mutate(intro_loc = intro_num,
+           Scale = 'Division',
+           `Mobility Data Type` = 'Observed',
+           Count = row_number()) |>
+    dplyr::select(run_num, time, intro_loc, adm_1, time, Count, 
+                  Scale, `Mobility Data Type`)
+  
+  inv_list[[i]] <- inv_dat 
+  remove(inv_dat)
+}
+
+# Save
+saveRDS(inv_list, file = './out/adm_1_random_inv.rds')
+remove(adm_1_random, inv_list, inv_dat)
+
 # Median arrival time (ADM 1)
 adm_1_random_inv <- readRDS('out/adm_1_random_inv.rds')
 adm_1_random_inv_all <- do.call(rbind, adm_1_random_inv)
 
+# Calculate median by introduction location and province
 all_1_1.5 <- adm_1_random_inv_all |>
   group_by(adm_1, intro_loc, Scale, `Mobility Data Type`) |>
   mutate(median = median(time),
@@ -762,16 +814,68 @@ all_1_1.5 <- adm_1_random_inv_all |>
          `Mobility Data Type` = 'Observed') |>
   distinct(adm_1, intro_loc, Scale, `Mobility Data Type`, median)
 
+# Merge on Adm 1 names
 adm_1_names <- as.data.frame(adm_1_name_vec)
 adm_1_names <- adm_1_names |> mutate(intro_loc = row_number())
 
 all_1_1.5 <- left_join(all_1_1.5, adm_1_names, by = 'intro_loc')
 
+#############
+# ADM 1 NEW #
+#############
+
+## LOAD 25 RANDOM LOCATION RESULTS ##
+adm_1_random <- readRDS('./out/adm_1_random_new.rds')
+
+# Create empty list
+inv_list <- NULL
+
+# Loop through introduction scenarios
+for (i in 1:25) {
+  print(i)
+  inv_dat <- adm_1_random[[i]]
+  inv_dat <- inv_dat |>
+    # Restrict to simulations that took off
+    group_by(run_num) |>
+    dplyr::filter(sum(incid_I) > 100) |>
+    ungroup() |>
+    # Sum to relevant spatial scale
+    group_by(run_num, time, adm_1) |> 
+    mutate(sum_incid_I = sum(incid_I)) |>
+    distinct(run_num, intro_num, time, adm_1, sum_incid_I) |> 
+    ungroup() |>
+    group_by(run_num, adm_1) |> 
+    # Calculate cumulative cases at the spatial scale
+    mutate(cum_sum_I = cumsum(sum_incid_I),
+           intro = ifelse(cum_sum_I > 1, 1, 0)) |>
+    # Indicate the first instance when cumulative > 1
+    mutate(intro_first = intro == 1 & !duplicated(intro == 1)) |>
+    # Filter to first instance for all admin
+    dplyr::filter(intro_first == TRUE) |>
+    ungroup() |>
+    arrange(run_num, time) |>
+    group_by(run_num) |>
+    arrange(time) |>
+    mutate(intro_loc = intro_num,
+           Scale = 'Division',
+           `Mobility Data Type` = 'Observed',
+           Count = row_number()) |>
+    dplyr::select(run_num, time, intro_loc, adm_1, time, Count, 
+                  Scale, `Mobility Data Type`)
+  
+  inv_list[[i]] <- inv_dat 
+  remove(inv_dat)
+}
+
+# Save
+saveRDS(inv_list, file = './out/adm_1_random_new_inv.rds')
+remove(adm_1_random, inv_list, inv_dat)
+
 # Median arrival time (ADM 1 NEW)
 adm_1_random_new_inv <- readRDS('out/adm_1_random_new_inv.rds')
 adm_1_random_new_inv_all <- do.call(rbind, adm_1_random_new_inv)
 
-
+# Calculate median by introduction location and province
 all_new_1_1.5 <- adm_1_random_new_inv_all |>
   group_by(adm_1, intro_loc, Scale, `Mobility Data Type`) |>
   mutate(median = median(time),

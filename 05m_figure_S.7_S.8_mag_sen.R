@@ -1,7 +1,7 @@
 ################################################################################
-# File Name: 05m_figure_S.8_S.9_mag_sen                                        #
+# File Name: 05m_figure_S.7_S.8_mag_sen                                        #
 #                                                                              #
-# Purpose:   Create figures S.8 and S.9 for the manuscript.                    #
+# Purpose:   Create figures S.7 and S.8 for the manuscript.                    #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
 #            2. Load simulated epidemics                                       #
@@ -30,6 +30,7 @@ library(ggpubr)
 library(forcats)
 library(parallel)
 library(ggpubr)
+library(ggpattern)
 
 # Set the seed
 set.seed(123456)
@@ -577,7 +578,7 @@ mag_trans <- ggplot(plot_dat_mag) + geom_boxplot(aes(x = Scale, y = magnitude / 
   theme_bw() + 
   xlab('Scale') +
   ylab('\nProportion Infected') +
-  ggtitle('Epidemic Magnitude by Introduction Location & Transmissibility') +
+  ggtitle('Epidemic Final Size by Introduction Location & Transmissibility') +
   scale_y_continuous(limits = c(0, 1),                
                      breaks = c(0, 0.50, 1)) +
   theme(plot.title = element_text(size=34, hjust = 0.5),
@@ -603,15 +604,16 @@ plot <- cowplot::plot_grid(intro_trans,
 # Save Figure S.7
 ggsave('./figs/figure_S.7.jpg', plot = mag_trans , height = 14, width = 25)
 
+#######################################
+# CREATE ADMIN 2 INFECTION TIME PLOTS #
+#######################################
 
-
-
-
-
+# Combine scenarios together
 int_del_obs_all <- rbind(adm_3_at_2_del_inv, adm_2_at_2_del_inv, adm_3_at_2_del_sen_inv)
 
 int_col_obs_all <- rbind(adm_3_at_2_col_inv, adm_2_at_2_col_inv, adm_3_at_2_col_sen_inv)
 
+# Create order sets
 adm_2_order_del <- adm_2_at_2_del_inv |>
   group_by(adm_2) |>
   mutate(median = median(time)) |>
@@ -628,9 +630,11 @@ adm_2_order_col <- adm_2_at_2_col_inv |>
   arrange(median) |>
   mutate(Order = row_number())
 
+# Merge
 int_mad_obs_all <- left_join(int_del_obs_all, adm_2_order_del, by = c('adm_2' = 'adm_2'))
 int_col_obs_all <- left_join(int_col_obs_all, adm_2_order_col, by = c('adm_2' = 'adm_2'))
 
+# Plot
 line_plot_col_obs <- ggplot(int_col_obs_all, aes(x = time, y = fct_reorder(adm_2, Order), fill = Scale, linetype = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
@@ -671,10 +675,20 @@ line_plot_mad_obs <- ggplot(int_mad_obs_all, aes(x = time, y = fct_reorder(adm_2
         legend.title = element_text(size = 30)) 
 line_plot_mad_obs
 
-int_del_obs_all_1 <- rbind(adm_3_at_1_del_inv, adm_2_at_1_del_inv, adm_1_at_1_del_inv, adm_3_at_1_del_sen_inv, adm_2_at_1_del_sen_inv)
+#######################################
+# CREATE ADMIN 3 INFECTION TIME PLOTS #
+#######################################
 
-int_col_obs_all_1 <- rbind(adm_3_at_1_col_inv, adm_2_at_1_col_inv, adm_1_at_1_col_inv, adm_3_at_1_col_sen_inv, adm_2_at_1_col_sen_inv)
+# R_0 = 1.5 #
 
+# Combine scenarios together
+int_del_obs_all_1 <- rbind(adm_3_at_1_del_inv, adm_2_at_1_del_inv, adm_1_at_1_del_inv, 
+                           adm_3_at_1_del_sen_inv, adm_2_at_1_del_sen_inv)
+
+int_col_obs_all_1 <- rbind(adm_3_at_1_col_inv, adm_2_at_1_col_inv, adm_1_at_1_col_inv, 
+                           adm_3_at_1_col_sen_inv, adm_2_at_1_col_sen_inv)
+
+# Create order sets
 adm_1_order_del <- adm_1_at_1_del_inv |>
   group_by(adm_1) |>
   mutate(median = median(time)) |>
@@ -691,37 +705,43 @@ adm_1_order_col <- adm_1_at_1_col_inv |>
   arrange(median) |>
   mutate(Order = row_number())
 
+# Calculate the median
 del_1.5 <- int_del_obs_all_1 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 del_1.5_prov <- del_1.5 |> filter(Scale == 'Province')
 
 del_1.5 <- left_join(del_1.5, del_1.5_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 del_1.5_med <- del_1.5 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '1.5')
 
+# Calculate the median
 col_1.5 <- int_col_obs_all_1 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 col_1.5_prov <- col_1.5 |> filter(Scale == 'Province')
 
 col_1.5 <- left_join(col_1.5, col_1.5_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 col_1.5_med <- col_1.5 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '1.5')
 
+# R_0 = 1.1 #
 
-
-
+# Combine scenarios together
 int_del_obs_all_1.1 <- rbind(adm_3_at_1_del_inv_1.1, adm_2_at_1_del_inv_1.1, 
                              adm_1_at_1_del_inv_1.1, adm_3_at_1_del_sen_inv_1.1, 
                              adm_2_at_1_del_sen_inv_1.1)
@@ -730,37 +750,43 @@ int_col_obs_all_1.1 <- rbind(adm_3_at_1_col_inv_1.1, adm_2_at_1_col_inv_1.1,
                              adm_1_at_1_col_inv_1.1, adm_3_at_1_col_sen_inv_1.1, 
                              adm_2_at_1_col_sen_inv_1.1)
 
+# Calculate the median
 del_1.1 <- int_del_obs_all_1.1 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 del_1.1_prov <- del_1.1 |> filter(Scale == 'Province')
 
 del_1.1 <- left_join(del_1.1, del_1.1_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 del_1.1_med <- del_1.1 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '1.1')
 
+# Calculate the median
 col_1.1 <- int_col_obs_all_1.1 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 col_1.1_prov <- col_1.1 |> filter(Scale == 'Province')
 
 col_1.1 <- left_join(col_1.1, col_1.1_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 col_1.1_med <- col_1.1 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '1.1')
 
+# R_0 = 3.0 #
 
-
-
+# Combine scenarios together
 int_del_obs_all_3.0 <- rbind(adm_3_at_1_del_inv_3.0, adm_2_at_1_del_inv_3.0, 
                              adm_1_at_1_del_inv_3.0, adm_3_at_1_del_sen_inv_3.0, 
                              adm_2_at_1_del_sen_inv_3.0)
@@ -769,36 +795,41 @@ int_col_obs_all_3.0 <- rbind(adm_3_at_1_col_inv_3.0, adm_2_at_1_col_inv_3.0,
                              adm_1_at_1_col_inv_3.0, adm_3_at_1_col_sen_inv_3.0, 
                              adm_2_at_1_col_sen_inv_3.0)
 
+# Calculate the median
 del_3.0 <- int_del_obs_all_3.0 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 del_3.0_prov <- del_3.0 |> filter(Scale == 'Province')
 
 del_3.0 <- left_join(del_3.0, del_3.0_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 del_3.0_med <- del_3.0 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '3.0')
 
+# Calculate the median
 col_3.0 <- int_col_obs_all_3.0 |>
   group_by(adm_1, Scale, `Mobility Data Type`) |>
   mutate(median = median(time)) |>
   distinct(adm_1, Scale, `Mobility Data Type`, median)
 
+# Merge on Province data
 col_3.0_prov <- col_3.0 |> filter(Scale == 'Province')
 
 col_3.0 <- left_join(col_3.0, col_3.0_prov[,c(1, 4)], by = 'adm_1')
 
+# Calculate RMSE
 col_3.0_med <- col_3.0 |> group_by(Scale, `Mobility Data Type`) |>
   mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
   distinct(Scale, `Mobility Data Type`, rmse) |>
   mutate(trans = '3.0')
 
-
-
+# PLOT COLOMBO RMSE BY R_0 #
 rmse_col <- rbind(col_1.5_med, col_1.1_med, col_3.0_med)
 rmse_col <- rmse_col |> dplyr::filter(Scale != 'Province')
 rmse_col <- rmse_col |> ungroup() |>
@@ -824,7 +855,7 @@ rmse_plot_col_obs_1 <- ggplot(rmse_col) +
         legend.title = element_text(size = 30)) 
   
     
-library(ggpattern)
+# PLOT SVET RMSE BY R_0 #
 rmse_del <- rbind(del_1.5_med, del_1.1_med, del_3.0_med)
 rmse_del <- rmse_del |> dplyr::filter(Scale != 'Province')
 rmse_del <- rmse_del |> ungroup() |>
@@ -849,48 +880,17 @@ rmse_plot_mad_obs_1 <- ggplot(rmse_del) +
         legend.text = element_text(size = 30),
         legend.title = element_text(size = 30)) 
 
-library(ggpattern)
-rmse_del <- rbind(del_1.5_med, del_1.1_med, del_3.0_med)
-rmse_del <- rmse_del |> dplyr::filter(Scale != 'Province')
-rmse_del <- rmse_del |> ungroup() |>
-  mutate(`Mobility Data Type` = factor(`Mobility Data Type`, levels=c(  "Original", "Rescaled"))) |>
-  mutate(trans = factor(trans, levels=c('1.1', '1.5', '3.0'))) |>
-  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) |>
-  dplyr::filter(Scale != 'District')
 
 
-rmse_plot_mad_obs_1 <- ggplot(rmse_del) +
-  geom_bar(aes(x = trans, y = rmse, fill = Scale, linetype = `Mobility Data Type`), 
-                   color = 'black', stat = "identity", position = "dodge", linewidth = 1, width = 0.7) +
-  labs(x = expression(~ R[0]), y = "RMSE (days)", fill = "Scale") +
-  theme_minimal() + scale_y_continuous(limits = c(0, 45), breaks = c(0, 10, 20, 30, 40)) +
-  scale_linetype_manual(values = c('Original' = 'solid', 'Rescaled' = 'dashed')) +
-  scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
-  guides(linetype = guide_legend(override.aes = list(fill = "white")))  + ggtitle('Difference from Province Model') +
-  theme(plot.title = element_text(size=34, hjust = 0.5),
-        axis.title = element_text(size=34),
-        axis.text = element_text(size=30),
-        panel.grid.minor = element_blank(),
-        legend.position = 'none',
-        legend.text = element_text(size = 30),
-        legend.title = element_text(size = 30)) 
-
-rmse_plot_mad_obs_1 
-
-
-
-col_3.0_med <- col_3.0 |> group_by(Scale, `Mobility Data Type`) |>
-  mutate(rmse = sqrt(mean((median.x - median.y)^2))) |>
-  distinct(Scale, `Mobility Data Type`, rmse) |>
-  mutate(trans = '3.0')
-
+# Merge on order sets
 int_mad_obs_all_1 <- left_join(int_del_obs_all_1, adm_1_order_del, by = c('adm_1' = 'adm_1'))
 int_col_obs_all_1 <- left_join(int_col_obs_all_1, adm_1_order_col, by = c('adm_1' = 'adm_1'))
 
+# Relevel
 int_col_obs_all_1 <- int_col_obs_all_1 |> ungroup() |>
   mutate(Scale = factor(Scale, levels=c("Division", "District", "Province"))) 
 
-
+# PLOT COL TIME BY PROVINCE #
 line_plot_col_obs_1 <- ggplot(int_col_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
@@ -911,19 +911,19 @@ line_plot_col_obs_1 <- ggplot(int_col_obs_all_1, aes(x = time, y = fct_reorder(a
         legend.title = element_text(size = 30)) 
 line_plot_col_obs_1
 
+# Relevel data
 int_mad_obs_all_1 <- int_mad_obs_all_1 |> ungroup() |>
-  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province")),
-         `Mobility Data Type` = factor(`Mobility Data Type`, levels=c("Rescaled",  "Original"))) |>
-  dplyr::filter(Scale != 'District')
+  mutate(Scale = factor(Scale, levels=c("Division", "District", "Province")))
 
-
-line_plot_mad_obs_1 <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, linetype = `Mobility Data Type`)) +
+# PLOT SVET TIME BY PROVINCE #
+line_plot_mad_obs_1 <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
-  geom_boxplot(position = position_dodge(width = 0.75), width=0.5, color = 'black', outlier.shape = NA, coef = 0, linewidth = 1) +
+  geom_boxplot_pattern(position = position_dodge(width = 0.75), width=0.5, color = 'black', outlier.shape = NA, coef = 0, linewidth = 1) +
   theme_minimal() + coord_cartesian(xlim = c(0, 110)) +
   scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
-  scale_linetype_manual(values = c('Original' = 'solid', 'Rescaled' = 'dashed')) +
+  scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
+  theme(legend.position = 'none') +
   ylab('Province') +
   xlab('Time (days)') +
   ggtitle('Province Infection Time') +
@@ -936,21 +936,16 @@ line_plot_mad_obs_1 <- ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(a
         legend.title = element_text(size = 30)) 
 line_plot_mad_obs_1
 
-
-legend <- ggplot(int_mad_obs_all_1, aes(x = mean(time), y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
+# MAKE LEGEND
+legend <-  ggplot(int_mad_obs_all_1, aes(x = time, y = fct_reorder(adm_1, Order), fill = Scale, pattern = `Mobility Data Type`)) +
   #geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
   #scale="width", width = 0.6, position = position_dodge(width = 0.9)) +
-  geom_bar_pattern(aes(fill = Scale, pattern = `Mobility Data Type`), 
-                   color = 'black', stat = "identity", position = "dodge", linewidth = 1,
-                   pattern_density = 0.1,
-                   pattern_spacing = 0.5,
-                   pattern_key_scale_factor = 0.6,
-                   pattern_fill = "black",
-                   pattern_angle = 45) +
+  geom_bar_pattern(stat = "identity", position = "dodge", width=0.5, color = 'black', linewidth = 1) +
   theme_minimal() + coord_cartesian(xlim = c(0, 110)) +
   scale_fill_manual(values = c('District'="#9e9ac8", 'Division'="#41AE76",'Province'= "#4292C6")) +
   scale_pattern_manual(values = c('Original' = 'none', 'Rescaled' = 'stripe')) +
-  ylab('Province') + 
+  theme(legend.position = 'none') +
+  ylab('Province') +
   xlab('Time (days)') +
   ggtitle('Province Infection Time') +
   theme(plot.title = element_text(size=34, hjust = 0.5),
@@ -958,14 +953,17 @@ legend <- ggplot(int_mad_obs_all_1, aes(x = mean(time), y = fct_reorder(adm_1, O
         axis.text = element_text(size=30),
         panel.grid.minor = element_blank(),
         legend.position = 'bottom',
-        legend.text = element_text(size = 38),
-        legend.title = element_text(size = 44),
-        legend.key.width = unit(2, "cm")) +
-  guides(pattern = guide_legend(override.aes = list(fill = "white")),
+        legend.text = element_text(size = 40),
+        legend.title = element_text(size = 40)) +
+  guides(pattern = guide_legend(override.aes = list(fill = "white", pattern_fill = "grey")),
          fill = guide_legend(override.aes = list(pattern = "none")))
 
-
+# Grab legend
 legend_get <- get_legend(legend)
+
+##########################
+# 3. CREATE FINAL FIGURE #
+##########################
 
 row_1_1 <- cowplot::plot_grid(ggplot() + theme_void(), ggplot() + theme_void(),
                               line_plot_col_obs_1, line_plot_mad_obs_1, 
@@ -975,10 +973,11 @@ row_1_1 <- cowplot::plot_grid(ggplot() + theme_void(), ggplot() + theme_void(),
                               label_size = 34,
                               rel_heights = c(0.05, 1, 0.45))
 
-
 plot <- cowplot::plot_grid(row_1_1, legend_get,
                            nrow = 2, rel_heights = c(1, 0.1),
                            label_size = 34, hjust = 0)
 
-ggsave('./figs/figure_5_spectrum_new.jpg', plot = plot, height = 25, width = 25)
+ggsave('./figs/figure_S.8_new.jpg', plot = plot, height = 25, width = 25)
 
+################################################################################
+################################################################################
