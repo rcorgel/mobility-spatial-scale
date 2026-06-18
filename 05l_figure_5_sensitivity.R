@@ -543,12 +543,11 @@ adm_3_random_rescale_inv_all <- left_join(adm_3_random_rescale_inv_all, intro_nu
 
 # Calculate median by introduction location and province
 all_rescale_3_1.5 <- adm_3_random_rescale_inv_all |>
-  group_by(adm_1, intro_nums, Scale, `Mobility Data Type`) |>
+  group_by(adm_1, intro_loc, Scale, `Mobility Data Type`) |>
   mutate(median = median(time),
          Scale = 'Division',
          `Mobility Data Type` = 'Rescaled') |>
-  distinct(adm_1, intro_nums, Scale, `Mobility Data Type`, median) |>
-  dplyr::rename('intro_loc' = 'intro_nums')
+  distinct(adm_1, intro_loc, Scale, `Mobility Data Type`, median) 
 
 # Merge on Adm 3 names
 all_rescale_3_1.5 <- left_join(all_rescale_3_1.5, adm_3_names, by = 'intro_loc')
@@ -762,7 +761,7 @@ adm_1_random <- readRDS('./out/adm_1_random.rds')
 inv_list <- NULL
 
 # Loop through introduction scenarios
-for (i in 1:25) {
+for (i in 1:9) {
   print(i)
   inv_dat <- adm_1_random[[i]]
   inv_dat <- inv_dat |>
@@ -773,7 +772,7 @@ for (i in 1:25) {
     # Sum to relevant spatial scale
     group_by(run_num, time, adm_1) |> 
     mutate(sum_incid_I = sum(incid_I)) |>
-    distinct(run_num, intro_num, time, adm_1, sum_incid_I) |> 
+    distinct(run_num, time, adm_1, sum_incid_I) |> 
     ungroup() |>
     group_by(run_num, adm_1) |> 
     # Calculate cumulative cases at the spatial scale
@@ -787,7 +786,7 @@ for (i in 1:25) {
     arrange(run_num, time) |>
     group_by(run_num) |>
     arrange(time) |>
-    mutate(intro_loc = intro_num,
+    mutate(intro_loc = i,
            Scale = 'Division',
            `Mobility Data Type` = 'Observed',
            Count = row_number()) |>
@@ -831,7 +830,7 @@ adm_1_random <- readRDS('./out/adm_1_random_new.rds')
 inv_list <- NULL
 
 # Loop through introduction scenarios
-for (i in 1:25) {
+for (i in 1:9) {
   print(i)
   inv_dat <- adm_1_random[[i]]
   inv_dat <- inv_dat |>
@@ -842,7 +841,7 @@ for (i in 1:25) {
     # Sum to relevant spatial scale
     group_by(run_num, time, adm_1) |> 
     mutate(sum_incid_I = sum(incid_I)) |>
-    distinct(run_num, intro_num, time, adm_1, sum_incid_I) |> 
+    distinct(run_num, time, adm_1, sum_incid_I) |> 
     ungroup() |>
     group_by(run_num, adm_1) |> 
     # Calculate cumulative cases at the spatial scale
@@ -856,7 +855,7 @@ for (i in 1:25) {
     arrange(run_num, time) |>
     group_by(run_num) |>
     arrange(time) |>
-    mutate(intro_loc = intro_num,
+    mutate(intro_loc = i,
            Scale = 'Division',
            `Mobility Data Type` = 'Observed',
            Count = row_number()) |>
@@ -908,8 +907,8 @@ rmse_adm_3_rescale <- all_rescale_3_1.5 |> group_by(Scale.x, intro_loc.x, `Mobil
 # Append
 rmse <- rbind(rmse_adm_3_obs, rmse_adm_3_rescale)
 rmse <- left_join(rmse, adm_3_names, by = c('intro_loc.x' = 'intro_loc'))
-rmse <- left_join(rmse, adm_3_adm_1_phone_leave, 
-                  by = c('adm_3_name_vec' = 'origin'))
+#rmse <- left_join(rmse, adm_3_adm_1_phone_leave, 
+                 # by = c('adm_3_name_vec' = 'origin'))
 
 # MERGE ADM 3 to ADM 1 (NEW)
 all_new_1_1.5$adm_1 <- as.numeric(all_new_1_1.5$adm_1)
@@ -1080,6 +1079,22 @@ plot_3_1_scatter
 ############
 # PLOT MAP #
 ############
+
+choropleth_3 <- read_sf(dsn = './raw/lka_adm_20220816_shp/', 
+                        layer = 'lka_admbnda_adm3_slsd_20220816')
+
+# Load mobility to shape cross walk
+# The mobility data combines multiple admin 3 units, changing the total from 339 to 330
+mobility_shape_xwalk <- readRDS('./tmp/mobility_shape_xwalk.rds')
+
+# Merge on the cross walk
+choropleth_3 <- left_join(choropleth_3, mobility_shape_xwalk, by = c('ADM3_EN' = 'adm_3_shape'))
+
+# Join polygons to create 330 mobility admin 3 units
+choropleth_3_mobility <- choropleth_3 |> 
+  group_by(adm_3_mobility) |>
+  summarise(geometry = sf::st_union(geometry)) |>
+  ungroup()
 
 choropleth_1_new <- readRDS('./out/adm_1_new_shape.rds')
 choropleth_3_mobility <- left_join(choropleth_3_mobility, adm_3_adm_1_phone_leave[ c('origin', 'difference')], by = 
