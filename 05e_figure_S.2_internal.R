@@ -50,14 +50,14 @@ data_summary <- function(x) {
 
 # Create violin plots of internal trip proportions by location
 make_violin_plot <- function(data, color) {
-  plot <- ggplot(data, aes(x = level, y = value, fill = level)) +
+  plot <- ggplot(data, aes(x = level, y = value*100, fill = level)) +
     geom_violin(trim = FALSE, color = 'black', linewidth = 1.5, alpha = 1, 
                 scale="width", width = 0.6) +
     theme_minimal() + ylim(0, 1) +
     scale_fill_manual(values=c(color, 'grey70')) +
     theme(legend.position = 'none') +
     xlab('') + 
-    ylab('\nStay Probability') +
+    ylab('\nStay Probability (%)') +
     ggtitle(' ') +
     theme(axis.title = element_text(size=26),
           axis.text = element_text(size=22),
@@ -69,13 +69,13 @@ make_violin_plot <- function(data, color) {
 # Make a scatter plot
 make_scatter_plot <- function(data) {
   plot <- ggplot(data) +
-    geom_point(aes(x = log(population), y = value, color = level), alpha = 0.25, size = 4) +
-    geom_smooth(method = lm, aes(x = log(population), y = value, color = level), 
+    geom_point(aes(x = log(population), y = value*100, color = level), alpha = 0.25, size = 4) +
+    geom_smooth(method = lm, aes(x = log(population), y = value*100, color = level), 
                 alpha = 0.8, se = FALSE, linewidth = 2.5) +
     ylim(0, 1) + xlim(6, 16) +
     scale_color_manual('Scale', values=c('#41AE76', '#807DBA', '#4292C6')) +
     xlab('Log Population') + 
-    ylab('Stay Probability') +
+    ylab('Stay Probability (%)') +
     ggtitle(' ') +
     theme_minimal() + 
     theme(axis.title = element_text(size=26),
