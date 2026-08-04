@@ -6,7 +6,7 @@
 #            1. Set-up script                                                  #
 #            2. Create the metapopulation model                                #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 

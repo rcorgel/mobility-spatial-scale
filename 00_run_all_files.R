@@ -6,7 +6,7 @@
 #            1. Set-up script                                                  #
 #            2. Run all files                                                  #
 #                                                                              #
-# Project:   Sri Lanka Spatial Aggregation                                     #
+# Project:   Mobility Spatial Scale                                            #
 # Author:    Ronan Corgel                                                      #
 ################################################################################
 
