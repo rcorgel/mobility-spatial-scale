@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05b_table_S.1_missingness                                         #
+# File Name: 05b_table_S1                                                      #
 # Purpose:   Find out which variables are significantly related to missing     # 
 #            data.                                                             #
 # Steps:                                                                       # 

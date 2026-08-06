@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 02b_rescale_phone_mobility_data                                   #
+# File Name: 02b_rescale_mobility_data                                         #
 # Purpose:   Rescale phone mobility data such that travel at finer scales      #
 #            is the same as travel at aggregated scales. This is to isolate    #
 #            the homogeneous mixing assumption.                                #

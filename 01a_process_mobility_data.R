@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 01a_process_phone_mobility_data                                   #
+# File Name: 01a_process_mobility_data                                         #
 #                                                                              #
 # Purpose:   Load and format phone mobility data used in analyses.             #
 # Steps:                                                                       # 

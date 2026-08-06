@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05i_figure_S.5_cluster                                            #
+# File Name: 05i_figure_S5                                                     #
 #                                                                              #
 # Purpose:   Create figure S.5 for the manuscript.                             #
 # Steps:                                                                       # 

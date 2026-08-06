@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05c_figure_2_descriptive                                          #
+# File Name: 05c_figure_2                                                      #
 #                                                                              #
 # Purpose:   Create figure 2 for the manuscript.                               #
 #                                                                              #

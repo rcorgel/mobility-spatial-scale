@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 04a_metapop_results_observed_data                                 #
+# File Name: 04a_metapop_observed_data                                         #
 #                                                                              #
 # Purpose:   Simulate disease dynamics with the observed mobility data.        #
 #            Two introduction scenarios (Colombo & Delft) and three            #

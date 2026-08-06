@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05a_figure_1_overview                                             #
+# File Name: 05a_figure_1                                                      #
 #                                                                              #
 # Purpose:   Create figure 1 for the manuscript.                               #
 # Steps:                                                                       # 

@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 04c_metapop_results_simulated_data                                #
+# File Name: 04c_metapop_simulated_data                                        #
 #                                                                              #
 # Purpose:   Simulate disease dynamics with the simulated mobility data.       #
 #            Two introduction scenarios (Colombo & Delft) and three            #

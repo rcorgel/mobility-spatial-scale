@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05l_figure_5_sensitivity                                          #
+# File Name: 05l_figure_5                                                      #
 #                                                                              #
 # Purpose:   Create figure 5 for the manuscript.                               #
 # Steps:                                                                       # 

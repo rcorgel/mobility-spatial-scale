@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05m_figure_S.7_S.8_mag_sen                                        #
+# File Name: 05m_figure_S7_S8                                                  #
 #                                                                              #
 # Purpose:   Create figures S.7 and S.8 for the manuscript.                    #
 # Steps:                                                                       # 

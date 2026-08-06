@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 02a_format_phone_mobility_data                                    #
+# File Name: 02a_format_mobility_data                                          #
 # Purpose:   Format phone mobility data.                                       #                                                  
 # Steps:                                                                       #
 #         1. Set-up the script                                                 #

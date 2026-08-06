@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 01b_create_mobility_shape_xwalk                                   #
+# File Name: 01b_create_shape_xwalk                                            #
 #                                                                              #
 # Purpose:   Since administrative 3 units are not one to one between the       #
 #            mobility data and the shape files, a crosswalk needs to be        #

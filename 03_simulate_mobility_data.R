@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 03_simulate_mobile_phone_data                                     #
+# File Name: 03_simulate_mobility_data                                         #
 #                                                                              #
 # Purpose:   Simulate mobile phone data OD matrices using mobility models      #
 #            from observed data. DIC and fitted values from this file are      #

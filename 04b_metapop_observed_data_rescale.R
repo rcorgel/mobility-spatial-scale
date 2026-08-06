@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 04b_metapop_results_observed_data_rescale                         #
+# File Name: 04b_metapop_observed_data_rescale                                 #
 #                                                                              #
 # Purpose:   Simulate disease dynamics with the obs. rescaled mobility data.   #
 #            Two introduction scenarios (Colombo & Delft) and three            #

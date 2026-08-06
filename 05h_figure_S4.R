@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05h_figure_S.4_nested_sim                                         #
+# File Name: 05h_figure_S4                                                     #
 #                                                                              #
 # Purpose:   Create figure S.4 for the manuscript.                             #
 # Steps:                                                                       # 

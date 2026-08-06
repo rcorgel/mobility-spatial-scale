@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05e_figure_S.2_internal                                           #
+# File Name: 05e_figure_S2                                                     #
 #                                                                              #
 # Purpose:   Create figure S.2 for the manuscript.                             #
 # Steps:                                                                       # 

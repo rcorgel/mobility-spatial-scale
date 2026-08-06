@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 04d_metapop_results_observed_data_new                             #
+# File Name: 04d_metapop_observed_data_new                                     #
 #                                                                              #
 # Purpose:   Simulate disease dynamics with the observed and rescaled mobility # 
 #            data but under new spatial aggregations. Choose 25 random         #

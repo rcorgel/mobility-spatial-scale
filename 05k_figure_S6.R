@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05k_figure_S.6_example_sim                                        #
+# File Name: 05k_figure_S6                                                     #
 #                                                                              #
 # Purpose:   Create figure S.6 for the manuscript.                             #
 # Steps:                                                                       # 

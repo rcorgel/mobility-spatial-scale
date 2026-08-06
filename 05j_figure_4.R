@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: 05j_figure_4_example                                              #
+# File Name: 05j_figure_4                                                      #
 #                                                                              #
 # Purpose:   Create figure 4 for the manuscript.                               #
 # Steps:                                                                       # 

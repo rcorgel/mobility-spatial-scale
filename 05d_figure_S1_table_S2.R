@@ -1,13 +1,13 @@
 ################################################################################
-# File Name: 05d_table_figure_S.2_corr_comp                                    #
+# File Name: 05d_figure_S1_table_S2                                            #
 #                                                                              #
 # Purpose:   This file contains code for table S.2, figure S.1 as well as      #
 #            text call outs.                                                   #
 #                                                                              #
 # Steps:                                                                       # 
 #            1. Set-up script                                                  #
-#            2. Create figure S.2 and table S.2                                #
-#            3. Create S.2 proportion subfigures                               #
+#            2. Create figure S.1 and table S.2                                #
+#            3. Create S.1 proportion subfigures                               #
 #            4. Combine subfigures                                             #
 #            5. Text callouts                                                  #
 #                                                                              #
@@ -38,7 +38,7 @@ set.seed(12345)
 setwd('/Users/rcorgel/My Drive (rcorgel@gmail.com)/Projects/spatial-resolution-project/')
 
 ######################################
-# 2. CREATE FIGURE S.2 AND TABLE S.2 #
+# 2. CREATE FIGURE S.1 AND TABLE S.2 #
 ######################################
 
 # Load simulated trip count data
@@ -192,7 +192,7 @@ sim_comp_3 <- ggplot(data = adm_3_long_pred) +
   ylab('Simulated Value')
 
 #######################################
-# 3. CREATE S.2 PROPORTION SUBFIGURES #
+# 3. CREATE S.1 PROPORTION SUBFIGURES #
 #######################################
 
 # Load phone mobility data
